@@ -1,0 +1,241 @@
+module Luban
+  module Deployment
+    module Package
+      class Binary < Luban::Deployment::Command
+        using Luban::CLI::CoreRefinements
+
+        class << self
+          def inherited(subclass)
+            super
+            # Ensure package dependencies from base class
+            # got inherited to its subclasses
+
+            subclass.instance_variable_set(
+              '@dependencies',
+              Marshal.load(Marshal.dump(dependencies))
+            )
+          end
+
+          def dependencies
+            @dependencies ||= DependencySet.new
+          end
+
+          def apply_to(version, &blk)
+            dependencies.apply_to(version, &blk)
+          end
+
+          def required_packages_for(version)
+            dependencies.dependencies_for(version)
+          end
+
+          def package_class(package)
+            require_path = package_require_path(package)
+            require require_path
+            package_base_class(require_path)
+          rescue LoadError => e
+            abort "Aborted! Failed to load package #{require_path}: #{e.message}"
+          end
+
+          def worker_class(worker, package: self)
+            if package.is_a?(Class)
+              if package == self
+                super(worker)
+              else
+                package.worker_class(worker)
+              end
+            else
+              package_class(package).worker_class(worker)
+            end
+          end
+
+          protected
+
+          def package_require_path(package_name)
+            package_require_root.join(package_name.to_s.gsub(':', '/'))
+          end
+
+          def package_require_root
+            @default_package_root ||= Pathname.new("luban/deployment/packages")
+          end
+
+          def package_base_class(path)
+            Object.const_get(path.to_s.camelcase, false)
+          end
+        end
+
+        include Luban::Deployment::Parameters::Project
+        include Luban::Deployment::Parameters::Application
+        include Luban::Deployment::Command::Tasks::Install
+
+        attr_reader :current_version
+
+        def package_options; @package_options ||= {}; end
+
+        def update_package_options(version, **opts)
+          unless package_options.has_key?(version)
+            package_options[version] = 
+              { name: name.to_s }.merge!(decompose_version(version))
+          end
+          @current_version = version if opts[:current]
+          package_options[version].merge!(opts)
+        end
+
+        def has_version?(version)
+          package_options.has_key?(version)
+        end
+
+        def decompose_version(version)
+          { major_version: version, patch_level: '' }
+        end
+
+        def versions; package_options.keys; end
+
+        %i(install uninstall cleanup_all update_binstubs
+           get_summary which_current whence_origin).each do |m| 
+          define_task_method(m, worker: :installer)
+        end
+
+        def install_all(args:, opts:)
+          versions.each do |v| 
+            install(args: args, opts: opts.merge(version: v))
+          end
+        end
+
+        def uninstall_all(args:, opts:)
+          versions.each do |v|
+            uninstall(args: args, opts: opts.merge(version: v))
+          end
+        end
+
+        alias_method :uninstall!, :uninstall
+        def uninstall(args:, opts:)
+          servers = select_servers(opts[:roles], opts[:hosts])
+          apps = parent.other_package_users_for(name, opts[:version], servers: servers)
+          if apps.empty? or opts[:force]
+            uninstall!(args: args, opts: opts)
+          else
+            puts "Skipped. #{name}-#{opts[:version]} is being referenced by #{apps.join(', ')}. " +
+                 "use -f to force uninstalling if necessary."
+          end
+        end
+
+        def cleanup(args:, opts:)
+          versions.each do |v|
+            cleanup_all(args: args, opts: opts.merge(version: v))
+          end
+        end
+
+        def binstubs(args:, opts:)
+          if current_version
+            update_binstubs(args: args, opts: opts.merge(version: current_version))
+          else
+            versions.each do |v|
+              update_binstubs(args: args, opts: opts.merge(version: v))
+            end
+          end
+        end
+
+        def show_current(args:, opts:)
+          if current_version
+            print_summary(get_summary(args: args, opts: opts.merge(version: current_version)))
+          else
+            puts "    Warning! No current version of #{display_name} is specified."
+          end
+        end
+
+        def show_summary(args:, opts:)
+          versions.each do |v|
+            print_summary(get_summary(args: args, opts: opts.merge(version: v)))
+          end
+        end
+
+        def which(args:, opts:)
+          if current_version
+            print_summary(which_current(args: args, opts: opts.merge(version: current_version)))
+          else
+            puts "    Warning! No current version of #{display_name} is specified."
+          end
+        end
+
+        def whence(args:, opts:)
+          versions.each do |v|
+            print_summary(whence_origin(args: args, opts: opts.merge(version: v)))
+          end
+        end
+
+        protected
+
+        def set_parameters
+          self.config = parent.config
+        end
+
+        def setup_tasks
+          super
+          setup_install_tasks
+        end
+
+        def compose_task_options(opts)
+          opts = super
+          version = opts[:version]
+          unless version.nil?
+            # Merge package options into task options without nil ones
+            opts = package_options[version].merge(opts.reject { |_, v| v.nil? })
+          end
+          opts
+        end
+
+        def setup_descriptions
+          desc "Manage package #{display_name}"
+          long_desc "Manage the deployment of package #{display_name} in #{parent.class.name}"
+        end
+
+        def setup_install_tasks
+          super
+
+          undef_task :build
+          undef_task :destroy
+
+          _package = self
+          task :install do
+            desc "Install a given version"
+            option :version, "Version to install", short: :v, required: true,
+                   assure: ->(v){ _package.versions.include?(v) }
+            switch :force, "Force to install", short: :f
+            action! :install
+          end
+
+          task :install_all do
+            desc "Install all versions"
+            switch :force, "Force to install", short: :f
+            action! :install_all
+          end
+
+          task :uninstall do
+            desc "Uninstall a given version"
+            option :version, "Version to uninstall", short: :v, required: true,
+                    assure: ->(v){ _package.versions.include?(v) }
+            switch :force, "Force to uninstall", short: :f
+            action! :uninstall
+          end
+
+          task :uninstall_all do
+            desc "Uninstall all versions"
+            switch :force, "Force to uninstall", short: :f, required: true
+            action! :uninstall_all
+          end
+        end
+
+        def print_summary(result)
+          result.each do |entry|
+            s = entry[:summary]
+            puts "  [#{entry[:hostname]}] #{s[:status]} #{s[:name]} #{s[:installed]}"
+            puts "  [#{entry[:hostname]}]      #{s[:executable]}" unless s[:executable].nil?
+            puts "  [#{entry[:hostname]}]    #{s[:alert]}" unless s[:alert].nil?
+          end
+        end
+      end
+
+      Base = Binary
+    end
+  end
+end

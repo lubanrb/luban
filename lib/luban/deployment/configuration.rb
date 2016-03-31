@@ -1,0 +1,5 @@
+require_relative 'configuration/core'
+require_relative 'configuration/filter'
+require_relative 'configuration/question'
+require_relative 'configuration/server'
+require_relative 'configuration/server_set'

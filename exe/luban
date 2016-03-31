@@ -1,0 +1,3 @@
+require "luban"
+
+Luban::Deployment::Runner.new.run
