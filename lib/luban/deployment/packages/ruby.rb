@@ -40,8 +40,8 @@ module Luban
 
         apply_to '>= 1.9.3' do
           before_install do
-            depend_on 'openssl', version: '1.0.2e'
-            depend_on 'yaml', version: '0.1.6'
+            depend_on 'openssl', version: '1.0.2g'
+            #depend_on 'yaml', version: '0.1.6'
           end
         end
 

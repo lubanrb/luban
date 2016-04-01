@@ -83,10 +83,6 @@ module Luban
           capture(:cat, "#{file} 2>/dev/null | openssl md5")
         end
 
-        #def md5_for_dir(dir)
-        #  capture(:tar, "-cf - #{dir} 2>/dev/null | openssl md5")
-        #end
-
         def sudo(*args)
           execute(:sudo, *args)
         end
@@ -139,7 +135,8 @@ module Luban
           match?("grep \"Revision: \" #{file_to_upload}", revision)
         end
 
-        [:test, :make, :within, :with, :as, :execute, :upload!, :download!].each do |cmd|
+        [:test, :make, :within, :with, :as, :execute, 
+         :upload!, :download!].each do |cmd|
           define_method(cmd) do |*args, &blk|
             backend.send(__method__, *args, &blk)
           end
@@ -177,24 +174,6 @@ module Luban
         def method_missing(sym, *args, &blk)
           backend.respond_to?(sym) ? backend.send(sym, *args, &blk) : super
         end
-
-        #def run_cmd(cmd, **opts)
-        #  capture(cmd, compose_cmd(cmd, opts))
-        #end
-
-        #def compose_cmd(cmd, **opts)
-        #  shell = opts[:shell_setup] || shell_setup
-        #  envrc = if opts[:env].nil?
-        #            environment.envrc_file
-        #          else
-        #            environment.env_path.join(opts[:env]).join('.envrc')
-        #          end
-        #  "#{shell} -c \"source #{envrc}; #{try_sudo} env PATH=$PATH #{cmd}\""
-        #end
-
-        #def try_sudo
-        #  use_sudo ? "sudo" : ""
-        #end
       end
     end
   end

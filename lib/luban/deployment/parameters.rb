@@ -37,8 +37,6 @@ module Luban
           production_stages.include?(stage)
         end
 
-        #def user_home; ENV['HOME']; end
-
         protected
 
         def set_default_general_parameters
