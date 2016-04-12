@@ -80,7 +80,7 @@ module Luban
         def setup_password_authen
           host.user, host.password = user, nil if host.user.nil?
           host.password = app.password_for(host.user) if host.password.nil?
-          host.ssh_options[:auth_methods] = %w(keyboard-interactive)
+          host.ssh_options[:auth_methods] = %w(keyboard-interactive password)
         end
 
         def add_authorized_keys
