@@ -25,7 +25,7 @@ module Luban
         end
 
         def cached?
-          file?(src_cache_path)
+          md5_matched?(src_cache_path, src_file_md5)
         end
 
         def validate_download_url
@@ -210,11 +210,11 @@ module Luban
         def install!
           upload_package
           uncompress_package
-          assure_dirs(build_path)
           within build_path do
-            with compose_build_env_variables do
-              build_package
-            end
+            #with compose_build_env_variables do
+            #  build_package
+            #end
+            build_package
           end
           cleanup_build!
         end
@@ -288,7 +288,8 @@ module Luban
         end
 
         def bootstrap_install
-          assure_dirs(etc_path, tmp_path, app_bin_path, install_path, install_log_path)
+          assure_dirs(etc_path, tmp_path, app_bin_path, 
+                      package_tmp_path, install_path, install_log_path)
         end
 
         def download_package!
@@ -300,7 +301,7 @@ module Luban
 
         def upload_package
           info "Uploading #{package_full_name} source package"
-          if file?(src_cache_path)
+          if cached?
             info "#{package_full_name} is uploaded ALREADY"
           else
             upload_package!
