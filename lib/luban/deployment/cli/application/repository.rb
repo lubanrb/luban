@@ -1,8 +1,9 @@
 module Luban
   module Deployment
     class Application
-      class Repository < Luban::Deployment::Worker::Local
+      class Repository < Luban::Deployment::Worker::Base
         using Luban::CLI::CoreRefinements
+        include Luban::Deployment::Worker::Paths::Local
 
         DefaultRevisionSize = 12
 

@@ -1,7 +1,9 @@
 module Luban
   module Deployment
     class Application
-      class Builder < Luban::Deployment::Worker::Remote
+      class Builder < Luban::Deployment::Worker::Base
+        include Luban::Deployment::Worker::Paths::Remote
+
         def envrc_template_file
           @envrc_template_file ||= find_template_file("envrc.erb")
         end
@@ -39,8 +41,8 @@ module Luban
         protected
 
         def bootstrap
-          assure_dirs(etc_path, tmp_path, 
-                      app_bin_path, app_tmp_path,
+          assure_dirs(etc_path, tmp_path, downloads_path,
+                      app_bin_path, app_tmp_path, 
                       releases_path, shared_path)
           assure_linked_dirs
         end

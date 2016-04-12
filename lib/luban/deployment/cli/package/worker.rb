@@ -1,7 +1,9 @@
 module Luban
   module Deployment
     module Package
-      class Worker < Luban::Deployment::Worker::Remote
+      class Worker < Luban::Deployment::Worker::Base
+        include Luban::Deployment::Worker::Paths::Remote
+
         class << self
           def package_class(package)
             Luban::Deployment::Package::Base.package_class(package)
@@ -34,8 +36,16 @@ module Luban
           @package_path ||= luban_install_path.join('pkg', package_name)
         end
 
+        def package_versions_path
+          @package_versions_path ||= package_path.join('versions')
+        end
+
         def package_tmp_path
           @package_tmp_path ||= package_path.join('tmp')
+        end
+
+        def package_downloads_path
+          @package_downloads_path ||= downloads_path.join(package_name)
         end
       end
     end

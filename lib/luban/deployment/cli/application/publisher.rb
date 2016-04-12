@@ -1,7 +1,9 @@
 module Luban
   module Deployment
     class Application
-      class Publisher < Luban::Deployment::Worker::Remote
+      class Publisher < Luban::Deployment::Worker::Base
+        include Luban::Deployment::Worker::Paths::Remote
+
         def release_name; task.opts.release[:name]; end
         def release_tag; task.opts.release[:tag]; end
         def release_package_path; task.opts.release[:path]; end
