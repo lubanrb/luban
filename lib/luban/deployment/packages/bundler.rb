@@ -72,7 +72,7 @@ module Luban
             install_opts = ['--local']
             install_opts << "--no-document" unless install_doc?
             test("#{gem_executable} uninstall bundler -a -x -I >> #{install_log_file_path} 2>&1") and
-            test("#{gem_executable} install #{install_opts.join(' ')} #{src_file_path} >> #{install_log_file_path} 2>&1")
+            test("#{gem_executable} install #{install_opts.join(' ')} #{src_cache_path} >> #{install_log_file_path} 2>&1")
           end
         end
       end

@@ -29,6 +29,10 @@ module Luban
             @tmp_path ||= luban_root_path.join('tmp')
           end
 
+          def downloads_path
+            @downloads_path ||= luban_root_path.join('downloads')
+          end
+
           def project_path
             @project_path ||= env_path.join("#{stage}.#{project}")
           end
@@ -53,16 +57,16 @@ module Luban
             @shared_path ||= app_path.join('shared')
           end
 
-          def luban_install_path
-            @luban_install_path ||= project_path.join('.luban')
-          end
-
           def envrc_file
             @envrc_file ||= app_path.join(".envrc")
           end
 
           def unset_envrc_file
             @unset_envrc_file ||= app_path.join(".unset_envrc")
+          end
+
+          def luban_install_path
+            @luban_install_path ||= project_path.join('.luban')
           end
         end
       end

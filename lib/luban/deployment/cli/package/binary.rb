@@ -90,9 +90,17 @@ module Luban
 
         def versions; package_options.keys; end
 
-        %i(install uninstall cleanup_all update_binstubs
+        define_task_method("download_package", task: :download, worker: :installer, locally: true)
+        define_task_method("install_package", task: :install, worker: :installer)
+
+        %i(uninstall cleanup_all update_binstubs
            get_summary which_current whence_origin).each do |m| 
           define_task_method(m, worker: :installer)
+        end
+
+        def install(args:, opts:)
+          md5 = download_package(args: args, opts: opts)[:md5]
+          install_package(args: args, opts: opts.merge(src_file_md5: md5))
         end
 
         def install_all(args:, opts:)

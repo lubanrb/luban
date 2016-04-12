@@ -58,7 +58,7 @@ module Luban
             luban_root_path Pathname.new(luban_root_path)
           end
           unless luban_root_path.is_a?(Pathname)
-            abort "Aborted! Luban root path should be a String or a Pathname: luban_root_path Pathname.new('/opt/luban')"
+            abort "Aborted! Luban root path should be a String or a Pathname: luban_root_path Pathname.new('#{DefaultLubanRootPath}')"
           end
         end
       end
@@ -70,9 +70,6 @@ module Luban
 
         parameter :process_monitor
         parameter :process_monitor_env
-        parameter :lubhub_protocol
-        parameter :lubhub_host
-        parameter :lubhub_port
 
         parameter :sshkit_backend
         parameter :authen_key_type
@@ -82,26 +79,11 @@ module Luban
         parameter :pty
         parameter :connection_timeout
         parameter :ssh_options
-        parameter :shell_setup
         parameter :use_sudo
-
-        # To download all package sources directly from the package providers,
-        # Just do NOT set any Lubpack related variables.
-        #
-        # To specify the Lubpack of your own, you can
-        #     lubhub_protocol 'http'
-        #     lubhub_host 'your.lubhub.com'
-        #     lubhub_port 8080
-        def lubhub
-          lubhub_host.nil? ? nil : "#{lubhub_protocol}://#{lubhub_host}:#{lubhub_port}"
-        end
-        alias_method :lubhub_repo, :lubhub
 
         protected
 
         def set_default_project_parameters
-          set_default :lubhub_protocol, 'http'
-          set_default :lubhub_port, 8080
           set_default :sshkit_backend, SSHKit::Backend::Netssh
           set_default :authen_key_type, 'rsa'
           set_default :default_env, { path: '$PATH:/usr/local/bin' }
@@ -110,7 +92,6 @@ module Luban
           set_default :pty, false
           set_default :connection_timeout, 30 # second
           set_default :ssh_options, {}
-          set_default :shell_setup, 'bash -l' # Use Bash interactive shell by default
           set_default :use_sudo, false # Turn off sudo by default
 
           setup_default_project_config_finder

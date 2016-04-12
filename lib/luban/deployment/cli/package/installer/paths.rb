@@ -12,40 +12,28 @@ module Luban
           @src_file_extname ||= DefaultSrcFileExtName
         end
 
-        def src_file_path
-          @src_file_path ||= tmp_path.join(src_file_name)
+        def src_cache_path
+          @src_cache_path ||= tmp_path.join(src_file_name)
+        end
+
+        def src_file_path 
+          @src_file_path ||= package_downloads_path.join(src_file_name)
         end
 
         def source_repo
           raise NotImplementedError, "#{self.class.name}#source_repo is an abstract method."
         end
 
-        def download_from_source?
-          lubhub_repo.nil?
-        end
-
-        def download_from_lubhub?
-          !lubhub_repo.nil?
-        end
-
-        def download_repo
-          @download_repo ||= download_from_source? ? source_repo : lubhub_repo
-        end
-
         def source_url_root
           raise NotImplementedError, "#{self.class.name}#source_url_root is an abstract method."
         end
 
-        def download_url_root
-          @download_url_root ||= download_from_source? ? source_url_root : package_name
-        end
-
         def download_url
-          @download_url ||= File.join(download_repo, download_url_root, src_file_name)
+          @download_url ||= File.join(source_repo, source_url_root, src_file_name)
         end
 
         def install_path
-          @install_path ||= package_path.join('versions', package_version)
+          @install_path ||= package_versions_path.join(package_version)
         end
 
         def bin_path

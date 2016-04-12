@@ -4,6 +4,8 @@ module Luban
       class Installer
         class InstallFailure < Luban::Deployment::Error; end
 
+        def src_file_md5; task.opts.src_file_md5; end
+
         def required_packages
           @required_packages ||= 
             self.class.package_class(package_name).
@@ -18,9 +20,35 @@ module Luban
           raise NotImplementedError, "#{self.class.name}#installed? is an abstract method."
         end
 
+        def downloaded?
+          file?(src_file_path)
+        end
+
+        def cached?
+          file?(src_cache_path)
+        end
+
         def validate_download_url
           info "Validating download URL for #{package_full_name}"
           validate_download_url!
+        end
+
+        def download
+          info "Downloading #{package_full_name}"
+          if downloaded?
+            update_result "Skipped! #{package_full_name} has been downloaded ALREADY.",
+                          status: :skipped, md5: md5_for_file(src_file_path)
+          else
+            download_package!
+            if downloaded?
+              update_result "Successfully downloaded #{package_full_name}.",
+                            md5: md5_for_file(src_file_path)
+            else
+              update_result "Failed to download #{package_full_name}. " + 
+                            "Please check install log for details: #{install_log_file_path}",
+                            status: :failed, level: :error
+            end
+          end
         end
 
         def install
@@ -29,9 +57,8 @@ module Luban
             if force?
               install!
             else
-              update_result "Skipped! #{package_full_name} has been installed ALREADY.", 
-                            status: :skipped
-              return
+              return update_result("Skipped! #{package_full_name} has been installed ALREADY.", 
+                                   status: :skipped)
             end
           else
             install!
@@ -146,17 +173,21 @@ module Luban
 
         protected
 
-        def before_install
-          bootstrap
-          unless installed? or file?(src_file_path)
+        def before_download
+          unless downloaded?
+            bootstrap_download
             validate_download_url
           end
+        end
+
+        def before_install
+          bootstrap_install unless installed?
           install_required_packages(:before_install)          
         end
 
         def after_install
           install_required_packages(:after_install)
-          update_binstubs!
+          update_binstubs
         end
 
         def install_required_packages(type)
@@ -177,7 +208,7 @@ module Luban
         end
 
         def install!
-          download_package
+          upload_package
           uncompress_package
           assure_dirs(build_path)
           within build_path do
@@ -252,23 +283,35 @@ module Luban
           end
         end
 
-        def bootstrap
+        def bootstrap_download
+          assure_dirs(package_downloads_path)
+        end
+
+        def bootstrap_install
           assure_dirs(etc_path, tmp_path, app_bin_path, install_path, install_log_path)
         end
 
-        def download_package
-          info "Downloading #{package_full_name} source package"
-          if file?(src_file_path)
-            info "#{package_full_name} is downloaded ALREADY"
-          else
-            download_package!
+        def download_package!
+          unless test(:curl, "-L -o #{src_file_path} #{download_url}")
+            rm(src_file_path)
+            abort_action('download')
           end
         end
 
-        def download_package!
-          unless test("curl -L -o #{src_file_path} #{download_url} >> #{install_log_file_path} 2>&1")
-            rm(src_file_path)
-            abort_action('download')
+        def upload_package
+          info "Uploading #{package_full_name} source package"
+          if file?(src_cache_path)
+            info "#{package_full_name} is uploaded ALREADY"
+          else
+            upload_package!
+          end
+        end
+
+        def upload_package!
+          upload!(src_file_path.to_s, src_cache_path.to_s)
+          unless md5_matched?(src_cache_path, src_file_md5)
+            rm(src_cache_path)
+            abort_action('upload')
           end
         end
 
@@ -278,7 +321,7 @@ module Luban
         end
 
         def uncompress_package!
-          unless test("tar -xzf #{src_file_path} -C #{package_tmp_path} >> #{install_log_file_path} 2>&1")
+          unless test("tar -xzf #{src_cache_path} -C #{package_tmp_path} >> #{install_log_file_path} 2>&1")
             abort_action('uncompress')
           end
         end
