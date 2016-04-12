@@ -10,8 +10,7 @@ module Luban
       def default_rc
         @default_rc ||= { 'luban_roles' => %i(app),
                           'luban_root_path' => Parameters::General::DefaultLubanRootPath,
-                          'stages' => %w(development staging production),
-                          'production_stages' => %w(production)
+                          'stages' => %w(development staging production)
                         }
       end
 
@@ -33,8 +32,7 @@ module Luban
       end
 
       def set_default_parameters
-        %i(luban_roles luban_root_path
-          stages production_stages).each { |p| set_default p, rc[p.to_s] }
+        %i(luban_roles luban_root_path stages).each { |p| set_default p, rc[p.to_s] }
 
         set_default :applications, find_applications
         set_default :project, File.basename(work_dir)

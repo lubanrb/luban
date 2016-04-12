@@ -218,9 +218,8 @@ module Luban
 
       def set_parameters
         copy_parameters_from_parent(
-          :luban_roles, :luban_root_path,
-          :stages, :production_stages, :applications,
-          :work_dir, :apps_path, :user
+          :luban_roles, :luban_root_path, :user,
+          :stages, :applications, :work_dir, :apps_path
         )
       end
 

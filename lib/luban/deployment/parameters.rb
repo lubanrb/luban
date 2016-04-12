@@ -24,7 +24,6 @@ module Luban
         parameter :luban_root_path
 
         parameter :stages
-        parameter :production_stages
         parameter :applications
 
         parameter :work_dir
@@ -32,10 +31,6 @@ module Luban
         parameter :project
         parameter :user
         parameter :config_finder
-
-        def production_stage?(stage)
-          production_stages.include?(stage)
-        end
 
         protected
 
