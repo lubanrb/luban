@@ -4,7 +4,7 @@ module Luban
       class Git < Luban::Deployment::Package::Binary
         apply_to :all do
           before_install do
-            depend_on 'openssl', version: '1.0.2e'
+            depend_on 'openssl', version: '1.0.2g'
           end
         end
 
