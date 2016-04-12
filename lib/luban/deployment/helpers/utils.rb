@@ -1,5 +1,3 @@
-require "digest/md5"
-
 module Luban
   module Deployment
     module Helpers
