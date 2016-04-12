@@ -20,7 +20,7 @@ module Luban
 
             def fetch_revision
               # Use MD5 as the revision
-              capture(:tar, "-cf - #{dir} 2>/dev/null | openssl md5")[0, rev_size]
+              capture(:tar, "-cf - #{clone_path} 2>/dev/null | openssl md5")[0, rev_size]
             end
 
             def clone
