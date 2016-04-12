@@ -1,5 +1,16 @@
 # Change log
 
+## Version 0.3.1 (Apr 13, 2016)
+
+Minor enhancements:
+  * Add SSH auth method "password" in addition to "keyboard-interactive"
+  * Removed support for production stages
+
+Bug fixes:
+  * Ensured pakcage tmp path is created during bootstrapping
+  * Built package without setting up build environment varaibles which are problematic
+  * Checked third-party package download correctly with MD5
+
 ## Version 0.3.0 (Apr 12, 2016)
 
 Minor enhancements:
