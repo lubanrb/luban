@@ -64,7 +64,7 @@ module Luban
         end
 
         module Deploy
-          %i(deploy rollback).each do |action| 
+          %i(deploy).each do |action| 
             define_method(action) do |args:, opts:|
               raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
             end
