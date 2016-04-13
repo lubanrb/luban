@@ -119,6 +119,7 @@ module Luban
           template = File.read(template_file)
 
           if auto_revision and file?(file_to_upload)
+            require 'digest/md5'
             revision = Digest::MD5.hexdigest(template)
             return if revision_match?(file_to_upload, revision)
           end
