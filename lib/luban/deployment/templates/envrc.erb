@@ -1,4 +1,5 @@
-# Project environment activation resource file for <%= stage %>.<%= project %>/<%= application %>
+# Luban environment activation resource file
+# Environment: <%= env_name = "#{stage}.#{project}/#{application}" %>
 # Revision: <%= revision %>
 # Created at <%= Time.now().strftime("%d/%m/%Y %H:%M:%S") %>
 
@@ -10,10 +11,10 @@ echo_line() {
 
 if [ -n "${LUBAN_ROOT:+x}" ]; then
   if [[ "$LUBAN_ROOT" == "<%= app_path %>" ]]; then
-    echo_line "Project environment for <%= project %> has ALREADY been activated!"
+    echo_line "Environment <%= env_name %> has ALREADY been activated!"
   else
     local current_env=${LUBAN_ROOT##*env/}
-    echo_line "Project environment $current_env is STILL active!"
+    echo_line "Environment $current_env is STILL active!"
     echo_line "Please de-activate it first:"
     echo_line "\tunset_lubenv $current_env"
     echo_line "\t\tor"
@@ -25,6 +26,5 @@ else
   export LUBAN_ROOT
   export PATH
 
-  echo_line "Project environment <%= stage %>.<%= project %>/<%= application %> is activated!"
+  echo_line "Environment <%= env_name %> is activated!"
 fi
-

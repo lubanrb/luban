@@ -1,4 +1,5 @@
-# Project environment de-activation resource file for <%= stage %>.<%= project %>/<%= application %>
+# Environment de-activation resource file
+# Environment: <%= env_name = "#{stage}.#{project}/#{application}" %>
 # Revision: <%= revision %>
 # Created at <%= Time.now().strftime("%d/%m/%Y %H:%M:%S") %>
 
@@ -13,16 +14,15 @@ if [ -n "${LUBAN_ROOT:+x}" ]; then
     PATH=${PATH//$LUBAN_ROOT\/bin:/}
     unset LUBAN_ROOT
     export PATH
-    echo_line "Project environment <%= stage %>.<%= project %>/<%= application %> is de-activated!"
+    echo_line "Environment <%= env_name %> is de-activated!"
   else
     local current_env=${LUBAN_ROOT##*env/}
-    echo_line "ACTUALLY, project environment $curent_env is active!"
+    echo_line "ACTUALLY, environment $curent_env is active!"
     echo_line "Please run the following command instead to de-activate it:"
     echo_line "\tunset_lubenv $current_env"
     echo_line "\t\tor"
     echo_line "\tsource $LUBAN_ROOT/.unset_envrc"
   fi
 else
-  echo_line "Project environment <%= stage %>.<%= project %>/<%= application %> has ALREADY been de-activated!"
+  echo_line "Environment <%= env_name %> has ALREADY been de-activated!"
 fi
-
