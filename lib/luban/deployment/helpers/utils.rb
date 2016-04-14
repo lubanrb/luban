@@ -118,7 +118,7 @@ module Luban
         def upload_by_template(file_to_upload:, template_file:, auto_revision: false, **opts)
           template = File.read(template_file)
 
-          if auto_revision and file?(file_to_upload)
+          if auto_revision
             require 'digest/md5'
             revision = Digest::MD5.hexdigest(template)
             return if revision_match?(file_to_upload, revision)
@@ -131,7 +131,7 @@ module Luban
         end
 
         def revision_match?(file_to_upload, revision)
-          match?("grep \"Revision: \" #{file_to_upload}", revision)
+          file?(file_to_upload) and match?("grep \"Revision: \" #{file_to_upload}", revision)
         end
 
         [:test, :make, :within, :with, :as, :execute, 
