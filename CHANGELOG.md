@@ -1,5 +1,15 @@
 # Change log
 
+## Version 0.3.2 (Apr 15, 2016)
+
+Minor enhancements:
+  * Revised envrc and unset_envrc resource files
+  * Refactored promptless authen and environment bootstrap to task #setup from task #build
+
+Bug fixes:
+  * Made required package current one to use in order to ensure proper binstubs generation
+  * Fixed revision calculation
+
 ## Version 0.3.1 (Apr 13, 2016)
 
 Minor enhancements:
