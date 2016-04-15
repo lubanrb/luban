@@ -16,6 +16,11 @@ module Luban
 
           def setup_install_tasks
             _self = self
+            task :setup do
+              desc "Setup #{_self.display_name} environment"
+              action! :setup
+            end
+
             task :build do
               desc "Build #{_self.display_name} environment"
               switch :force, "Force to build", short: :f

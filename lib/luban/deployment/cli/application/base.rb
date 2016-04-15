@@ -61,10 +61,14 @@ module Luban
         promptless_authen!(args: args, opts: opts)
       end
 
-      def build(args:, opts:)
+      def setup(args:, opts:)
         show_app_environment
         promptless_authen(args: args, opts: opts)
         build!(args: args, opts: opts)
+      end
+
+      def build(args:, opts:)
+        show_app_environment
         install_all(args: args, opts: opts)
         build_repositories(args: args, opts: opts)
       end
