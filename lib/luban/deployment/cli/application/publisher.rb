@@ -90,7 +90,7 @@ module Luban
 
         def after_publish
           create_symlinks
-          bundle_gems
+          bundle_gems unless gems.empty?
         end
 
         protected
