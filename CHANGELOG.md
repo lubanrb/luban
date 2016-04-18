@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.3.3 (Apr 18, 2016)
+
+Bug fixes:
+  * Properly handled running luban command-line out of any Luban projects
+  * Skip bundling if no gems to be bundled
+
 ## Version 0.3.2 (Apr 15, 2016)
 
 Minor enhancements:
