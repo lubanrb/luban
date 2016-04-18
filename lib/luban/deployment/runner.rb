@@ -24,11 +24,11 @@ module Luban
 
       def on_configure
         super
-        set_work_dir
-        load_configuration_file(config_file)
-        set_default_parameters
-        load_libraries
-        setup_cli
+        if set_work_dir
+          setup_cli_with_projects
+        else
+          setup_cli_without_projects
+        end
       end
 
       def set_default_parameters
@@ -45,9 +45,7 @@ module Luban
 
       def set_work_dir
         project_root = find_lubanfile
-        if project_root.nil?
-          abort "Aborted! NOT a Luban project (or any of the parent directories): #{lubanfile} is NOT found."
-        else
+        unless project_root.nil?
           work_dir Pathname.new(project_root)
           apps_path work_dir.join('apps')
         end
@@ -73,7 +71,11 @@ module Luban
         Object.const_get(project.camelcase)
       end
 
-      def setup_cli
+      def setup_cli_with_projects
+        load_configuration_file(config_file)
+        set_default_parameters
+        load_libraries
+
         version Luban::Deployment::VERSION
         desc "Manage the deployment of project #{project.camelcase}"
         setup_projects
@@ -91,6 +93,14 @@ module Luban
       def project_class(stg)
         mod = Object.const_set(stg.camelcase, Module.new)
         mod.const_set(project.camelcase, Class.new(project_base_class))
+      end
+
+      def setup_cli_without_projects
+        version Luban::Deployment::VERSION
+        desc "Framework to manage project deployment"
+        action do
+          abort "Aborted! NOT a Luban project (or any of the parent directories): #{lubanfile} is NOT found."
+        end
       end
     end
   end
