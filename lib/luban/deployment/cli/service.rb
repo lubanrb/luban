@@ -1,0 +1,5 @@
+require_relative 'service/base'
+require_relative 'service/worker'
+require_relative 'service/installer'
+require_relative 'service/configurator'
+require_relative 'service/controller'

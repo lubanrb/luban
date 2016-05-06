@@ -1,6 +1,5 @@
 require_relative 'package/dependency'
 require_relative 'package/dependency_set'
-require_relative 'package/binary'
-require_relative 'package/service'
+require_relative 'package/base'
 require_relative 'package/worker'
 require_relative 'package/installer'

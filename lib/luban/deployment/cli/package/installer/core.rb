@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     module Package
-      class Installer < Worker
+      class Installer
         # Shared library file extension name based on OS
         LibExtensions = { 
           Linux:  'so',   # Linux

@@ -60,7 +60,7 @@ module Luban
           task.result.tap do |r|
             r.status = status
             r.level = level
-            r.message = message unless message.nil?
+            r.message = message unless message.nil? or !r.message.nil?
             attrs.each_pair { |k, v| r.send("#{k}=", v) }
             send(level, message) unless message.nil? or message.empty?  
           end

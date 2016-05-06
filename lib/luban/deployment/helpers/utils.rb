@@ -131,7 +131,7 @@ module Luban
         end
 
         def revision_match?(file_to_upload, revision)
-          file?(file_to_upload) and match?("grep \"Revision: \" #{file_to_upload}", revision)
+          file?(file_to_upload) and match?("grep \"Revision: \" #{file_to_upload}; true", revision)
         end
 
         [:test, :make, :within, :with, :as, :execute, 
@@ -142,7 +142,7 @@ module Luban
         end
 
         def capture(*args, &blk)
-          backend.capture(*args, &blk).chomp
+          backend.capture(*args, raise_on_non_zero_exit: false, &blk).chomp
         end
 
         def md5_matched?(file_path, md5)

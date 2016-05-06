@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     module Packages
-      class Rubygems < Luban::Deployment::Package::Binary
+      class Rubygems < Luban::Deployment::Package::Base
         protected
 
         def setup_install_tasks
@@ -22,10 +22,8 @@ module Luban
             parent.install_path
           end
           
-          def rubygems_executable
-            @rubygems_executable ||= bin_path.join('gem')
-          end
-
+          default_executable 'gem'
+          
           def ruby_executable
             parent.ruby_executable
           end
@@ -44,8 +42,8 @@ module Luban
           end
 
           def installed?
-            return false unless file?(rubygems_executable)
-            match?("#{rubygems_executable} -v", package_version)
+            return false unless file?(gem_executable)
+            match?("#{gem_executable} -v", package_version)
           end
 
           protected

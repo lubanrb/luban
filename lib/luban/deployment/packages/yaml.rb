@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     module Packages
-      class Yaml < Luban::Deployment::Package::Binary
+      class Yaml < Luban::Deployment::Package::Base
         class Installer < Luban::Deployment::Package::Installer
           def header_file
             @header_file ||= include_path.join('yaml.h')

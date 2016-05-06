@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     module Packages
-      class Openssl < Luban::Deployment::Package::Binary
+      class Openssl < Luban::Deployment::Package::Base
         class Installer < Luban::Deployment::Package::Installer
           OSXArchArgs = {
             x86_64: %w(darwin64-x86_64-cc enable-ec_nistp_64_gcc_128),
@@ -13,9 +13,7 @@ module Luban
             
           end
 
-          def openssl_executable
-            @openssl_executable ||= bin_path.join('openssl')
-          end
+          default_executable 'openssl'
 
           def source_repo
             #@source_repo ||= "https://www.openssl.org"

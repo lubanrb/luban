@@ -70,10 +70,12 @@ module Luban
 
         def find_template_file(file_name)
           path = find_template_file_by_config_finder(file_name) ||
-                 find_default_template_file(file_name)
+                 Finder.find_default_template_file(file_name)
           raise RuntimeError, "Template file is NOT found: #{file_name}." if path.nil?
           path
         end
+
+        def default_templates_paths; Finder.default_templates_paths; end
 
         protected
 
@@ -82,19 +84,48 @@ module Luban
                  config_finder[:project].find_template_file(file_name)
         end
 
-        def find_default_template_file(file_name)
-          path = File.expand_path(File.join(File.dirname(__FILE__), '..', 
-                                            'templates', file_name))
-          return path if File.file?(path)
-        end
-
         class Finder
+          def self.default_templates_paths
+            @default_templates_paths ||= 
+              [Pathname.new(File.join(File.dirname(__FILE__), '..', 'templates')).realpath]
+          end
+
+          def self.find_default_template_file(file_name)
+            path = default_templates_paths.find { |p| p.join(file_name).file? }
+            return path.join(file_name) unless path.nil?
+          end
+
           class Project < Finder
             def base_path; base_path ||= target.work_dir; end
           end
 
           class Application < Finder
+            attr_reader :profile_templates_path
+            attr_reader :stage_profile_path
+            attr_reader :stage_profile_templates_path
+
             def base_path; base_path ||= target.apps_path.join(target.application); end
+
+            def has_profile?
+              stage_profile_templates_path.directory? or
+              stage_profile_path.directory? or
+              profile_templates_path.directory?
+            end
+
+            def find_template_file(file_name)
+              return file_path if (file_path = stage_profile_templates_path.join(file_name)).file?
+              return file_path if (file_path = profile_templates_path.join(file_name)).file?
+              super
+            end
+
+            protected
+
+            def set_config_paths
+              super
+              @profile_templates_path = @templates_path.join('profile')
+              @stage_profile_path = @stage_config_path.join('profile')
+              @stage_profile_templates_path = @stage_templates_path.join('profile')
+            end
           end
 
           def self.project(target); Project.new(target); end
@@ -137,8 +168,8 @@ module Luban
           end
 
           def find_template_file(file_name)
-            return file_path if File.file?(file_path = stage_templates_path.join(file_name))
-            return file_path if File.file?(file_path = templates_path.join(file_name))
+            return file_path if (file_path = stage_templates_path.join(file_name)).file?
+            return file_path if (file_path = templates_path.join(file_name)).file?
           end
 
           protected

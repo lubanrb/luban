@@ -25,6 +25,10 @@ module Luban
             @etc_path ||= luban_root_path.join('etc')
           end
 
+          def logrotate_path
+            @logrotate_path = etc_path.join('logrotate')
+          end
+
           def tmp_path
             @tmp_path ||= luban_root_path.join('tmp')
           end
@@ -67,6 +71,52 @@ module Luban
 
           def luban_install_path
             @luban_install_path ||= project_path.join('.luban')
+          end
+
+          module Service
+            def profile_path
+              @profile_path ||= shared_path.join('profile')
+            end
+
+            def log_path
+              @log_path ||= shared_path.join('log')
+            end
+
+            def log_file_path
+              @log_file_path ||= log_path.join(log_file_name)
+            end
+
+            def log_file_name
+              raise NotImplementedError, "#{self.class.name}#log_file_name is an abstract method."
+            end
+
+            def pids_path
+              @pids_path ||= shared_path.join('pids')
+            end
+
+            def pid_file_path
+              @pid_file_path ||= pids_path.join(pid_file_name)
+            end
+
+            def pid_file_name
+              raise NotImplementedError, "#{self.class.name}#pid_file_name is an abstract method."
+            end
+
+            def control_file_path
+              @control_file_path ||= profile_path.join(control_file_name)
+            end
+
+            def control_file_name
+              raise NotImplementedError, "#{self.class.name}#control_file_name is an abstract method."
+            end
+
+            def logrotate_file_path
+              @logrotate_file_path ||= profile_path.join(logrotate_file_name)
+            end
+
+            def logrotate_file_name
+              raise NotImplementedError, "#{self.class.name}#logrotate_file_name is an abstract method."
+            end
           end
         end
       end

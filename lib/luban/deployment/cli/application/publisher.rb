@@ -120,18 +120,18 @@ module Luban
 
         def create_symlinks
           send("create_#{release_name}_symlinks")
-        end
-
-        def create_profile_symlinks
-          create_release_symlink(shared_path)
           create_shared_symlinks_for(:directory, linked_dirs)
           create_shared_symlinks_for(:directory, bundle_linked_dirs) if file?(gemfile)
         end
 
+        def create_profile_symlinks
+          create_release_symlink(shared_path)
+          create_etc_symlinks
+        end
+
         def create_app_symlinks
           create_release_symlink(app_path)
-          create_shared_symlinks_for(:directory, linked_dirs | %w(profile))
-          create_shared_symlinks_for(:directory, bundle_linked_dirs) if file?(gemfile)
+          create_shared_symlinks_for(:directory, %w(profile))
           create_shared_symlinks_for(:file, linked_files)
         end
 
@@ -145,6 +145,17 @@ module Luban
             assure_dirs(target_path.dirname)
             source_path = shared_path.join(path)
             assure_symlink(source_path, target_path)
+          end
+        end
+
+        def create_etc_symlinks
+          create_logrotate_symlinks
+        end
+
+        def create_logrotate_symlinks
+          logrotate_files.each do |path|
+            target_file = "#{stage}.#{project}.#{application}.#{path.basename}"
+            assure_symlink(path, logrotate_path.join(target_file))
           end
         end
 
