@@ -3,8 +3,9 @@ module Luban
     class Command < Luban::CLI::Command
       module Tasks
         module Install
-          %i(build destroy cleanup binstubs
-             show_current show_summary which whence).each do |action|
+          Actions = %i(setup build destroy cleanup binstubs
+                       show_current show_summary which whence)
+          Actions.each do |action|
             define_method(action) do |args:, opts:|
               raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
             end
@@ -69,7 +70,8 @@ module Luban
         end
 
         module Deploy
-          %i(deploy).each do |action| 
+          Actions = %i(deploy)
+          Actions.each do |action|
             define_method(action) do |args:, opts:|
               raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
             end
@@ -88,9 +90,10 @@ module Luban
         end
 
         module Control
-          %i(start_process stop_process restart_process
-             show_process_status test_process 
-             monitor_process unmonitor_process).each do |action|
+          Actions = %i(start_process stop_process kill_process
+                       restart_process check_process
+                       monitor_process unmonitor_process)
+          Actions.each do |action|
             define_method(action) do |args:, opts:|
               raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
             end
@@ -116,14 +119,14 @@ module Luban
               action! :restart_process
             end
 
-            task :status do
-              desc "Show process status"
-              action! :show_process_status
+            task :kill do
+              desc "Kill process forcely"
+              action! :kill_process
             end
 
-            task :test do
-              desc "Test process"
-              action! :test_process
+            task :status do
+              desc "Check process status"
+              action! :check_process
             end
 
             task :monitor do
@@ -151,7 +154,7 @@ module Luban
 
       def task(cmd, **opts, &blk)
         command(cmd, **opts, &blk).tap do |c|
-        add_common_task_options(c)
+          add_common_task_options(c)
           if !c.summary.nil? and c.description.empty?
             c.long_desc "#{c.summary} in #{self.class.name}"
           end
@@ -174,10 +177,10 @@ module Luban
           end
         end
 
-        def define_task_method(method, task: method, worker:, locally: false, &blk)
-          define_method(method) do |args:, opts:|
-            run_task(cmd: task, args: args, opts: opts, locally: locally,
-                     worker_class: self.class.worker_class(worker), &blk)
+        def dispatch_task(task, to:, as: task, locally: false, &blk)
+          define_method(task) do |args:, opts:|
+            run_task(cmd: as, args: args, opts: opts, locally: locally,
+                     worker_class: self.class.worker_class(to), &blk)
           end
         end
       end
@@ -198,6 +201,7 @@ module Luban
             r = worker_class.new(task_msg.merge(backend: backend), &blk).run
           rescue StandardError => e
             r = {
+              hostname: backend.host.hostname,
               status: :failed,
               message: backtrace ? "#{e.message}\n#{e.backtrace.join("\n")}" : e.message,
               error: e
@@ -263,8 +267,8 @@ module Luban
         setup_control_tasks if controllable?
       end
 
-      %i(install deploy control).each do |operation|
-        define_method("setup_#{operation}_tasks") do
+      %i(install deploy control).each do |action|
+        define_method("setup_#{action}_tasks") do
           raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
         end
       end
@@ -339,9 +343,12 @@ module Luban
           sshkit.backend.configure do |backend|
             backend.pty                = pty
             backend.connection_timeout = connection_timeout
-            backend.ssh_options        = 
-              backend.ssh_options.merge(user: user).merge!(ssh_options)
+            if backend.respond_to?(:ssh_options)
+              backend.ssh_options        = 
+                backend.ssh_options.merge(user: user).merge!(ssh_options)
+            end
           end
+          #bundle_bins.each { |cmd| sshkit.command_map.prefix[cmd.to_sym].push("bundle exec") }
         end
 
         configure_airbrussh if format == :airbrussh

@@ -36,9 +36,7 @@ module Luban
         end
       end
 
-      %i(build destroy_project cleanup binstubs
-         show_current show_summary which whence
-        ).each do |action|
+      (Luban::Deployment::Command::Tasks::Install::Actions | %i(destroy_project)).each do |action|
         define_method(action) do |args:, opts:|
           apps.each_value do |app|
             app.send(__method__, args: args, opts: opts) if app.installable?
@@ -47,6 +45,22 @@ module Luban
       end
 
       alias_method :destroy, :destroy_project
+
+      Luban::Deployment::Command::Tasks::Deploy::Actions.each do |action|
+        define_method(action) do |args:, opts:|
+          apps.each_value do |app|
+            app.send(__method__, args: args, opts: opts) if app.deployable?
+          end
+        end
+      end
+
+      Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
+        define_method(action) do |args:, opts:|
+          apps.each_value do |app|
+            app.send(__method__, args: args, opts: opts) if app.controllable?
+          end
+        end
+      end
 
       protected
 
