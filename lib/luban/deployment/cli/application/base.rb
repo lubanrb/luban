@@ -40,7 +40,7 @@ module Luban
                 command(name, base: Luban::Deployment::Package::Base.package_class(name))
               end
         pkg.update_package_options(version, opts)
-        services[name] = pkg if pkg.is_a?(Luban::Deployment::Package::Service)
+        services[name] = pkg if pkg.is_a?(Luban::Deployment::Service::Base)
         packages[name] = pkg
       end
       alias_method :require_package, :package
@@ -84,7 +84,8 @@ module Luban
         end
       end
 
-      %i(cleanup binstubs show_current show_summary which whence).each do |action|
+      (Luban::Deployment::Command::Tasks::Install::Actions - 
+       %i(setup build destroy)).each do |action|
         define_method(action) do |args:, opts:|
           show_app_environment
           packages.each_value { |p| p.send(__method__, args: args, opts: opts) }
@@ -104,7 +105,15 @@ module Luban
 
       def deploy(args:, opts:)
         show_app_environment
-        deploy_releases(args: args, opts: opts)
+        deploy_profile(args: args, opts: opts) if has_profile?
+        deploy_release(args: args, opts: opts) if has_source?
+      end
+
+      Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
+        define_method(action) do |args:, opts:|
+          show_app_environment
+          services.each_value { |s| s.send(__method__, args: args, opts: opts) }
+        end
       end
 
       protected
@@ -133,8 +142,9 @@ module Luban
       end
 
       def set_default_profile
-        profile_path = config_finder[:application].stage_config_path.join('profile')
-        profile(profile_path, scm: :rsync) if profile_path.directory?
+        if config_finder[:application].has_profile?
+          profile(config_finder[:application].stage_profile_path, scm: :rsync) 
+        end
       end
 
       def load_configuration
@@ -151,8 +161,8 @@ module Luban
         puts "#{display_name} in #{parent.class.name}"
       end
 
-      %i(build destroy cleanup).each do |m|
-        define_task_method("#{m}!", task: m, worker: :builder)
+      %i(build destroy cleanup).each do |task|
+        dispatch_task "#{task}!", to: :builder, as: task
       end
 
       def build_repositories(args:, opts:)
@@ -160,24 +170,33 @@ module Luban
         build_repository!(args: args, opts: opts.merge(repository: source)) if has_source?
       end
 
-      def deploy_releases(args:, opts:)
-        deploy_release(args: args, opts: opts.merge(repository: profile)) if has_profile?
-        deploy_release(args: args, opts: opts.merge(repository: source)) if has_source?
+      def deploy_profile(args:, opts:)
+        update_profile!(args: args, opts: opts)
+        deploy_profile!(args: args, opts: opts.merge(repository: profile))
+      end
+
+      def update_profile!(args:, opts:)
+        services.each_value { |s| s.send(:update_profile, args: args, opts: opts) }
       end
 
       def deploy_release(args:, opts:)
+        deploy_release!(args: args, opts: opts.merge(repository: source))
+      end
+
+      def deploy_release!(args:, opts:)
         package_release!(args: args, opts: opts)[:release].tap do |release|
           unless release.nil?
             publish_release!(args: args, opts: opts.merge(release: release))
           end
         end
       end
+      alias_method :deploy_profile!, :deploy_release!
 
-      define_task_method("promptless_authen!", task: :promptless_authen, worker: :authenticator)
-      define_task_method("public_key!", task: :public_key, worker: :authenticator, locally: true)
-      define_task_method("build_repository!", task: :build, worker: :repository, locally: true)
-      define_task_method("package_release!", task: :package, worker: :repository, locally: true)
-      define_task_method("publish_release!", task: :publish, worker: :publisher)
+      dispatch_task :promptless_authen!, to: :authenticator, as: :promptless_authen
+      dispatch_task :public_key!, to: :authenticator, as: :public_key, locally: true
+      dispatch_task :build_repository!, to: :repository, as: :build, locally: true
+      dispatch_task :package_release!, to: :repository, as: :package, locally: true
+      dispatch_task :publish_release!, to: :publisher, as: :publish
     end
   end
 end
