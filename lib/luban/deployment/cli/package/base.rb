@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     module Package
-      class Binary < Luban::Deployment::Command
+      class Base < Luban::Deployment::Command
         using Luban::CLI::CoreRefinements
 
         class << self
@@ -90,12 +90,12 @@ module Luban
 
         def versions; package_options.keys; end
 
-        define_task_method("download_package", task: :download, worker: :installer, locally: true)
-        define_task_method("install_package", task: :install, worker: :installer)
+        dispatch_task :download_package, to: :installer, as: :download, locally: true
+        dispatch_task :install_package, to: :installer, as: :install
 
         %i(uninstall cleanup_all update_binstubs
-           get_summary which_current whence_origin).each do |m| 
-          define_task_method(m, worker: :installer)
+           get_summary which_current whence_origin).each do |task|
+          dispatch_task task, to: :installer
         end
 
         def install(args:, opts:)
@@ -200,6 +200,7 @@ module Luban
         def setup_install_tasks
           super
 
+          undef_task :setup
           undef_task :build
           undef_task :destroy
 
@@ -242,8 +243,6 @@ module Luban
           end
         end
       end
-
-      Base = Binary
     end
   end
 end
