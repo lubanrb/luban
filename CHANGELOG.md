@@ -1,5 +1,20 @@
 # Change log
 
+## Version 0.3.5 (May 06, 2016)
+
+New features:
+  * Created Luban::Deployment::Service::Base to handle service package deployment
+  * Added logrotate support
+  * Generated profile locally before publishing to remote servers for a given service package
+
+Minor enhancements:
+  * Renamed Luban::Deployment::Package::Binary to Luban::Deployment::Package::Base for clarity
+  * Added convenient class method #default_executable to define executable method for a given package
+  * Minor code refactoring and cleanup
+
+Bug fixes:
+  * Fixed a bug in md5 calculation on a given folder
+
 ## Version 0.3.3 (Apr 18, 2016)
 
 Bug fixes:
@@ -19,7 +34,7 @@ Bug fixes:
 ## Version 0.3.1 (Apr 13, 2016)
 
 Minor enhancements:
-  * Add SSH auth method "password" in addition to "keyboard-interactive"
+  * Added SSH auth method "password" in addition to "keyboard-interactive"
   * Removed support for production stages
 
 Bug fixes:
