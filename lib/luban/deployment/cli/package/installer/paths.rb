@@ -32,14 +32,6 @@ module Luban
           @download_url ||= File.join(source_repo, source_url_root, src_file_name)
         end
 
-        def install_path
-          @install_path ||= package_versions_path.join(package_version)
-        end
-
-        def bin_path
-          @bin_path ||= install_path.join('bin')
-        end
-
         def lib_path
           @lib_path ||= install_path.join('lib')
         end
