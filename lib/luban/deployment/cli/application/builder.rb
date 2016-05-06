@@ -41,8 +41,8 @@ module Luban
         protected
 
         def bootstrap
-          assure_dirs(etc_path, tmp_path, downloads_path,
-                      app_bin_path, app_tmp_path, 
+          assure_dirs(logrotate_path, downloads_path,
+                      tmp_path, app_bin_path, app_tmp_path, 
                       releases_path, shared_path)
           assure_linked_dirs
         end

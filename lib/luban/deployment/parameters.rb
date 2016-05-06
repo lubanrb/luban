@@ -108,6 +108,7 @@ module Luban
         parameter :keep_releases
         parameter :linked_dirs
         parameter :linked_files
+        parameter :logrotate_files
 
         protected
 
@@ -116,6 +117,7 @@ module Luban
           set_default :keep_releases, 3
           set_default :linked_dirs, []
           set_default :linked_files, []
+          set_default :logrotate_files, []
 
           setup_default_application_config_finder
         end
