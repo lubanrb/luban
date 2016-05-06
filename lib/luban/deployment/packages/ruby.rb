@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     module Packages
-      class Ruby < Luban::Deployment::Package::Binary
+      class Ruby < Luban::Deployment::Package::Base
         apply_to '1.8.6' do
           after_install do
             depend_on 'rubygems', version: '1.3.7'
@@ -73,9 +73,7 @@ module Luban
             task.opts.install_doc
           end
 
-          def ruby_executable
-            @ruby_executable ||= bin_path.join('ruby')
-          end
+          default_executable 'ruby'
 
           def gem_executable
             @gem_executable ||= bin_path.join('gem')

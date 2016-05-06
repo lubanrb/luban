@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     module Packages
-      class Bundler < Luban::Deployment::Package::Binary
+      class Bundler < Luban::Deployment::Package::Base
         protected
 
         def setup_install_tasks
@@ -26,9 +26,7 @@ module Luban
             parent.install_path
           end
 
-          def bundler_executable
-            @bundler_executable ||= bin_path.join('bundle')
-          end
+          default_executable 'bundler'
 
           def gem_executable
             parent.gem_executable

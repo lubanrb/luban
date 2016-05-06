@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     module Packages
-      class Git < Luban::Deployment::Package::Binary
+      class Git < Luban::Deployment::Package::Base
         apply_to :all do
           before_install do
             depend_on 'openssl', version: '1.0.2g'
@@ -9,9 +9,7 @@ module Luban
         end
 
         class Installer < Luban::Deployment::Package::Installer
-          def git_executable
-            @git_executable ||= bin_path.join('git')
-          end
+          default_executable 'git'
 
           def source_repo
             @source_repo ||= "https://www.kernel.org"

@@ -12,6 +12,12 @@ module Luban
           def worker_class(worker, **opts)
             Luban::Deployment::Package::Base.worker_class(worker, **opts)
           end
+
+          def default_executable(name)
+            define_method("#{name}_executable") do
+              @default_executable ||= bin_path.join(name)
+            end
+          end
         end
 
         def package_name; task.opts.name; end
@@ -38,6 +44,14 @@ module Luban
 
         def package_versions_path
           @package_versions_path ||= package_path.join('versions')
+        end
+
+        def install_path
+          @install_path ||= package_versions_path.join(package_version)
+        end
+
+        def bin_path
+          @bin_path ||= install_path.join('bin')
         end
 
         def package_tmp_path
