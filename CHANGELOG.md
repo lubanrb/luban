@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.3.6 (May 09, 2016)
+
+Minor enhancements:
+  * Upgraded OpenSSL to 1.0.2h for Git installer
+  * Upgraded OpenSSL to 1.0.2h for Ruby installer
+
 ## Version 0.3.5 (May 06, 2016)
 
 New features:
