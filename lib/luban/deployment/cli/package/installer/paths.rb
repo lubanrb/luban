@@ -20,6 +20,10 @@ module Luban
           @src_file_path ||= package_downloads_path.join(src_file_name)
         end
 
+        def src_md5_file_path
+          @src_md5_file_path ||= package_downloads_path.join("#{src_file_name}.md5")
+        end
+
         def source_repo
           raise NotImplementedError, "#{self.class.name}#source_repo is an abstract method."
         end

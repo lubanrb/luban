@@ -99,8 +99,8 @@ module Luban
         end
 
         def install(args:, opts:)
-          md5 = download_package(args: args, opts: opts)[:md5]
-          install_package(args: args, opts: opts.merge(src_file_md5: md5))
+          download_package(args: args, opts: opts)
+          install_package(args: args, opts: opts)
         end
 
         def install_all(args:, opts:)

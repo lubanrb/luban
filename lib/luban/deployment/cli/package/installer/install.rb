@@ -4,7 +4,9 @@ module Luban
       class Installer
         class InstallFailure < Luban::Deployment::Error; end
 
-        def src_file_md5; task.opts.src_file_md5; end
+        def src_file_md5
+          @src_file_md5 ||= capture(:cat, src_md5_file_path)
+        end
 
         def required_packages
           @required_packages ||= 
@@ -36,13 +38,13 @@ module Luban
         def download
           info "Downloading #{package_full_name}"
           if downloaded?
-            update_result "Skipped! #{package_full_name} has been downloaded ALREADY.",
-                          status: :skipped, md5: md5_for_file(src_file_path)
+            create_src_md5_file unless file?(src_md5_file_path)
+            update_result "Skipped! #{package_full_name} has been downloaded ALREADY."
           else
             download_package!
             if downloaded?
-              update_result "Successfully downloaded #{package_full_name}.",
-                            md5: md5_for_file(src_file_path)
+              create_src_md5_file unless file?(src_md5_file_path)
+              update_result "Successfully downloaded #{package_full_name}."
             else
               update_result "Failed to download #{package_full_name}. " + 
                             "Please check install log for details: #{install_log_file_path}",
@@ -178,6 +180,25 @@ module Luban
             bootstrap_download
             validate_download_url
           end
+          download_required_packages(:before_install)
+        end
+
+        def after_download
+          download_required_packages(:after_install)
+        end
+
+        def download_required_packages(type)
+          manage_required_packages(type, :download)
+        end
+
+        def manage_required_packages(type, cmd)
+          required_packages[type].each do |d|
+            self.class.worker_class(:installer, package: d.name).new(
+              config: config, backend: backend,
+              cmd: cmd, args: {},
+              opts: d.options.merge(name: d.name, version: d.version, current: true, parent: self)
+            ).run
+          end
         end
 
         def before_install
@@ -191,13 +212,7 @@ module Luban
         end
 
         def install_required_packages(type)
-          required_packages[type].each do |d|
-            self.class.worker_class(:installer, package: d.name).new(
-              config: config, backend: backend, 
-              cmd: :install, args: {}, 
-              opts: d.options.merge(name: d.name, version: d.version, current: true, parent: self)
-            ).run
-          end
+          manage_required_packages(type, :install)
         end
 
         def validate_download_url!
@@ -210,12 +225,7 @@ module Luban
         def install!
           upload_package
           uncompress_package
-          within build_path do
-            #with compose_build_env_variables do
-            #  build_package
-            #end
-            build_package
-          end
+          build_package
           cleanup_build!
         end
 
@@ -299,6 +309,10 @@ module Luban
           end
         end
 
+        def create_src_md5_file
+          execute(:echo, "#{md5_for_file(src_file_path)} > #{src_md5_file_path}")
+        end
+
         def upload_package
           info "Uploading #{package_full_name} source package"
           if cached?
@@ -328,9 +342,11 @@ module Luban
         end
 
         def build_package
-          configure_package
-          make_package
-          install_package
+          within build_path do
+            configure_package
+            make_package
+            install_package
+          end
         end
 
         def configure_package

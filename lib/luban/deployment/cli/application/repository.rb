@@ -158,9 +158,18 @@ module Luban
                 info "Package gems bundled in Gemfile"
                 execute(:bundle, :package, "--all --quiet")
               end
-              gem_files = capture(:ls, '-xt', gems_cache).split
+              gem_files = capture(:ls, '-xt', gems_cache.join('*.gem')).split
               gem_files.each do |gem_file|
-                gems[gem_file] = md5_for_file(gems_cache.join(gem_file))
+                gem_name = File.basename(gem_file)
+                md5_file = "#{gem_file}.md5"
+                gems[gem_name] =
+                  if file?(md5_file)
+                    gems[gem_name] = capture(:cat, md5_file)
+                  else
+                    md5_for_file(gem_file).tap { |md5|
+                      execute(:echo, "#{md5} > #{md5_file}")
+                    }
+                  end
               end
             end
             bundled_gems[:gems_cache] = workspace_path.join(gems_cache)
