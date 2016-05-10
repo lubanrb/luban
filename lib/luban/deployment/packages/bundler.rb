@@ -64,6 +64,7 @@ module Luban
           def uncompress_package; end
           def configure_package; end
           def make_package; end
+          def build_package; install_package; end
           def update_binstubs!; end
 
           def install_package!
