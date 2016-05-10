@@ -47,7 +47,7 @@ module Luban
 
         apply_to :all do
           after_install do
-            depend_on 'bundler', version: '1.11.2'
+            depend_on 'bundler', version: '1.12.3'
           end
         end
         
