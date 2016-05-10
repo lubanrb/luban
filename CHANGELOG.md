@@ -1,5 +1,16 @@
 # Change log
 
+## Version 0.4.0 (May 11, 2016)
+
+Minor enhancements:
+  * Upgraded Bundler for Ruby to version 1.12.3
+  * Used OpenSSL ftp site to download its source code package
+  * Optimized md5 signature generation for both source code package as well as gems downloaded
+
+Bug fixes:
+  * Fixed a bug in md5 calculation for a given file
+  * Fixed broken installer for Bundler
+
 ## Version 0.3.6 (May 09, 2016)
 
 Minor enhancements:
