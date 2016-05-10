@@ -16,8 +16,7 @@ module Luban
           default_executable 'openssl'
 
           def source_repo
-            #@source_repo ||= "https://www.openssl.org"
-            @source_repo ||= "http://www.openssl.org"
+            @source_repo ||= "ftp://ftp.openssl.org"
           end
 
           def source_url_root
