@@ -67,13 +67,6 @@ module Luban
           end
         end
 
-        def compose_build_env_variables
-          build_env_vars.inject({}) do |vars, (k, v)|
-            vars[k] = "'#{v.join(' ').strip}'" unless v.all?(&:empty?)
-            vars
-          end
-        end
-
         def configure_build_options
           @configure_opts = default_configure_opts | (task.opts.__remaining__ || [])
           @configure_opts.unshift(install_prefix)
