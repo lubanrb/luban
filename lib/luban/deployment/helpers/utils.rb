@@ -78,7 +78,7 @@ module Luban
         end
 
         def md5_for_file(file)
-          capture(:cat, "#{file} 2>/dev/null | openssl md5")
+          capture(:cat, "#{file} 2>/dev/null | openssl md5")[/\h+$/]
         end
 
         def sudo(*args)
