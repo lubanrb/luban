@@ -27,8 +27,9 @@ module Luban
         def package_major_version; task.opts.major_version; end
         def package_patch_level; task.opts.patch_level; end
 
-        def child?; !task.opts.parent.nil?; end
         def parent; task.opts.parent; end
+        def child?; !parent.nil?; end
+        
 
         def current_path
           @current_path ||= app_path.join(package_name)
