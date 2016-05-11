@@ -8,6 +8,13 @@ module Luban
           end
         end
 
+        protected
+
+        def setup_install_tasks
+          super
+          commands[:install].option :openssl, "OpenSSL version"
+        end
+
         class Installer < Luban::Deployment::Package::Installer
           default_executable 'git'
 

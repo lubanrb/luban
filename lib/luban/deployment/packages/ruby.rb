@@ -57,6 +57,7 @@ module Luban
           super
           commands[:install].switch :install_doc, "Install Ruby document"
           commands[:install].option :bundler, "Bundler version"
+          commands[:install].option :openssl, "OpenSSL version (effective for v1.9.3 or above)"
         end
 
         def decompose_version(version)
