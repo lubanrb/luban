@@ -14,10 +14,6 @@ module Luban
             task.opts.install_doc
           end
 
-          def package_version
-            parent.task.opts.bundler || super
-          end
-
           def package_path
             parent.package_path
           end

@@ -196,7 +196,8 @@ module Luban
             self.class.worker_class(:installer, package: d.name).new(
               config: config, backend: backend,
               cmd: cmd, args: {},
-              opts: d.options.merge(name: d.name, version: d.version, current: true, parent: self)
+              opts: d.options.merge(name: d.name, version: task.opts.send(d.name) || d.version, 
+                                    current: true, parent: self)
             ).run
           end
         end
