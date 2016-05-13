@@ -193,10 +193,12 @@ module Luban
 
         def manage_required_packages(type, cmd)
           required_packages[type].each do |d|
+            version = task.opts.send(d.name) || d.version
+            next if version = 'default'
             self.class.worker_class(:installer, package: d.name).new(
               config: config, backend: backend,
               cmd: cmd, args: {},
-              opts: d.options.merge(name: d.name, version: task.opts.send(d.name) || d.version, 
+              opts: d.options.merge(name: d.name, version: version, 
                                     current: true, parent: self)
             ).run
           end
