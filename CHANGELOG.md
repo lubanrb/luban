@@ -1,5 +1,12 @@
 # Change log
 
+## Version 0.4.1 (May 13, 2016)
+
+Minor enhancements:
+  * Optimized overriding dependent package version thru command-line options
+  * Added command-line option to specify OpenSSL version for Git and Ruby
+  * Used system default package if the given required package version is "default"
+
 ## Version 0.4.0 (May 11, 2016)
 
 Minor enhancements:
