@@ -68,7 +68,9 @@ module Luban
         end
 
         def configure_build_options
-          @configure_opts = default_configure_opts | (task.opts.__remaining__ || [])
+          @configure_opts = default_configure_opts
+          @configure_opts |= task.opts.configure_opts unless task.opts.configure_opts.nil?
+          @configure_opts |= task.opts.__remaining__ unless task.opts.__remaining__.nil?
           @configure_opts.unshift(install_prefix)
         end
 
