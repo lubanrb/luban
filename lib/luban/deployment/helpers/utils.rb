@@ -14,8 +14,8 @@ module Luban
           test "[ -d #{path} ]"
         end
 
-        def file?(path)
-          test "[ -f #{path} ]"
+        def file?(path, test_op = "-f")
+          test "[ #{test_op} #{path} ]"
         end
 
         def symlink?(path)
@@ -53,9 +53,12 @@ module Luban
         end
 
         def rm(*opts, path)
+          execute(:rm, '-f', *opts, path)
+        end
+
+        def rmdir(*opts, path)
           execute(:rm, '-fr', *opts, path)
         end
-        alias_method :rmdir, :rm
 
         def chmod(*opts, path)
           execute(:chmod, '-R', *opts, path)
@@ -101,33 +104,35 @@ module Luban
           @user_home ||= capture("eval echo ~")
         end
 
-        def url_exists?(download_url)
+        def url_exists?(url)
           # Sent HEAD request to avoid downloading the file contents
-          test("curl -s -L -I -o /dev/null -f #{download_url}")
+          test("curl -s -L -I -o /dev/null -f #{url}")
 
           # Other effective ways to check url existence with curl
 
           # In case HEAD request is refused, 
           # only the first byte of the file is requested
-          # test("curl -s -L -o /dev/null -f -r 0-0 #{download_url}")
+          # test("curl -s -L -o /dev/null -f -r 0-0 #{url}")
 
           # Alternatively, http code (200) can be validated
-          # capture("curl -s -L -I -o /dev/null -w '%{http_code}' #{download_url}") == '200'
+          # capture("curl -s -L -I -o /dev/null -w '%{http_code}' #{url}") == '200'
         end
 
         def upload_by_template(file_to_upload:, template_file:, auto_revision: false, **opts)
-          template = File.read(template_file)
-
           if auto_revision
             require 'digest/md5'
-            revision = Digest::MD5.hexdigest(template)
+            revision = Digest::MD5.file(template_file).hexdigest
             return if revision_match?(file_to_upload, revision)
           end
 
-          require 'erb'
-          context = opts[:binding] || binding
-          upload!(StringIO.new(ERB.new(template, nil, '<>').result(context)), file_to_upload)
+          upload!(StringIO.new(render_template(template_file, context: binding)), file_to_upload)
           yield file_to_upload if block_given?
+        end
+
+        def render_template(template_file, context: binding)
+          require 'erb'
+          template = File.read(template_file)
+          ERB.new(template, nil, '<>').result(context)
         end
 
         def revision_match?(file_to_upload, revision)
@@ -168,6 +173,10 @@ module Luban
 
         def hostname
           @hostname ||= host.hostname
+        end
+
+        def now
+          Time.now().strftime("%d/%m/%Y %H:%M:%S")
         end
 
         def method_missing(sym, *args, &blk)
