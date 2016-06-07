@@ -36,7 +36,7 @@ module Luban
                 assure_dirs(release_tag)
                 execute(:tar, "-C #{clone_path} -cf - . | tar -C #{release_tag} -xf -")
                 execute(:tar, "-czf", release_package_path, release_tag)
-                rm(release_tag)
+                rmdir(release_tag)
               end
             end
           end

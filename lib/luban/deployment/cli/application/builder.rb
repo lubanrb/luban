@@ -29,7 +29,7 @@ module Luban
 
         def destroy_app
           rm(etc_path.join('*', "#{stage}.#{project}.#{application}.*"))
-          rm(app_path)
+          rmdir(app_path)
           update_result "The application environment is destroyed."
         end
 

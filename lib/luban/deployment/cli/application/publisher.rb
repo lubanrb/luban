@@ -112,7 +112,7 @@ module Luban
             create_symlinks
             update_releases_log
           else
-            rm(release_path)
+            rmdir(release_path)
           end
         ensure
           rm(upload_to)
@@ -176,7 +176,7 @@ module Luban
             end
             releases_to_remove = releases - releases_to_keep
             releases_to_remove.each do |release| 
-              rm(releases_path.join(release))
+              rmdir(releases_path.join(release))
             end
             info "Removed #{releases_to_remove.count} old releases."
           else

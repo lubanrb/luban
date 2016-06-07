@@ -283,8 +283,7 @@ module Luban
         end
 
         def remove_symlinks!
-          return unless symlink?(current_path)
-          execute "[ -h #{current_path} ] && rm -f #{current_path}; true"
+          symlink?(current_path) and rm(current_path)
         end
 
         def remove_binstubs!
@@ -292,7 +291,7 @@ module Luban
           find_cmd = "find #{current_bin_path}/* -type f -print && find #{current_bin_path}/* -type l -print"
           capture(find_cmd).split("\n").each do |bin|
             bin_symlink = app_bin_path.join(File.basename(bin))
-            execute "[ -h #{bin_symlink} ] && rm -f #{bin_symlink}; true"
+            symlink?(bin_symlink) and rm(bin_symlink)
           end
         end
 
