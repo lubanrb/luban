@@ -91,8 +91,7 @@ module Luban
 
         module Control
           Actions = %i(start_process stop_process kill_process
-                       restart_process check_process
-                       monitor_process unmonitor_process)
+                       restart_process check_process)
           Actions.each do |action|
             define_method(action) do |args:, opts:|
               raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
@@ -100,6 +99,12 @@ module Luban
           end
 
           def controllable?; true; end
+
+          def process_monitor_via(monitor, env: "uber/lubmon")
+            monitor = monitor.to_s.downcase
+            env = env.to_s.downcase
+            process_monitor name: monitor, env: env
+          end
 
           protected
 
@@ -127,16 +132,6 @@ module Luban
             task :status do
               desc "Check process status"
               action! :check_process
-            end
-
-            task :monitor do
-              desc "Turn on process monitor"
-              action! :monitor_process
-            end
-
-            task :unmonitor do
-              desc "Turn off process monitor"
-              action! :unmonitor_process
             end
           end
         end
@@ -325,7 +320,9 @@ module Luban
       def print_task_result(result)
         result.each do |entry|
           next if entry[:message].to_s.empty?
-          puts "  [#{entry[:hostname]}] #{entry[:message]}"
+          entry[:message].split("\n").each do |msg|
+            puts "  [#{entry[:hostname]}] #{msg}"
+          end
         end
       end
 
@@ -336,7 +333,7 @@ module Luban
         enable_dry_run if dry_run
 
         SSHKit.configure do |sshkit|
-          sshkit.format           = format
+          sshkit.format           = format unless format == :airbrussh
           sshkit.output_verbosity = verbosity
           sshkit.default_env      = default_env
           sshkit.backend          = sshkit_backend
