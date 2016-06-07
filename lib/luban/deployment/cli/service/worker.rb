@@ -5,7 +5,11 @@ module Luban
         include Luban::Deployment::Worker::Paths::Remote::Service
 
         def service_name
-          @service_name = package_name.downcase
+          @service_name ||= package_name.downcase
+        end
+
+        def service_entry
+          @service_entry ||= "#{env_name.gsub('/', '.')}.#{service_name}"
         end
 
         def profile_path

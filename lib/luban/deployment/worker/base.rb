@@ -25,6 +25,10 @@ module Luban
         def osx?; os_name == 'Darwin'; end
         def linux?; os_name == 'Linux'; end
 
+        def env_name
+          @env_name ||= "#{stage}.#{project}/#{application}"
+        end
+
         def run
           update_result(__return__: @run_blk ? run_with_block : run_with_command).to_h
         end
@@ -62,7 +66,9 @@ module Luban
             r.level = level
             r.message = message unless message.nil? or !r.message.nil?
             attrs.each_pair { |k, v| r.send("#{k}=", v) }
-            send(level, message) unless message.nil? or message.empty?  
+            unless message.nil? or message.empty?
+              message.split("\n").each { |msg| send(level, msg) }
+            end
           end
         end
       end
