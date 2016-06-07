@@ -64,8 +64,6 @@ module Luban
         parameter :stage
 
         parameter :process_monitor
-        parameter :process_monitor_env
-
         parameter :sshkit_backend
         parameter :authen_key_type
         parameter :default_env
@@ -79,6 +77,7 @@ module Luban
         protected
 
         def set_default_project_parameters
+          set_default :process_monitor, {}
           set_default :sshkit_backend, SSHKit::Backend::Netssh
           set_default :authen_key_type, 'rsa'
           set_default :default_env, { path: '$PATH:/usr/local/bin' }
@@ -97,7 +96,16 @@ module Luban
             Luban::Deployment::Helpers::Configuration::Finder.project(self)
         end
 
-        def validate_project_parameters; end
+        def validate_project_parameters
+          unless process_monitor.empty?
+            if process_monitor[:name].nil?
+              abort "Aborted! Please specify the process monitor."
+            end
+            if process_monitor[:env].nil?
+              abort "Aborted! Please specify the process monitor environment."
+            end
+          end
+        end
       end
 
       module Application

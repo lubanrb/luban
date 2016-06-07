@@ -120,7 +120,7 @@ module Luban
 
       def set_parameters
         super
-        copy_parameters_from_parent(:stage, :project)
+        copy_parameters_from_parent(:stage, :project, :process_monitor)
         @packages = {}
         @services = {}
         @source = {}
