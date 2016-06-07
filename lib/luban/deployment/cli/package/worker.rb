@@ -20,7 +20,7 @@ module Luban
           end
         end
 
-        def package_name; task.opts.name; end
+        def package_name; File.basename(task.opts.name); end
         def package_full_name; "#{package_name}-#{package_version}"; end
 
         def package_version; task.opts.version; end
