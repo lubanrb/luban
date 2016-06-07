@@ -5,18 +5,24 @@ module Luban
         include Luban::Deployment::Command::Tasks::Deploy
         include Luban::Deployment::Command::Tasks::Control
 
-        ControlActions = Luban::Deployment::Command::Tasks::Control::Actions
-        ProfileActions = %i(update_profile)
-
-        (ControlActions | ProfileActions).each do |m|
-          define_method(m) do |args:, opts:|
+        def self.service_action(name, dispatch_to: nil, locally: false, &blk)
+          define_method(name) do |args:, opts:|
             if current_version
               send("#{__method__}!", args: args, opts: opts.merge(version: current_version))
             else
               abort "Aborted! No current version of #{display_name} is specified."
             end
           end
+          unless dispatch_to.nil?
+            dispatch_task "#{name}!", to: dispatch_to, as: name, locally: locally, &blk
+            protected "#{name}!"
+          end
         end
+
+        Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
+          service_action action, dispatch_to: :controller
+        end
+        service_action :update_profile, dispatch_to: :configurator, locally: true
 
         protected
 
@@ -37,12 +43,6 @@ module Luban
           super
           linked_dirs.push('log', 'pids')
         end
-
-        ControlActions.each do |task|
-          dispatch_task "#{task}!", to: :controller, as: task
-        end
-
-        dispatch_task :update_profile!, to: :configurator, as: :update_profile, locally: true
       end
     end
   end
