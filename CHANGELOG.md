@@ -1,5 +1,20 @@
 # Change log
 
+## Version 0.4.2 (Jun 07, 2016)
+
+Minor enhancements:
+  * Enhanced process management in controller
+  * Added parameters #process_monitor to setup process monitor in Luban
+  * Added #process_monitor_via convenient method to setup process monitor in Luban
+  * Removed #monitor_process and #unmonitor_process from common control tasks
+  * Added option #configure_opts for package installation
+  * Optimized format result output message
+  * Added convenient methods #env_name and #service_name to standardize naming
+  * Minor code refactoring
+
+Bug fixes:
+  * Fixed SSHKit output format to handle :airbrussh properly
+
 ## Version 0.4.1 (May 13, 2016)
 
 Minor enhancements:
