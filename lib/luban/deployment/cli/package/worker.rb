@@ -13,9 +13,15 @@ module Luban
             Luban::Deployment::Package::Base.worker_class(worker, **opts)
           end
 
-          def default_executable(name)
-            define_method("#{name}_executable") do
-              @default_executable ||= bin_path.join(name)
+          def define_executable(*names)
+            names.each do |name|
+              define_method("#{name}_executable") do
+                if instance_variable_defined?("@#{__method__}")
+                  instance_variable_get("@#{__method__}")
+                else
+                  instance_variable_set("@#{__method__}", bin_path.join(name))
+                end
+              end
             end
           end
         end

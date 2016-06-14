@@ -22,7 +22,7 @@ module Luban
             parent.install_path
           end
           
-          default_executable 'gem'
+          define_executable 'gem'
           
           def ruby_executable
             parent.ruby_executable

@@ -13,7 +13,7 @@ module Luban
             
           end
 
-          default_executable 'openssl'
+          define_executable 'openssl'
 
           def source_repo
             @source_repo ||= "ftp://ftp.openssl.org"

@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.4.3 (WIP)
+
+Minor enhancements:
+  * Changed #default_executable to #define_executable with a better general approach
+
 ## Version 0.4.2 (Jun 07, 2016)
 
 Minor enhancements:

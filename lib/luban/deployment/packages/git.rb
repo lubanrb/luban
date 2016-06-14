@@ -16,7 +16,7 @@ module Luban
         end
 
         class Installer < Luban::Deployment::Package::Installer
-          default_executable 'git'
+          define_executable 'git'
 
           def source_repo
             @source_repo ||= "https://www.kernel.org"

@@ -22,7 +22,7 @@ module Luban
             parent.install_path
           end
 
-          default_executable 'bundler'
+          define_executable 'bundler'
 
           def gem_executable
             parent.gem_executable

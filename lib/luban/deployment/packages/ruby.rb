@@ -74,7 +74,7 @@ module Luban
             task.opts.install_doc
           end
 
-          default_executable 'ruby'
+          define_executable 'ruby'
 
           def gem_executable
             @gem_executable ||= bin_path.join('gem')
