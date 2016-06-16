@@ -1,9 +1,17 @@
 # Change log
 
-## Version 0.4.3 (WIP)
+## Version 0.4.3 (Jun 16, 2016)
 
 Minor enhancements:
   * Changed #default_executable to #define_executable with a better general approach
+  * Refactored start/stop/monitor/unmonitor into corresponding commands for better reusability
+  * Added convenient methods, #default_pending_seconds and # default_pending_interval
+    * These two methods provided a better way to customize timging for process status check
+  * Refactored header information into a generic header template for all erb template files
+
+Bug fixes:
+  * Fixed monitor/unmonitor timing for start/stop operations
+  * Checked process status before killing process
 
 ## Version 0.4.2 (Jun 07, 2016)
 
