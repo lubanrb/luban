@@ -118,14 +118,21 @@ module Luban
           # capture("curl -s -L -I -o /dev/null -w '%{http_code}' #{url}") == '200'
         end
 
-        def upload_by_template(file_to_upload:, template_file:, auto_revision: false, **opts)
+        def upload_by_template(file_to_upload:, template_file:, 
+                               header_file: find_template_file('header.erb'), 
+                               auto_revision: false, **opts)
+          content = render_template(template_file, context: binding)
+
+          revision = ''
           if auto_revision
             require 'digest/md5'
-            revision = Digest::MD5.file(template_file).hexdigest
+            revision = Digest::MD5.hexdigest(content)
             return if revision_match?(file_to_upload, revision)
           end
 
-          upload!(StringIO.new(render_template(template_file, context: binding)), file_to_upload)
+          header = render_template(header_file, context: binding)
+
+          upload!(StringIO.new(header + content), file_to_upload)
           yield file_to_upload if block_given?
         end
 
