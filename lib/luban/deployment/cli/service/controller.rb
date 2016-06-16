@@ -26,8 +26,23 @@ module Luban
           file?(pid_file_path, "-s") # file is NOT zero size
         end
 
-        def process_pattern
-          raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
+        %i(process_pattern start_command stop_command).each do |m|
+          define_method(m) do
+            raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
+          end
+        end
+
+        def monitor_executable
+          @monitor_executable ||= env_path.join("#{stage}.#{process_monitor[:env]}").
+                                                join('bin').join(process_monitor[:name])
+        end
+
+        def monitor_command
+          @monitor_command ||= "#{monitor_executable} monitor #{service_entry}"
+        end
+
+        def unmonitor_command
+          @unmonitor_command ||= "#{monitor_executable} unmonitor #{service_entry}"
         end
 
         def start_process
@@ -38,8 +53,8 @@ module Luban
 
           output = start_process!
           if check_until { process_started? }
-            monitor_process
             update_result "Start #{package_full_name}: [OK] #{output}"
+            monitor_process
           else
             remove_orphaned_pid_file
             update_result "Start #{package_full_name}: [FAILED] #{output}", 
@@ -53,9 +68,9 @@ module Luban
             return
           end
 
+          unmonitor_process
           output = stop_process! || 'OK'
           if check_until { process_stopped? }
-            unmonitor_process
             update_result "Stop #{package_full_name}: [OK] #{output}"
           else
             remove_orphaned_pid_file
@@ -66,10 +81,10 @@ module Luban
 
         def restart_process
           if process_started?
+            unmonitor_process
             output = stop_process!
             if check_until { process_stopped? }
               info "Stop #{package_full_name}: [OK] #{output}"
-              unmonitor_process
             else
               remove_orphaned_pid_file
               update_result "Stop #{package_full_name}: [FAILED] #{output}",
@@ -94,9 +109,14 @@ module Luban
         end
 
         def kill_process
+          if process_stopped?
+            update_result "Skipped! Already stopped #{package_full_name}", status: :skipped
+            return
+          end
+
+          unmonitor_process
           output = kill_process!
           if check_until { process_stopped? }
-            unmonitor_process
             remove_orphaned_pid_file
             update_result "Kill #{package_full_name}: [OK] #{output}"
           else
@@ -128,21 +148,27 @@ module Luban
           end
         end
 
+        def default_pending_seconds; 30; end
+        def default_pending_interval; 1; end
+
         protected
 
-        %i(start_process! stop_process!).each do |m|
-          define_method(m) do
-            raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
-          end
-        end
-
-        def check_until(pending_seconds = 30)
+        def check_until(pending_seconds: default_pending_seconds, 
+                        pending_interval: default_pending_interval)
           succeeded = false
-          pending_seconds.times do
-            sleep 1
+          (pending_seconds/pending_interval).times do
+            sleep pending_interval
             break if (succeeded = yield)
           end
           succeeded
+        end
+
+        def start_process!
+          capture("#{start_command} 2>&1")
+        end
+
+        def stop_process!
+          capture("#{stop_command} 2>&1")
         end
 
         def check_process!
@@ -174,24 +200,11 @@ module Luban
         end
 
         def monitor_process!
-          test(process_monitor_command)
+          test("#{monitor_command} 2>&1")
         end
 
         def unmonitor_process!
-          test(process_unmonitor_command)
-        end
-
-        def process_monitor_executable
-          @process_monitor_executable ||= env_path.join("#{stage}.#{process_monitor[:env]}").
-                                                   join('bin').join(process_monitor[:name])
-        end
-
-        def process_monitor_command
-          @process_monitor_command ||= "#{process_monitor_executable} monitor #{service_entry}"
-        end
-
-        def process_unmonitor_command
-          @process_unmonitor_command ||= "#{process_monitor_executable} unmonitor #{service_entry}"
+          test("#{unmonitor_command} 2>&1")
         end
       end
     end
