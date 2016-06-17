@@ -199,7 +199,8 @@ module Luban
               config: config, backend: backend,
               cmd: cmd, args: {},
               opts: d.options.merge(name: d.name, version: version, 
-                                    current: true, parent: self)
+                                    current: true, parent: self).
+                              merge(self.class.package_class(d.name).decompose_version(version))
             ).run
           end
         end

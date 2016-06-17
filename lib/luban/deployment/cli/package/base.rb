@@ -48,6 +48,10 @@ module Luban
             end
           end
 
+          def decompose_version(version)
+            { major_version: version, patch_level: '' }
+          end
+
           protected
 
           def package_require_path(package_name)
@@ -74,7 +78,7 @@ module Luban
         def update_package_options(version, **opts)
           unless package_options.has_key?(version)
             package_options[version] = 
-              { name: name.to_s }.merge!(decompose_version(version))
+              { name: name.to_s }.merge!(self.class.decompose_version(version))
           end
           @current_version = version if opts[:current]
           package_options[version].merge!(opts)
@@ -82,10 +86,6 @@ module Luban
 
         def has_version?(version)
           package_options.has_key?(version)
-        end
-
-        def decompose_version(version)
-          { major_version: version, patch_level: '' }
         end
 
         def versions; package_options.keys; end

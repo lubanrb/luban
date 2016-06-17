@@ -51,6 +51,13 @@ module Luban
           end
         end
         
+        def self.decompose_version(version)
+          major_version, patch_level = version.split('-')
+          patch_level = '' if patch_level.nil?
+          patch_level = $1 if patch_level.match(/^p(\d+)$/)
+          { major_version: major_version, patch_level: patch_level }
+        end
+        
         protected
 
         def setup_install_tasks
@@ -58,13 +65,6 @@ module Luban
           commands[:install].switch :install_doc, "Install Ruby document"
           commands[:install].option :bundler, "Bundler version"
           commands[:install].option :openssl, "OpenSSL version (effective for v1.9.3 or above)"
-        end
-
-        def decompose_version(version)
-          major_version, patch_level = version.split('-')
-          patch_level = '' if patch_level.nil?
-          patch_level = $1 if patch_level.match(/^p(\d+)$/)
-          { major_version: major_version, patch_level: patch_level }
         end
 
         class Installer < Luban::Deployment::Package::Installer
