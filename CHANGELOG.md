@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.4.4 (Jun 17, 2016)
+
+Bug fixes:
+  * Made #decompose_version to be a class method in order to correctly decompose version for dependent/child packages like PCRE
+
 ## Version 0.4.3 (Jun 16, 2016)
 
 Minor enhancements:
