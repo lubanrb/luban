@@ -107,9 +107,9 @@ module Luban
             def base_path; base_path ||= target.apps_path.join(target.application); end
 
             def has_profile?
-              stage_profile_templates_path.directory? or
-              stage_profile_path.directory? or
-              profile_templates_path.directory?
+              !Dir["#{stage_profile_templates_path}/**/*"].empty? or
+              !Dir["#{stage_profile_path}/**/*"].empty? or
+              !Dir["#{profile_templates_path}/**/*"].empty?
             end
 
             def find_template_file(file_name)
