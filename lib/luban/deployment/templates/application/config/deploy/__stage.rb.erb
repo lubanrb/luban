@@ -1,0 +1,4 @@
+# Deployment configuration for <%= stage %> application <%= application_name %>
+
+# Application servers
+role :app, `hostname -f`.chomp
