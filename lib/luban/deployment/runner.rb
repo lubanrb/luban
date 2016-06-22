@@ -20,6 +20,12 @@ module Luban
         @config_file ||= work_dir.join(lubanfile)
       end
 
+      def init_project(args:, opts:)
+        set_default :project, args[:project]
+        singleton_class.send(:include, Luban::Deployment::Helpers::Generator::Project)
+        create_project_skeleton
+      end
+
       protected
 
       def on_configure
@@ -31,12 +37,14 @@ module Luban
         end
       end
 
-      def set_default_parameters
+      def set_default_common_parameters
         %i(luban_roles luban_root_path stages).each { |p| set_default p, rc[p.to_s] }
+        set_default :user, (rc['user'] || ENV['USER'])
+      end
 
+      def set_default_project_parameters
         set_default :applications, find_applications
         set_default :project, File.basename(work_dir)
-        set_default :user, (rc['user'] || ENV['USER'])
       end
 
       def find_applications
@@ -73,11 +81,13 @@ module Luban
 
       def setup_cli_with_projects
         load_configuration_file(config_file)
-        set_default_parameters
+        set_default_common_parameters
+        set_default_project_parameters
         load_libraries
 
         version Luban::Deployment::VERSION
         desc "Manage the deployment of project #{project.camelcase}"
+        setup_init_project(false)
         setup_projects
       end
 
@@ -96,10 +106,19 @@ module Luban
       end
 
       def setup_cli_without_projects
+        set_default_common_parameters
+
         version Luban::Deployment::VERSION
         desc "Framework to manage project deployment"
-        action do
-          abort "Aborted! NOT a Luban project (or any of the parent directories): #{lubanfile} is NOT found."
+        
+        setup_init_project
+      end
+
+      def setup_init_project(new_project = true)
+        command :init do
+          desc 'Initialize a Luban deployment project'
+          argument :project, 'Project name', required: true if new_project
+          action! :init_project
         end
       end
     end

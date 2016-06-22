@@ -116,6 +116,14 @@ module Luban
         end
       end
 
+      def init_services(args:, opts:)
+        show_app_environment
+        service = args[:service]
+        (service.nil? ? services.values : [services[service]]).each do |s|
+          s.init_service(args: args, opts: opts)
+        end
+      end
+
       protected
 
       def set_parameters
@@ -155,6 +163,21 @@ module Luban
       def setup_descriptions
         desc "Manage application #{display_name}"
         long_desc "Manage the deployment of application #{display_name} in #{parent.class.name}"
+      end
+
+      def setup_tasks
+        setup_init_services
+        super
+      end
+
+      def setup_init_services
+        return unless has_services?
+        service_names = services.keys
+        command :init do
+          desc 'Initialize deployment services'
+          argument :service, 'Service name', within: service_names, required: false, type: :symbol
+          action! :init_services
+        end
       end
 
       def show_app_environment

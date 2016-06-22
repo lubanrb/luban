@@ -62,6 +62,12 @@ module Luban
         end
       end
 
+      def init_application(args:, opts:)
+        singleton_class.send(:include, Luban::Deployment::Helpers::Generator::Application)
+        define_singleton_method(:application) { args[:application] }
+        create_application_skeleton
+      end
+
       protected
 
       def validate_parameters
@@ -80,7 +86,7 @@ module Luban
 
       def load_libraries
         applications.each do |app|
-          require "#{work_dir}/apps/#{app}/lib/application"
+          require "#{apps_path}/#{app}/lib/application"
         end
       end
 
@@ -90,6 +96,7 @@ module Luban
 
       def setup_cli
         setup_applications
+        setup_init_application
         super
       end
 
@@ -100,8 +107,22 @@ module Luban
       def setup_applications
         @apps = {}
         applications.map(&:to_sym).each do |app|
-          @apps[app] = command(app, base: application_base_class(app))
+          if application_initialized?(app)
+            @apps[app] = command(app, base: application_base_class(app))
+          end
         end
+      end
+
+      def setup_init_application
+        command :init do
+          desc 'Initialize a Luban deployment application'
+          argument :application, 'Application name', required: true
+          action! :init_application
+        end
+      end
+
+      def application_initialized?(app)
+        File.file?("#{apps_path}/#{app}/config/deploy/#{stage}.rb")
       end
     end
   end
