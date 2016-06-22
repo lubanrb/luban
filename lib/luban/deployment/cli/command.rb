@@ -57,13 +57,13 @@ module Luban
 
             task :which do
               desc "Show the real path for the given executable"
-              argument :executable, "Executable to which", short: :e, required: true
+              argument :executable, "Executable to which"
               action! :which
             end
 
             task :whence do
               desc "List packages with the given executable"
-              argument :executable, "Executable to whence", short: :e, required: true
+              argument :executable, "Executable to whence"
               action! :whence
             end
           end
