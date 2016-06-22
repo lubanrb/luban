@@ -1,0 +1,5 @@
+/.bundle/
+/Gemfile.lock
+.luban/
+vendor/cache/
+.DS_Store
