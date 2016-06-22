@@ -1,5 +1,17 @@
 # Change log
 
+## Version 0.5.0 (Jun 22, 2016)
+
+Minor enhancements:
+  * Added a series of subcommands, #init to
+    * Initialize a Luban deployment project
+    * Initialize a Luban deployment application
+    * Initialize a Luban deployment service
+  * Added deployment project and application skeleton and templates
+
+Bug fixes:
+  * Corrected the checking for profile existence for a deployment application/service
+
 ## Version 0.4.4 (Jun 17, 2016)
 
 Bug fixes:
