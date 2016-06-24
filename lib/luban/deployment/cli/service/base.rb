@@ -28,14 +28,14 @@ module Luban
           respond_to?(:default_templates_path, true)
         end
 
-        def init_service(args:, opts:)
+        def init_profile(args:, opts:)
           return unless has_templates?
           require 'fileutils'
           puts "  Initializing #{name} profile"
           templates_path = config_finder[:application].profile_templates_path.join(name.to_s)
           profile_path = config_finder[:application].stage_profile_path.join(name.to_s)
           [templates_path, profile_path].each { |p| FileUtils.mkdir(p) unless p.directory? }
-          init_templates.each do |src_path|
+          init_profile_templates.each do |src_path|
             next unless src_path.file?
             dst_path = (src_path.extname == '.erb' ? templates_path : profile_path).
                        join(src_path.basename)
@@ -69,7 +69,7 @@ module Luban
           linked_dirs.push('log', 'pids')
         end
 
-        def init_templates
+        def init_profile_templates
           default_templates_path.children
         end
       end

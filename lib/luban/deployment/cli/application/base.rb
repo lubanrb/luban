@@ -116,12 +116,24 @@ module Luban
         end
       end
 
-      def init_services(args:, opts:)
+      def init_profiles(args:, opts:)
         show_app_environment
-        service = args[:service]
-        (service.nil? ? services.values : [services[service]]).each do |s|
-          s.init_service(args: args, opts: opts)
+        if opts[:app]
+          init_profile(args: args, opts: opts)
+        elsif opts[:service].nil?
+          init_profile(args: args, opts: opts)
+          init_service_profiles(args: args, opts: opts)
+        elsif opts[:service].is_a?(TrueClass)
+          init_service_profiles(args: args, opts: opts)
+        else
+          services[opts[:service]].init_profile(args: args, opts: opts)
         end
+      end
+
+      def init_profile(args:, opts:); end
+
+      def init_service_profiles(args:, opts:)
+        services.values.each { |s| s.init_profile(args: args, opts: opts) }
       end
 
       protected
@@ -166,17 +178,18 @@ module Luban
       end
 
       def setup_tasks
-        setup_init_services
+        setup_init_profiles
         super
       end
 
-      def setup_init_services
-        return unless has_services?
-        service_names = services.keys
+      def setup_init_profiles
+        _services = services.keys
         command :init do
-          desc 'Initialize deployment services'
-          argument :service, 'Service name', within: service_names, required: false, type: :symbol
-          action! :init_services
+          desc 'Initialize deployment application/service profiles'
+          switch :app, "Application profile ONLY", short: :a
+          option :service, "Service profile ONLY", short: :s, nullable: true, 
+                                                   within: _services.push(nil), type: :symbol
+          action! :init_profiles
         end
       end
 
