@@ -1,5 +1,5 @@
 require_relative 'application/base'
 require_relative 'application/authenticator'
-require_relative 'application/builder'
+require_relative 'application/constructor'
 require_relative 'application/repository'
 require_relative 'application/publisher'

@@ -1,7 +1,7 @@
 module Luban
   module Deployment
     class Application
-      class Builder < Luban::Deployment::Worker::Base
+      class Constructor < Luban::Deployment::Worker::Base
         include Luban::Deployment::Worker::Paths::Remote
 
         def envrc_template_file
@@ -12,7 +12,7 @@ module Luban
           @unset_envrc_template_file ||= find_template_file("unset_envrc.erb")
         end
 
-        def build
+        def setup
           bootstrap
           create_envrc_files
         end

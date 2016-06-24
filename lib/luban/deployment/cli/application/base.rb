@@ -64,7 +64,7 @@ module Luban
       def setup(args:, opts:)
         show_app_environment
         promptless_authen(args: args, opts: opts)
-        build!(args: args, opts: opts)
+        setup!(args: args, opts: opts)
       end
 
       def build(args:, opts:)
@@ -197,8 +197,8 @@ module Luban
         puts "#{display_name} in #{parent.class.name}"
       end
 
-      %i(build destroy cleanup).each do |task|
-        dispatch_task "#{task}!", to: :builder, as: task
+      %i(setup destroy cleanup).each do |task|
+        dispatch_task "#{task}!", to: :constructor, as: task
       end
 
       def build_repositories(args:, opts:)
