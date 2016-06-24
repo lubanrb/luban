@@ -1,10 +1,14 @@
 # Change log
 
+## Version 0.5.2 (WIP)
+
+Minor enhancements:
+  * Renamed application Builder to Constructor for better naming convention in Luban
+
 ## Version 0.5.1 (Jun 24, 2016)
 
 Minor enhancements:
   * Added subcommands #init to initialize deployment application/service profiles
-  * Renamed application Builder to Constructor for better naming convention in Luban
   * Added .gitignore file to the deployment project skeleton
 
 ## Version 0.5.0 (Jun 22, 2016)
