@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.5.1 (Jun 24, 2016)
+
+Minor enhancements:
+  * Added subcommands #init to initialize deployment application/service profiles
+  * Added .gitignore file to the deployment project skeleton
+
 ## Version 0.5.0 (Jun 22, 2016)
 
 Minor enhancements:
