@@ -1,9 +1,7 @@
 module Luban
   module Deployment
     class Application
-      class Constructor < Luban::Deployment::Worker::Base
-        include Luban::Deployment::Worker::Paths::Remote
-
+      class Constructor < Worker
         def envrc_template_file
           @envrc_template_file ||= find_template_file("envrc.erb")
         end
