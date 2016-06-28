@@ -7,7 +7,7 @@ module Luban
 
         DefaultRevisionSize = 12
 
-        attr_reader :name
+        attr_reader :type
         attr_reader :from
         attr_reader :scm
         attr_reader :revision
@@ -23,11 +23,11 @@ module Luban
         end
 
         def clone_path
-          @clone_path ||= workspace_path.join('repositories').join(name)
+          @clone_path ||= workspace_path.join('repositories').join(type)
         end
 
         def releases_path
-          @releases_path ||= workspace_path.join('releases').join(name)
+          @releases_path ||= workspace_path.join('releases').join(type)
         end
 
         def release_package_path
@@ -47,7 +47,7 @@ module Luban
         end
 
         def release_prefix
-          @release_prefix ||= "#{stage}-#{project}-#{application}-#{name}"
+          @release_prefix ||= "#{stage}-#{project}-#{application}-#{type}"
         end
 
         def release_tag
@@ -75,17 +75,17 @@ module Luban
           assure_dirs(clone_path, releases_path)
           if cloned? and !force?
             update_revision
-            update_result "Skipped! Local #{name} repository has been built ALREADY.", status: :skipped
+            update_result "Skipped! Local #{type} repository has been built ALREADY.", status: :skipped
           else
             if available?
               if build!
                 update_revision
-                update_result "Successfully built local #{name} repository."
+                update_result "Successfully built local #{type} repository."
               else
-                update_result "FAILED to build local #{name} repository!", status: :failed, level: :error
+                update_result "FAILED to build local #{type} repository!", status: :failed, level: :error
               end
             else
-              update_result "Aborted! Remote #{name} repository is NOT available.", status: :failed, level: :error
+              update_result "Aborted! Remote #{type} repository is NOT available.", status: :failed, level: :error
             end
           end
         end
@@ -94,16 +94,16 @@ module Luban
           if cloned?
             if package!
               cleanup_releases
-              update_result "Successfully package local #{name} repository to #{release_package_path}.", 
-                            release: { name: name, tag: release_tag,
+              update_result "Successfully package local #{type} repository to #{release_package_path}.", 
+                            release: { type: type, tag: release_tag,
                                        path: release_package_path, 
                                        md5: md5_for_file(release_package_path),
                                        bundled_gems: bundle_gems }
             else
-              update_result "FAILED to package local #{name} repository!", status: :failed, level: :error
+              update_result "FAILED to package local #{type} repository!", status: :failed, level: :error
             end
           else
-            update_result "Aborted! Local #{name} package is NOT built yet!", status: :failed, level: :error
+            update_result "Aborted! Local #{type} package is NOT built yet!", status: :failed, level: :error
           end
         end
 
