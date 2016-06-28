@@ -1,10 +1,8 @@
 module Luban
   module Deployment
     class Application
-      class Publisher < Luban::Deployment::Worker::Base
-        include Luban::Deployment::Worker::Paths::Remote
-
-        def release_name; task.opts.release[:name]; end
+      class Publisher < Worker
+        def release_type; task.opts.release[:type]; end
         def release_tag; task.opts.release[:tag]; end
         def release_package_path; task.opts.release[:path]; end
         def release_md5; task.opts.release[:md5]; end
@@ -13,15 +11,15 @@ module Luban
         def gems_source; bundled_gems[:gems_cache]; end
         def gems; bundled_gems[:gems]; end
 
-        def publish_app?; release_name == 'app'; end
-        def publish_profile?; release_name == 'profile'; end
+        def publish_app?; release_type == 'app'; end
+        def publish_profile?; release_type == 'profile'; end
 
         def display_name
-          @display_name ||= "#{application} #{release_name} (release: #{release_tag})"
+          @display_name ||= "#{application} #{release_type} (release: #{release_tag})"
         end
 
         def releases_path
-          @releases_path ||= super.join(release_name)
+          @releases_path ||= super.join(release_type)
         end
 
         def release_path
@@ -119,7 +117,7 @@ module Luban
         end
 
         def create_symlinks
-          send("create_#{release_name}_symlinks")
+          send("create_#{release_type}_symlinks")
           create_shared_symlinks_for(:directory, linked_dirs)
           create_shared_symlinks_for(:directory, bundle_linked_dirs) if file?(gemfile)
         end
@@ -136,7 +134,7 @@ module Luban
         end
 
         def create_release_symlink(target_dir)
-          assure_symlink(release_path, target_dir.join(release_name))
+          assure_symlink(release_path, target_dir.join(release_type))
         end
 
         def create_shared_symlinks_for(type, linked_paths)
