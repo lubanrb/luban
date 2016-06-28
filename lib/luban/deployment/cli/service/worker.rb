@@ -1,40 +1,70 @@
 module Luban
   module Deployment
     module Service
-      module Paths
-        include Luban::Deployment::Worker::Paths::Remote::Service
-
-        def service_name
-          @service_name ||= package_name.downcase
-        end
-
-        def service_entry
-          @service_entry ||= "#{env_name.gsub('/', '.')}.#{service_name}"
-        end
-
-        def profile_path
-          @profile_path ||= super.join(service_name)
-        end
-
-        def control_file_name
-          @control_file_name ||= "#{service_name}.conf"
-        end
-
-        def logrotate_file_name
-          @logrotate_file_name ||= "#{service_name}.logrotate"
-        end
-
-        def pid_file_name
-          @pid_file_name ||= "#{service_name}.pid"
-        end
-
-        def log_file_name
-          @log_file_name ||= "#{service_name}.log"
-        end
-      end
-
       class Worker < Luban::Deployment::Package::Worker
-        include Paths
+        module Base
+          def service_name
+            @service_name ||= package_name
+          end
+
+          def service_version
+            @service_version ||= package_version
+          end
+
+          def service_full_name
+            @service_full_name ||= package_full_name
+          end
+
+          def service_entry
+            @service_entry ||= "#{env_name.gsub('/', '.')}.#{service_name}"
+          end
+
+          def profile_path
+            @profile_path ||= shared_path.join('profile').join(service_name)
+          end
+
+          def log_path
+            @log_path ||= shared_path.join('log')
+          end
+
+          def log_file_path
+            @log_file_path ||= log_path.join(log_file_name)
+          end
+
+          def log_file_name
+            @log_file_name ||= "#{service_name}.log"
+          end
+
+          def pids_path
+            @pids_path ||= shared_path.join('pids')
+          end
+
+          def pid_file_path
+            @pid_file_path ||= pids_path.join(pid_file_name)
+          end
+
+          def pid_file_name
+            @pid_file_name ||= "#{service_name}.pid"
+          end
+
+          def control_file_path
+            @control_file_path ||= profile_path.join(control_file_name)
+          end
+
+          def control_file_name
+            @control_file_name ||= "#{service_name}.conf"
+          end
+
+          def logrotate_file_path
+            @logrotate_file_path ||= profile_path.join(logrotate_file_name)
+          end
+
+          def logrotate_file_name
+            @logrotate_file_name ||= "#{service_name}.logrotate"
+          end
+        end
+
+        include Base
       end
     end
   end

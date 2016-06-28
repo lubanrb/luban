@@ -2,7 +2,7 @@ module Luban
   module Deployment
     module Service
       class Installer < Luban::Deployment::Package::Installer
-        include Paths
+        include Worker::Base
       end
     end
   end
