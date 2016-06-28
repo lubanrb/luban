@@ -2,7 +2,6 @@ module Luban
   module Deployment
     module Service
       class Base < Luban::Deployment::Package::Base
-        include Luban::Deployment::Command::Tasks::Deploy
         include Luban::Deployment::Command::Tasks::Control
 
         def self.service_action(name, dispatch_to: nil, locally: false, &blk)
