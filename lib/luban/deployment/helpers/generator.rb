@@ -6,8 +6,42 @@ module Luban
       module Generator
         using Luban::CLI::CoreRefinements
 
+        module Utils
+          def mkdir(path)
+            if path.directory?
+              puts " [skipped]"
+            else
+              FileUtils.mkdir(path)
+              puts " [created]"
+            end
+          end
+
+          def copy_file(src_path, dst_path)
+            if dst_path.file?
+              puts " [skipped]"
+            else
+              FileUtils.cp(src_path, dst_path)
+              puts " [created]"
+            end
+          end
+
+          def render_file(template_path, output_path, context: binding)
+            if output_path.file?
+              puts " [skipped]"
+            else
+              require 'erb'
+              File.open(output_path, 'w') do |f|
+                f.write ERB.new(File.read(template_path), nil, '<>').result(context)
+              end
+              puts " [created]"
+            end
+          end
+        end
+
         module Base
           protected
+
+          include Utils
 
           def skeletons_path
             @skeletons_path ||= 
@@ -49,36 +83,6 @@ module Luban
                 print indent + "  - #{basename}"
                 send(action, f, dst_path.join(basename))
               end
-            end
-          end
-
-          def mkdir(path)
-            if path.directory?
-              puts " [skipped]"
-            else
-              FileUtils.mkdir(path)
-              puts " [created]"
-            end
-          end
-
-          def copy_file(src_path, dst_path)
-            if dst_path.file?
-              puts " [skipped]"
-            else
-              FileUtils.cp(src_path, dst_path)
-              puts " [created]"
-            end
-          end
-
-          def render_file(template_path, output_path, context: binding)
-            if output_path.file?
-              puts " [skipped]"
-            else
-              require 'erb'
-              File.open(output_path, 'w') do |f|
-                f.write ERB.new(File.read(template_path), nil, '<>').result(context)
-              end
-              puts " [created]"
             end
           end
 
