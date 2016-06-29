@@ -27,6 +27,15 @@ module Luban
             @profile_templates
           end
 
+          def default_templates; task.opts.default_templates; end
+
+          def init_profile
+            return if default_templates.empty?
+            puts "  Initializing #{service_name} profile"
+            assure_dirs(profile_templates_path, stage_profile_path)
+            upload_profile_templates
+          end
+
           def update_profile
             assure_dirs(stage_profile_path)
             render_profile
@@ -34,6 +43,25 @@ module Luban
           end
 
           protected
+
+          def upload_profile_templates
+            default_templates.each do |src_path|
+              next unless file?(src_path)
+              basename = src_path.basename
+              dst_path = if src_path.extname == '.erb'
+                           profile_templates_path
+                         else
+                           stage_profile_path
+                         end.join(basename)
+              print "    - #{basename}"
+              if file?(dst_path)
+                puts " [skipped]"
+              else
+                upload!(src_path, dst_path)
+                puts " [created]"
+              end
+            end
+          end
 
           def render_profile
             profile_templates.each { |template_file| render_profile_by_template(template_file) }

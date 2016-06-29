@@ -46,11 +46,20 @@ module Luban
       alias_method :require_package, :package
 
       def source(from = nil, **opts)
-        from.nil? ? @source : (@source = opts.merge(name: 'app', from: from))
+        return @source if from.nil?
+        @source = opts.merge(type: 'app', from: from)
+        if source_version.nil?
+          abort "Aborted! Please specify the source version with :tag, :branch or :ref." 
+        end
+        @source 
+      end
+
+      def source_version
+        @source[:tag] || @source[:branch] || @source[:ref]
       end
 
       def profile(from = nil, **opts)
-        from.nil? ? @profile : (@profile = opts.merge(name: 'profile', from: from))
+        from.nil? ? @profile : (@profile = opts.merge(type: 'profile', from: from))
       end
 
       def password_for(user); parent.password_for(user); end
@@ -118,22 +127,23 @@ module Luban
 
       def init_profiles(args:, opts:)
         show_app_environment
-        if opts[:app]
-          init_profile(args: args, opts: opts)
-        elsif opts[:service].nil?
-          init_profile(args: args, opts: opts)
-          init_service_profiles(args: args, opts: opts)
-        elsif opts[:service].is_a?(TrueClass)
-          init_service_profiles(args: args, opts: opts)
-        else
-          services[opts[:service]].init_profile(args: args, opts: opts)
+        init_profile(args: args, opts: opts)
+        init_service_profiles(args: args, opts: opts)
+      end
+
+      def init_profile(args:, opts:)
+        if opts[:app] or opts[:service].nil?
+          init_profile!(args: args, opts: opts.merge(default_templates: default_templates))
         end
       end
 
-      def init_profile(args:, opts:); end
-
       def init_service_profiles(args:, opts:)
-        services.values.each { |s| s.init_profile(args: args, opts: opts) }
+        return if opts[:app]
+        if services.has_key?(opts[:service])
+          services[opts[:service]].init_profile(args: args, opts: opts)
+        else
+          services.values.each { |s| s.init_profile(args: args, opts: opts) }
+        end
       end
 
       protected
@@ -184,12 +194,18 @@ module Luban
 
       def setup_init_profiles
         _services = services.keys
-        command :init do
-          desc 'Initialize deployment application/service profiles'
+        task :init do
+          desc 'Initialize deployment app/service profiles'
           switch :app, "Application profile ONLY", short: :a
           option :service, "Service profile ONLY", short: :s, nullable: true, 
                                                    within: _services.push(nil), type: :symbol
           action! :init_profiles
+        end
+      end
+
+      def compose_task_options(opts)
+        super.merge(name: 'app').tap do |o|
+          o.merge!(version: source_version) if has_source?
         end
       end
 
@@ -207,11 +223,12 @@ module Luban
       end
 
       def deploy_profile(args:, opts:)
-        update_profile!(args: args, opts: opts)
+        update_profile(args: args, opts: opts)
         deploy_profile!(args: args, opts: opts.merge(repository: profile))
       end
 
-      def update_profile!(args:, opts:)
+      def update_profile(args:, opts:)
+        update_profile!(args: args, opts: opts)
         services.each_value { |s| s.send(:update_profile, args: args, opts: opts) }
       end
 
@@ -230,6 +247,8 @@ module Luban
 
       dispatch_task :promptless_authen!, to: :authenticator, as: :promptless_authen
       dispatch_task :public_key!, to: :authenticator, as: :public_key, locally: true
+      dispatch_task :init_profile!, to: :configurator, as: :init_profile, locally: true
+      dispatch_task :update_profile!, to: :configurator, as: :update_profile, locally: true
       dispatch_task :build_repository!, to: :repository, as: :build, locally: true
       dispatch_task :package_release!, to: :repository, as: :package, locally: true
       dispatch_task :publish_release!, to: :publisher, as: :publish

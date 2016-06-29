@@ -208,6 +208,12 @@ module Luban
         locally ? result.first[:__return__] : result
       end
 
+      def default_templates_path; end
+
+      def default_templates
+        default_templates_path.nil? ? [] : default_templates_path.children
+      end
+
       protected
 
       def on_configure
@@ -217,6 +223,7 @@ module Luban
         load_configuration
         validate_parameters
         load_libraries
+        include_default_templates_path unless default_templates_path.nil?
         setup_cli
       end
 
@@ -248,6 +255,14 @@ module Luban
       end
 
       def load_libraries; end
+
+      def include_default_templates_path
+        if default_templates_path.is_a?(Pathname)
+          default_templates_paths.unshift(default_templates_path)
+        else
+          abort "Aborted! Default templates path for #{self.class.name} MUST be a Pathname."
+        end
+      end
 
       def setup_cli
         setup_descriptions
