@@ -1,9 +1,17 @@
 # Change log
 
-## Version 0.5.2 (WIP)
+## Version 0.5.5 (WIP)
 
 Minor enhancements:
+  * Refactored app/service profile templates initialization
+  * Refactored Service::Worker to abstract general behavior for Service/Application
+  * Refactored Service::Configurator to abstract general configuration for Service/Application
+  * Refactored Service::Controller to abstract general control for Service/Application
+  * Changed attribute :name to :type in Application::Repository for better naming
+  * Changed attribute :release_name to :release_type in Application::Publisher for better naming
+  * Removed deploy commands in Service because deploy commands exist ONLY in application level
   * Renamed application Builder to Constructor for better naming convention in Luban
+  * Minor refactoring
 
 ## Version 0.5.1 (Jun 24, 2016)
 
