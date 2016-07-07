@@ -22,7 +22,7 @@ module Luban
             end
 
             def fetch_revision
-              within(clone_path) { capture(git_cmd, "rev-parse --short=#{rev_size} #{ref}") }
+              within(clone_path) { capture(git_cmd, "rev-parse --short=#{rev_size} #{ref} 2>/dev/null") }
               #within(clone_path) { capture(git_cmd, "rev-list --max-count=1 --abbrev-commit --abbrev=rev_size #{ref}") }
             end
 
