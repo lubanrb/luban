@@ -177,6 +177,8 @@ module Luban
             run_task(cmd: as, args: args, opts: opts, locally: locally,
                      worker_class: self.class.worker_class(to), &blk)
           end
+
+          protected task
         end
       end
 
@@ -204,7 +206,7 @@ module Luban
           end
           mutex.synchronize { result << r }
         end
-        print_task_result result
+        print_task_result(result) if opts[:format] == :blackhole
         locally ? result.first[:__return__] : result
       end
 
@@ -316,7 +318,7 @@ module Luban
       def compose_task_options(opts); opts.clone; end
 
       def run(roles: luban_roles, hosts: nil, once: false,
-              dry_run: false, format: log_format, verbosity: log_level, **opts)
+              dry_run: false, format:, verbosity:, **opts)
         configure_backend(dry_run: dry_run, format: format, verbosity: verbosity)
         hosts = Array(hosts)
         servers = select_servers(roles, hosts)
