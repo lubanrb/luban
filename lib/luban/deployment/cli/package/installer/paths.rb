@@ -49,7 +49,7 @@ module Luban
         end
 
         def install_log_path
-          @install_log_path ||= package_path.join('log').join(package_full_name)
+          @install_log_path ||= package_path.join('log', package_full_name)
         end
 
         def install_log_file_path
