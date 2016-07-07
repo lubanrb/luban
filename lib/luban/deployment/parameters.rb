@@ -67,8 +67,6 @@ module Luban
         parameter :sshkit_backend
         parameter :authen_key_type
         parameter :default_env
-        parameter :log_format
-        parameter :log_level
         parameter :pty
         parameter :connection_timeout
         parameter :ssh_options
@@ -81,8 +79,6 @@ module Luban
           set_default :sshkit_backend, SSHKit::Backend::Netssh
           set_default :authen_key_type, 'rsa'
           set_default :default_env, { path: '$PATH:/usr/local/bin' }
-          set_default :log_format, :pretty
-          set_default :log_level, :info
           set_default :pty, false
           set_default :connection_timeout, 30 # second
           set_default :ssh_options, {}
