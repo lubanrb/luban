@@ -34,8 +34,7 @@ module Luban
           end
 
           def monitor_executable
-            @monitor_executable ||= env_path.join("#{stage}.#{process_monitor[:env]}").
-                                                  join('bin').join(process_monitor[:name])
+            @monitor_executable ||= env_path.join("#{stage}.#{process_monitor[:env]}", 'bin', process_monitor[:name])
           end
 
           def monitor_command
@@ -174,11 +173,11 @@ module Luban
 
           def check_process!
             if pid_file_missing?
-              "#{service_full_name}: started but PID file does NOT exist - #{pid_file_path}"
+              "#{service_full_name}: started but PID file(s) do NOT exist in #{pids_path}"
             elsif process_started?
-              "#{service_full_name}: started (PID #{pid})"
+              "#{service_full_name}: started - PID(s) #{pid})"
             elsif pid_file_orphaned?
-              "#{service_full_name}: stopped but PID file exists - #{pid_file_path}"
+              "#{service_full_name}: stopped but PID file(s) exist in #{pids_path}"
             else
               "#{service_full_name}: stopped"
             end
@@ -206,6 +205,37 @@ module Luban
 
           def unmonitor_process!
             test("#{unmonitor_command} 2>&1")
+          end
+        end
+
+        module Cluster
+          def pid_file_pattern
+            raise NotImplementedError, "#{self.class.name}#pid_file_pattern is an abstract method."
+          end
+
+          def pid_files_path
+            pids_path.join(pid_file_pattern)
+          end
+
+          def pid_files
+            capture(:ls, "-A #{pid_files_path} 2>/dev/null").split.map do |f|
+              Pathname.new(f)
+            end
+          end
+
+          def pids
+            pid_files.collect { |pid_file| capture(:cat, "#{pid_file} 2>/dev/null") }
+          end
+
+          def pid; pids; end
+
+          def pid_file_exists?
+            # Any pid file is NOT zero size
+            pid_files.any? { |pid_file| file?(pid_file, "-s") }
+          end
+
+          def remove_orphaned_pid_file
+            rm(pid_files_path) if pid_file_orphaned?
           end
         end
 
