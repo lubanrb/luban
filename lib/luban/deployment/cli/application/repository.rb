@@ -23,11 +23,11 @@ module Luban
         end
 
         def clone_path
-          @clone_path ||= workspace_path.join('repositories').join(type)
+          @clone_path ||= workspace_path.join('repositories', type)
         end
 
         def releases_path
-          @releases_path ||= workspace_path.join('releases').join(type)
+          @releases_path ||= workspace_path.join('releases', type)
         end
 
         def release_package_path
@@ -67,7 +67,7 @@ module Luban
         #   release: copy the contents of cloned repository onto the release path
         [:available?, :cloned?, :fetch_revision, :clone, :update, :release].each do |method|
           define_method(method) do
-            raise NotImplementedError, "\#{self.class.name}##{__method__} is an abstract method."
+            raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
           end
         end
 
@@ -75,12 +75,12 @@ module Luban
           assure_dirs(clone_path, releases_path)
           if cloned? and !force?
             update_revision
-            update_result "Skipped! Local #{type} repository has been built ALREADY.", status: :skipped
+            update_result "Skipped! Local #{type} repository has been built ALREADY (#{revision}).", status: :skipped
           else
             if available?
               if build!
                 update_revision
-                update_result "Successfully built local #{type} repository."
+                update_result "Successfully built local #{type} repository (#{revision})."
               else
                 update_result "FAILED to build local #{type} repository!", status: :failed, level: :error
               end
