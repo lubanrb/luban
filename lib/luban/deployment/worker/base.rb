@@ -29,6 +29,13 @@ module Luban
           @env_name ||= "#{stage}.#{project}/#{application}"
         end
 
+        def target_name; task.opts.name; end
+        def target_full_name; "#{target_name}-#{target_version}"; end
+
+        def target_version; task.opts.version; end
+        def target_major_version; task.opts.major_version || target_version; end
+        def target_patch_level; task.opts.patch_level || ''; end
+
         def run
           update_result(__return__: @run_blk ? run_with_block : run_with_command).to_h
         end

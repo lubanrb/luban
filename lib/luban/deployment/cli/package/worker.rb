@@ -26,12 +26,9 @@ module Luban
           end
         end
 
-        def package_name; File.basename(task.opts.name); end
-        def package_full_name; "#{package_name}-#{package_version}"; end
-
-        def package_version; task.opts.version; end
-        def package_major_version; task.opts.major_version; end
-        def package_patch_level; task.opts.patch_level; end
+        %i(name full_name version major_version patch_level).each do |method|
+          define_method("package_#{method}") { send("target_#{method}") }
+        end
 
         def parent; task.opts.parent; end
         def child?; !parent.nil?; end

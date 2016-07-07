@@ -5,16 +5,21 @@ module Luban
         include Luban::Deployment::Worker::Paths::Remote
         include Luban::Deployment::Service::Worker::Base
 
-        def service_name
-          @service_name ||= task.opts.name
+        %i(name full_name version major_version patch_level).each do |method|
+          define_method("application_#{method}") { send("target_#{method}") }
         end
 
-        def service_version
-          @service_version ||= task.opts.version
+        def packages; task.opts.packages; end
+
+        def package_version(package_name); packages[package_name.to_sym].current_version; end
+
+        def package_path(package_name)
+          @package_path ||= luban_install_path.join('pkg', package_name.to_s, 'versions', 
+                                                    package_version(package_name))
         end
 
-        def service_full_name
-          @service_full_name ||= "#{service_name}-#{service_version}"
+        def package_bin_path(package_name)
+          @package_bin_path ||= package_path(package_name).join('bin')
         end
       end
     end

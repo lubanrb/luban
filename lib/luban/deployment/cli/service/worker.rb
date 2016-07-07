@@ -3,16 +3,8 @@ module Luban
     module Service
       class Worker < Luban::Deployment::Package::Worker
         module Base
-          def service_name
-            @service_name ||= package_name
-          end
-
-          def service_version
-            @service_version ||= package_version
-          end
-
-          def service_full_name
-            @service_full_name ||= package_full_name
+          %i(name full_name version major_version patch_level).each do |method|
+            define_method("service_#{method}") { send("target_#{method}") }
           end
 
           def service_entry
@@ -20,7 +12,7 @@ module Luban
           end
 
           def profile_path
-            @profile_path ||= shared_path.join('profile').join(service_name)
+            @profile_path ||= shared_path.join('profile', service_name)
           end
 
           def log_path
