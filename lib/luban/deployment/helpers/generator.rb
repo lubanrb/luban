@@ -45,7 +45,7 @@ module Luban
 
           def skeletons_path
             @skeletons_path ||= 
-              Pathname.new(__FILE__).dirname.join('..').join('templates').realpath
+              Pathname.new(__FILE__).dirname.join('..', 'templates').realpath
           end
 
           def copy_dir(src_path, dst_path, stages: [], depth: 1)
@@ -123,12 +123,12 @@ module Luban
             @application_target_path ||= apps_path.join(application)
           end
 
-          def application_name
+          def application_class_name
             "#{project}:#{application}".camelcase
           end
 
           def create_application_skeleton
-            puts "Creating skeleton for #{stage} application #{application_name}"
+            puts "Creating skeleton for #{stage} application #{application_class_name}"
             copy_dir(application_skeleton_path, application_target_path, stages: [stage])
           end
         end
