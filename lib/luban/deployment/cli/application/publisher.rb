@@ -43,11 +43,11 @@ module Luban
         end
 
         def bundle_path
-          @bundle_path ||= shared_path.join('vendor').join('bundle')
+          @bundle_path ||= shared_path.join('vendor', 'bundle')
         end
 
         def gems_cache_path
-          @gems_cache_path ||= shared_path.join('vendor').join('cache')
+          @gems_cache_path ||= shared_path.join('vendor', 'cache')
         end
 
         def bundle_without
@@ -118,7 +118,6 @@ module Luban
 
         def create_symlinks
           send("create_#{release_type}_symlinks")
-          create_shared_symlinks_for(:directory, linked_dirs)
           create_shared_symlinks_for(:directory, bundle_linked_dirs) if file?(gemfile)
         end
 
@@ -129,7 +128,7 @@ module Luban
 
         def create_app_symlinks
           create_release_symlink(app_path)
-          create_shared_symlinks_for(:directory, %w(profile))
+          create_shared_symlinks_for(:directory, linked_dirs | %w(profile))
           create_shared_symlinks_for(:file, linked_files)
         end
 
