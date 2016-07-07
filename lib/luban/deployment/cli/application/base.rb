@@ -69,60 +69,87 @@ module Luban
         opts[:roles] << scm_role unless scm_role.nil?
         promptless_authen!(args: args, opts: opts)
       end
+      dispatch_task :public_key!, to: :authenticator, as: :public_key, locally: true
+      dispatch_task :promptless_authen!, to: :authenticator, as: :promptless_authen
 
       def setup(args:, opts:)
         show_app_environment
         promptless_authen(args: args, opts: opts)
         setup!(args: args, opts: opts)
       end
+      dispatch_task :setup!, to: :constructor, as: :setup
 
       def build(args:, opts:)
         show_app_environment
-        install_all(args: args, opts: opts)
+        install_all!(args: args, opts: opts)
         build_repositories(args: args, opts: opts)
       end
 
       def destroy(args:, opts:)
-        uninstall_all(args: args, opts: opts)
+        uninstall_all!(args: args, opts: opts)
         destroy!(args: args, opts: opts)
-      end
-
-      %i(install_all uninstall_all).each do |action|
-        define_method(action) do |args:, opts:|
-          packages.each_value { |p| p.send(__method__, args: args, opts: opts) }
-        end
-      end
-
-      (Luban::Deployment::Command::Tasks::Install::Actions - 
-       %i(setup build destroy)).each do |action|
-        define_method(action) do |args:, opts:|
-          show_app_environment
-          packages.each_value { |p| p.send(__method__, args: args, opts: opts) }
-        end
-      end
-
-      alias_method :cleanup_packages, :cleanup
-      def cleanup(args:, opts:)
-        cleanup_packages(args: args, opts: opts)
-        cleanup!(args: args, opts: opts)
       end
 
       def destroy_project(args:, opts:)
         show_app_environment
         destroy!(args: args, opts: opts.merge(destroy_project: true))
       end
+      dispatch_task :destroy!, to: :constructor, as: :destroy
+
+      %i(install_all uninstall_all).each do |action|
+        define_method("#{action}!") do |args:, opts:|
+          packages.each_value { |p| p.send(action, args: args, opts: opts) }
+        end
+        protected "#{action}!"
+      end
+
+      (Luban::Deployment::Command::Tasks::Install::Actions - %i(setup build destroy)).each do |action|
+        define_method(action) do |args:, opts:|
+          show_app_environment
+          send("#{action}!", args: args, opts: opts)
+        end
+
+        define_method("#{action}!") do |args:, opts:|
+          packages.each_value { |p| p.send(action, args: args, opts: opts) }
+        end
+        protected "#{action}!"
+      end
+
+      alias_method :cleanup_packages!, :cleanup!
+      def cleanup!(args:, opts:)
+        cleanup_packages!(args: args, opts: opts)
+        cleanup_application!(args: args, opts: opts)
+      end
+      protected :cleanup!
+      dispatch_task :cleanup_application!, to: :constructor, as: :cleanup
 
       def deploy(args:, opts:)
         show_app_environment
+        if has_source?
+          release = deploy_release(args: args, opts: opts)
+          opts = opts.merge(release: release)
+        end
         deploy_profile(args: args, opts: opts) if has_profile?
-        deploy_release(args: args, opts: opts) if has_source?
       end
 
       Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
         define_method(action) do |args:, opts:|
           show_app_environment
-          services.each_value { |s| s.send(__method__, args: args, opts: opts) }
+          send("#{action}!", args: args, opts: opts)
         end
+
+        define_method("#{action}!") do |args:, opts:|
+          send("application_#{action}!", args: args, opts: opts) if has_source?
+          send("service_#{action}!", args: args, opts: opts)
+        end
+        protected "#{action}!"
+
+        dispatch_task "application_#{action}!", to: :controller, as: action
+
+        define_method("service_#{action}!") do |args:, opts:|
+          services.each_value { |s| s.send(action, args: args, opts: opts) }
+        end
+        protected "service_#{action}!"
       end
 
       def init_profiles(args:, opts:)
@@ -136,6 +163,7 @@ module Luban
           init_profile!(args: args, opts: opts.merge(default_templates: default_templates))
         end
       end
+      dispatch_task :init_profile!, to: :configurator, as: :init_profile, locally: true
 
       def init_service_profiles(args:, opts:)
         return if opts[:app]
@@ -171,6 +199,11 @@ module Luban
         set_default_profile
       end
 
+      def set_default_application_parameters
+        super
+        linked_dirs.push('log', 'pids')
+      end
+
       def set_default_profile
         if config_finder[:application].has_profile?
           profile(config_finder[:application].stage_profile_path, scm: :rsync) 
@@ -204,7 +237,7 @@ module Luban
       end
 
       def compose_task_options(opts)
-        super.merge(name: 'app').tap do |o|
+        super.merge(name: name.to_s, packages: packages).tap do |o|
           o.merge!(version: source_version) if has_source?
         end
       end
@@ -213,14 +246,11 @@ module Luban
         puts "#{display_name} in #{parent.class.name}"
       end
 
-      %i(setup destroy cleanup).each do |task|
-        dispatch_task "#{task}!", to: :constructor, as: task
-      end
-
       def build_repositories(args:, opts:)
         build_repository!(args: args, opts: opts.merge(repository: profile)) if has_profile?
         build_repository!(args: args, opts: opts.merge(repository: source)) if has_source?
       end
+      dispatch_task :build_repository!, to: :repository, as: :build, locally: true
 
       def deploy_profile(args:, opts:)
         update_profile(args: args, opts: opts)
@@ -231,9 +261,12 @@ module Luban
         update_profile!(args: args, opts: opts)
         services.each_value { |s| s.send(:update_profile, args: args, opts: opts) }
       end
+      dispatch_task :update_profile!, to: :configurator, as: :update_profile, locally: true
 
       def deploy_release(args:, opts:)
-        deploy_release!(args: args, opts: opts.merge(repository: source))
+        deploy_release!(args: args, opts: opts.merge(repository: source)).tap do
+          binstubs!(args: args, opts: opts)
+        end
       end
 
       def deploy_release!(args:, opts:)
@@ -244,12 +277,6 @@ module Luban
         end
       end
       alias_method :deploy_profile!, :deploy_release!
-
-      dispatch_task :promptless_authen!, to: :authenticator, as: :promptless_authen
-      dispatch_task :public_key!, to: :authenticator, as: :public_key, locally: true
-      dispatch_task :init_profile!, to: :configurator, as: :init_profile, locally: true
-      dispatch_task :update_profile!, to: :configurator, as: :update_profile, locally: true
-      dispatch_task :build_repository!, to: :repository, as: :build, locally: true
       dispatch_task :package_release!, to: :repository, as: :package, locally: true
       dispatch_task :publish_release!, to: :publisher, as: :publish
     end
