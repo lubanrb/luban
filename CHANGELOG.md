@@ -1,6 +1,33 @@
 # Change log
 
-## Version 0.5.5 (WIP)
+## Version 0.6.0 (Jul 08, 2016)
+
+New features:
+  * Added support for Cluster in Service::Controller
+  * Added control & configuration support for application if it has its own source code
+
+Minor enhancements:
+  * Ensured profile updates with the updated release info passed thru task to Configurator
+  * Refactored and standardized the following metadata for worker task:
+    * :name, :full_name, :version:, :major_version, :patch_level
+    * Created correponding instance methods with proper prefix for worker classes:
+      * Worker::Base with prefix "target_"
+      * Package::Worker with prefix "package_" 
+      * Service::Worker with prefix "service_"
+      * Application::Worker with prefix "application_"
+  * Updated binstubs after source code deployment in case any new bins are deployed
+  * Made task dispatcher method as protected
+  * Removed two unnecessary parameters: :log_format and :log_level
+  * Refactored method #default_templates_path in a DRY way
+  * Minor code cleanup
+
+Bug fixes:
+  * Returned revision as nill if any unexpected errors occur during revision fetching for Git
+  * Do not create symlinks for linked_dirs when publishing application profile
+  * Fixed duplicate result output when output format is not blakchole
+  * Made task dispatcher methods as protected
+
+## Version 0.5.5 (Jun 29, 2016)
 
 Minor enhancements:
   * Refactored app/service profile templates initialization
@@ -15,13 +42,15 @@ Minor enhancements:
 
 ## Version 0.5.1 (Jun 24, 2016)
 
-Minor enhancements:
+New features:
   * Added subcommands #init to initialize deployment application/service profiles
+
+Minor enhancements:
   * Added .gitignore file to the deployment project skeleton
 
 ## Version 0.5.0 (Jun 22, 2016)
 
-Minor enhancements:
+New features:
   * Added a series of subcommands, #init to
     * Initialize a Luban deployment project
     * Initialize a Luban deployment application
