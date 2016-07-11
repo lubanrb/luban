@@ -139,7 +139,7 @@ module Luban
         def render_template(template_file, context: binding)
           require 'erb'
           template = File.read(template_file)
-          ERB.new(template, nil, '<>').result(context)
+          ERB.new(template, nil, '-').result(context)
         end
 
         def revision_match?(file_to_upload, revision)
