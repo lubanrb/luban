@@ -248,6 +248,14 @@ module Luban
           def remove_orphaned_pid_file
             rm(pid_files_path) if pid_file_orphaned?
           end
+
+          def monitor_command
+            @monitor_command ||= "#{monitor_executable} monitor -g #{service_entry}"
+          end
+
+          def unmonitor_command
+            @unmonitor_command ||= "#{monitor_executable} unmonitor -g #{service_entry}"
+          end
         end
 
         include Base
