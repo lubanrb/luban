@@ -200,10 +200,10 @@ module Luban
           end
 
           def show_process!
-            output = ""
-            process_grep.inject("") do |s, (pid, cmd)|
-              s += "#{pid} : #{cmd}\n"
-            end
+            result = process_grep.inject("") do |s, (pid, cmd)|
+                       s += "#{pid} : #{cmd}\n"
+                     end
+            result.empty? ? "No processes are found up and running." : result
           end
 
           def remove_orphaned_pid_file
