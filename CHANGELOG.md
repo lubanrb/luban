@@ -1,5 +1,12 @@
 # Change log
 
+## Version 0.6.1 (Jul 11, 2016)
+
+New features:
+  * Added subcommand #process to grep and show running service/application processes
+  * Subcommands #version and #versions now also show the release info for application
+  * Used group to monitor/unmonitor service for cluster mode
+
 ## Version 0.6.0 (Jul 08, 2016)
 
 New features:
