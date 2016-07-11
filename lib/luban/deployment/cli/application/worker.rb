@@ -21,6 +21,10 @@ module Luban
         def package_bin_path(package_name)
           @package_bin_path ||= package_path(package_name).join('bin')
         end
+
+        def service_entry
+          @service_entry ||= "#{env_name.gsub('/', '.')}.app"
+        end
       end
     end
   end

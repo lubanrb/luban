@@ -115,13 +115,16 @@ module Luban
         protected "#{action}!"
       end
 
-      alias_method :cleanup_packages!, :cleanup!
-      def cleanup!(args:, opts:)
-        cleanup_packages!(args: args, opts: opts)
-        cleanup_application!(args: args, opts: opts)
+      { show_current: :controller, show_summary: :controller,
+        cleanup: :constructor }.each_pair do |action, worker|
+        alias_method "#{action}_packages!", "#{action}!" 
+        define_method("#{action}!") do |args:, opts:|
+          send("#{action}_application!", args: args, opts: opts)
+          send("#{action}_packages!", args: args, opts: opts)
+        end
+        protected "#{action}!"
+        dispatch_task "#{action}_application!", to: worker, as: action
       end
-      protected :cleanup!
-      dispatch_task :cleanup_application!, to: :constructor, as: :cleanup
 
       def deploy(args:, opts:)
         show_app_environment

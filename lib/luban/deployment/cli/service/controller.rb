@@ -108,6 +108,10 @@ module Luban
             update_result check_process!
           end
 
+          def show_process
+            update_result show_process!
+          end
+
           def kill_process
             if process_stopped?
               update_result "Skipped! Already stopped #{service_full_name}", status: :skipped
@@ -188,10 +192,17 @@ module Luban
           end
 
           def process_grep(pattern = process_pattern)
-            capture(:pgrep, "-l -f \"#{pattern}\" 2>/dev/null").split.inject({}) do |h, p|
+            capture(:pgrep, "-l -f \"#{pattern}\" 2>/dev/null").split("\n").inject({}) do |h, p|
               pid, pname = p.split(' ', 2)
               h[pid] = pname
               h
+            end
+          end
+
+          def show_process!
+            output = ""
+            process_grep.inject("") do |s, (pid, cmd)|
+              s += "#{pid} : #{cmd}\n"
             end
           end
 

@@ -46,12 +46,12 @@ module Luban
             end
 
             task :version do
-              desc "Show current version for required packages"
+              desc "Show current version for app/required packages"
               action! :show_current
             end
 
             task :versions do
-              desc "Show package installation summary"
+              desc "Show app/package installation summary"
               action! :show_summary
             end
 
@@ -91,7 +91,7 @@ module Luban
 
         module Control
           Actions = %i(start_process stop_process kill_process
-                       restart_process check_process)
+                       restart_process check_process show_process)
           Actions.each do |action|
             define_method(action) do |args:, opts:|
               raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
@@ -132,6 +132,11 @@ module Luban
             task :status do
               desc "Check process status"
               action! :check_process
+            end
+
+            task :process do
+              desc "Show running process if any"
+              action! :show_process
             end
           end
         end
