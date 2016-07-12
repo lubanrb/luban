@@ -119,7 +119,7 @@ module Luban
         cleanup: :constructor }.each_pair do |action, worker|
         alias_method "#{action}_packages!", "#{action}!" 
         define_method("#{action}!") do |args:, opts:|
-          send("#{action}_application!", args: args, opts: opts)
+          send("#{action}_application!", args: args, opts: opts) if has_source?
           send("#{action}_packages!", args: args, opts: opts)
         end
         protected "#{action}!"
