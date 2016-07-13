@@ -179,7 +179,7 @@ module Luban
             if pid_file_missing?
               "#{service_full_name}: started but PID file(s) do NOT exist in #{pids_path}"
             elsif process_started?
-              "#{service_full_name}: started - PID(s) #{pid})"
+              "#{service_full_name}: started - PID(s) #{pid}"
             elsif pid_file_orphaned?
               "#{service_full_name}: stopped but PID file(s) exist in #{pids_path}"
             else
