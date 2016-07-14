@@ -45,6 +45,10 @@ module Luban
             @unmonitor_command ||= "#{monitor_executable} unmonitor #{service_entry}"
           end
 
+          def reload_monitor_command
+            @reload_monitor_command ||= "#{monitor_executable} reload"
+          end
+
           def start_process
             if process_started?
               update_result "Skipped! Already started #{service_full_name}", status: :skipped
@@ -152,10 +156,24 @@ module Luban
             end
           end
 
+          def reload_monitor_process
+            if process_monitor_defined?
+              if reload_monitor_process!
+                info "Reloaded process monitor for #{service_entry}"
+              else
+                info "Failed to reload process monitor for #{service_entry}"
+              end
+            end
+          end
+
           def default_pending_seconds; 30; end
           def default_pending_interval; 1; end
 
           protected
+
+          def before_start_process
+            reload_monitor_process
+          end
 
           def check_until(pending_seconds: default_pending_seconds, 
                           pending_interval: default_pending_interval)
@@ -216,6 +234,10 @@ module Luban
 
           def unmonitor_process!
             test("#{unmonitor_command} 2>&1")
+          end
+
+          def reload_monitor_process!
+            test("#{reload_monitor_command} 2>&1")
           end
         end
 
