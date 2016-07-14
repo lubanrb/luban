@@ -1,5 +1,17 @@
 # Change log
 
+## Version 0.6.2 (Jul 14, 2016)
+
+New features:
+  * Automatically reload process monitor before start any apps/services to ensure process monitor has the most updated process monitoring configurations
+
+Minor enhancements:
+  * Added convenient methods to look up project/application instances
+  * Added a convenient method to get current app path/symlink
+
+Bug fixes:
+  * Checked versions ONLY when the application has source code
+
 ## Version 0.6.1 (Jul 11, 2016)
 
 New features:
