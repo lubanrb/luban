@@ -13,7 +13,7 @@ module Luban
         end
 
         def release_path
-          @release_path ||= Pathname.new(readlink(app_path.join('app')))
+          @release_path ||= Pathname.new(readlink(current_app_path))
         end
 
         def releases_path

@@ -45,6 +45,10 @@ module Luban
             @app_path ||= project_path.join(application)
           end
 
+          def current_app_path
+            @app_symlink ||= app_path.join('app')
+          end
+
           def app_bin_path
             @app_bin_path ||= app_path.join('bin')
           end
