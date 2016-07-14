@@ -10,6 +10,11 @@ module Luban
       attr_reader :packages
       attr_reader :services
 
+      def find_project; parent; end
+      def find_application(name = nil)
+        name.nil? ? self : find_project.apps[name.to_sym]
+      end
+
       def has_source?;   !source.empty?; end
       def has_profile?;  !profile.empty?; end
       def has_packages?; !packages.empty?; end

@@ -71,6 +71,11 @@ module Luban
         include Luban::Deployment::Parameters::Application
         include Luban::Deployment::Command::Tasks::Install
 
+        def find_project; parent.parent; end
+        def find_application(name = nil)
+          name.nil? ? parent : find_project.apps[name.to_sym]
+        end
+
         attr_reader :current_version
 
         def package_options; @package_options ||= {}; end
