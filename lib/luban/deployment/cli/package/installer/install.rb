@@ -119,7 +119,7 @@ module Luban
                     end
 
           if installed?
-            installed = '(installed)'
+            installed = 'installed'
             alert = case status
                     when "s*"
                       "Alert! #{package_full_name} is not the current version but symlinked IMPROPERLY. " +
@@ -129,7 +129,7 @@ module Luban
                       "Run \"binstubs\" to fix it."
                     end
           else
-            installed = '(NOT installed)'
+            installed = 'NOT installed'
             alert = nil
           end
           update_result summary: { name: package_full_name, installed: installed, 

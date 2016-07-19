@@ -81,7 +81,7 @@ module Luban
         def package_options; @package_options ||= {}; end
 
         def update_package_options(version, **opts)
-          unless package_options.has_key?(version)
+          unless has_version?(version)
             package_options[version] = 
               { name: name.to_s }.merge!(self.class.decompose_version(version))
           end
@@ -242,7 +242,7 @@ module Luban
         def print_summary(result)
           result.each do |entry|
             s = entry[:summary]
-            puts "  [#{entry[:hostname]}] #{s[:status]} #{s[:name]} #{s[:installed]}"
+            puts "  [#{entry[:hostname]}] #{s[:status]} #{s[:name]} (#{s[:installed]})"
             puts "  [#{entry[:hostname]}]      #{s[:executable]}" unless s[:executable].nil?
             puts "  [#{entry[:hostname]}]    #{s[:alert]}" unless s[:alert].nil?
           end
