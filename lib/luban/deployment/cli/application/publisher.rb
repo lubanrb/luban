@@ -2,11 +2,11 @@ module Luban
   module Deployment
     class Application
       class Publisher < Worker
-        def release_type; task.opts.release[:type]; end
-        def release_tag; task.opts.release[:tag]; end
-        def release_package_path; task.opts.release[:path]; end
-        def release_md5; task.opts.release[:md5]; end
-        def bundled_gems; task.opts.release[:bundled_gems]; end
+        def release_type; task.opts.release_pack[:type]; end
+        def release_tag; task.opts.release_pack[:tag]; end
+        def release_package_path; task.opts.release_pack[:path]; end
+        def release_md5; task.opts.release_pack[:md5]; end
+        def bundled_gems; task.opts.release_pack[:bundled_gems]; end
         def locked_gemfile; bundled_gems[:locked_gemfile]; end
         def gems_source; bundled_gems[:gems_cache]; end
         def gems; bundled_gems[:gems]; end
@@ -19,11 +19,7 @@ module Luban
         end
 
         def releases_path
-          @releases_path ||= super.join(release_type)
-        end
-
-        def release_path
-          @release_path ||= releases_path.join(release_tag)
+          @releases_path ||= super.dirname.join(release_type)
         end
 
         def releases_log_path

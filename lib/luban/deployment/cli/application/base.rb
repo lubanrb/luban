@@ -9,7 +9,23 @@ module Luban
 
       attr_reader :packages
       attr_reader :services
+      attr_reader :release_opts
+      attr_reader :current_version
 
+      def self.action_on_packages(action, as: action)
+        define_method(action) do |args:, opts:|
+          packages.each_value { |p| p.send(as, args: args, opts: opts) }
+        end
+        protected action
+      end
+
+      def self.action_on_services(action, as: action)
+        define_method(action) do |args:, opts:|
+          services.each_value { |s| s.send(as, args: args, opts: opts) }
+        end
+        protected action
+      end
+      
       def find_project; parent; end
       def find_application(name = nil)
         name.nil? ? self : find_project.apps[name.to_sym]
@@ -20,9 +36,9 @@ module Luban
       def has_packages?; !packages.empty?; end
       def has_services?; !services.empty?; end
 
-      def installable?;  has_source? or has_packages?; end
-      def deployable?;   has_source?  or has_profile? or has_services?; end
-      def controllable?; has_source? or has_profile? or has_services?; end
+      def installable?;  has_packages?; end
+      def deployable?;   has_source?  or has_profile? end
+      def controllable?; has_source? or has_services?; end
 
       def use_package?(package_name, package_version, servers: [])
         package_name = package_name.to_sym
@@ -32,8 +48,8 @@ module Luban
       end
 
       def other_package_users_for(package_name, package_version, servers: [])
-        parent.package_users_for(package_name, package_version, 
-                                 exclude: [name], servers: servers)
+        find_project.package_users_for(package_name, package_version, 
+                                       exclude: [name], servers: servers)
       end
 
       def package(name, version:, **opts)
@@ -50,24 +66,26 @@ module Luban
       end
       alias_method :require_package, :package
 
-      def source(from = nil, **opts)
-        return @source if from.nil?
-        @source = opts.merge(type: 'app', from: from)
-        if source_version.nil?
-          abort "Aborted! Please specify the source version with :tag, :branch or :ref." 
-        end
-        @source 
-      end
-
-      def source_version
-        @source[:tag] || @source[:branch] || @source[:ref]
-      end
-
       def profile(from = nil, **opts)
-        from.nil? ? @profile : (@profile = opts.merge(type: 'profile', from: from))
+        from.nil? ? @profile : (@profile = opts.merge(type: 'profile', from: from, auto_cleanup: true))
       end
 
-      def password_for(user); parent.password_for(user); end
+      def source(from = nil, **opts)
+        from.nil? ? @source : (@source = opts.merge(type: 'app', from: from))
+      end
+
+      def release(version, **opts)
+        @current_version = version if opts[:current]
+        release_opts[version] = opts.merge(version: version)
+      end
+
+      def has_version?(version)
+        release_opts.has_key?(version)
+      end
+
+      def versions; release_opts.keys; end
+
+      def password_for(user); find_project.password_for(user); end
 
       def promptless_authen(args:, opts:)
         opts = opts.merge(app: self, public_keys: Array(public_key!(args: args, opts: opts)))
@@ -101,63 +119,64 @@ module Luban
       end
       dispatch_task :destroy!, to: :constructor, as: :destroy
 
-      %i(install_all uninstall_all).each do |action|
-        define_method("#{action}!") do |args:, opts:|
-          packages.each_value { |p| p.send(action, args: args, opts: opts) }
-        end
-        protected "#{action}!"
-      end
-
-      (Luban::Deployment::Command::Tasks::Install::Actions - %i(setup build destroy)).each do |action|
+      %i(install_all uninstall_all binstubs which whence).each do |action|
         define_method(action) do |args:, opts:|
           show_app_environment
           send("#{action}!", args: args, opts: opts)
         end
-
-        define_method("#{action}!") do |args:, opts:|
-          packages.each_value { |p| p.send(action, args: args, opts: opts) }
-        end
-        protected "#{action}!"
+        action_on_packages("#{action}!", as: action)
       end
 
-      { show_current: :controller, show_summary: :controller,
-        cleanup: :constructor }.each_pair do |action, worker|
-        alias_method "#{action}_packages!", "#{action}!" 
-        define_method("#{action}!") do |args:, opts:|
-          send("#{action}_application!", args: args, opts: opts) if has_source?
+      def cleanup(args:, opts:)
+        show_app_environment
+        cleanup_packages!(args: args, opts: opts)
+        cleanup_application!(args: args, opts: opts)
+      end
+      action_on_packages :cleanup_packages!, as: :cleanup
+      dispatch_task :cleanup_application!, to: :constructor, as: :cleanup
+
+      %i(show_current show_summary).each do |action|
+        define_method(action) do |args:, opts:|
+          show_app_environment
           send("#{action}_packages!", args: args, opts: opts)
+          send("#{action}_application", args: args, opts: opts) if has_source?
         end
-        protected "#{action}!"
-        dispatch_task "#{action}_application!", to: worker, as: action
+        action_on_packages "#{action}_packages!", as: action
       end
+
+      def show_current_application(args:, opts:)
+        print_summary(get_summary(args: args, opts: opts.merge(version: current_version)))
+      end
+
+      def show_summary_application(args:, opts:)
+        versions.each do |version|
+          print_summary(get_summary(args: args, opts: opts.merge(version: version)))
+        end
+      end
+      dispatch_task :get_summary, to: :controller, as: :get_summary
 
       def deploy(args:, opts:)
         show_app_environment
-        if has_source?
-          release = deploy_release(args: args, opts: opts)
-          opts = opts.merge(release: release)
-        end
+        deploy_release(args: args, opts: opts) if has_source?
         deploy_profile(args: args, opts: opts) if has_profile?
       end
 
       Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
         define_method(action) do |args:, opts:|
           show_app_environment
-          send("#{action}!", args: args, opts: opts)
-        end
-
-        define_method("#{action}!") do |args:, opts:|
-          send("application_#{action}!", args: args, opts: opts) if has_source?
           send("service_#{action}!", args: args, opts: opts)
+          send("application_#{action}", args: args, opts: opts) if has_source?
         end
-        protected "#{action}!"
+        action_on_services "service_#{action}!", as: action
 
+        define_method("application_#{action}") do |args:, opts:|
+          if current_version
+            send("application_#{action}!", args: args, opts: opts.merge(version: current_version))
+          else
+            abort "Aborted! No current version of #{display_name} is specified."
+          end
+        end
         dispatch_task "application_#{action}!", to: :controller, as: action
-
-        define_method("service_#{action}!") do |args:, opts:|
-          services.each_value { |s| s.send(action, args: args, opts: opts) }
-        end
-        protected "service_#{action}!"
       end
 
       def init_profiles(args:, opts:)
@@ -178,7 +197,7 @@ module Luban
         if services.has_key?(opts[:service])
           services[opts[:service]].init_profile(args: args, opts: opts)
         else
-          services.values.each { |s| s.init_profile(args: args, opts: opts) }
+          services.each_value { |s| s.init_profile(args: args, opts: opts) }
         end
       end
 
@@ -191,6 +210,7 @@ module Luban
         @services = {}
         @source = {}
         @profile = {}
+        @release_opts = {}
       end
 
       def validate_parameters
@@ -246,9 +266,19 @@ module Luban
 
       def compose_task_options(opts)
         super.merge(name: name.to_s, packages: packages).tap do |o|
-          o.merge!(version: source_version) if has_source?
+          version = o[:version]
+          unless version.nil?
+            o.merge!(release: release_opts[version])
+            update_release_tag(o)
+          end
         end
       end
+
+      def update_release_tag(version:, **opts)
+        release_opts[version][:tag] ||= 
+          release_tag(args: {}, opts: opts.merge(repository: source))
+      end
+      dispatch_task :release_tag, to: :repository, as: :release_tag, locally: true
 
       def show_app_environment
         puts "#{display_name} in #{parent.class.name}"
@@ -262,31 +292,40 @@ module Luban
 
       def deploy_profile(args:, opts:)
         update_profile(args: args, opts: opts)
-        deploy_profile!(args: args, opts: opts.merge(repository: profile))
+        deploy_profile!(args: args, opts: opts.merge(version: current_version, repository: profile))
       end
 
       def update_profile(args:, opts:)
-        update_profile!(args: args, opts: opts)
+        update_profile!(args: args, opts: opts.merge(version: current_version))
         services.each_value { |s| s.send(:update_profile, args: args, opts: opts) }
       end
       dispatch_task :update_profile!, to: :configurator, as: :update_profile, locally: true
 
       def deploy_release(args:, opts:)
-        deploy_release!(args: args, opts: opts.merge(repository: source)).tap do
-          binstubs!(args: args, opts: opts)
+        opts = opts.merge(repository: source)
+        versions.each do |version|
+          deploy_release!(args: args, opts: opts.merge(version: version))
         end
       end
 
       def deploy_release!(args:, opts:)
-        package_release!(args: args, opts: opts)[:release].tap do |release|
-          unless release.nil?
-            publish_release!(args: args, opts: opts.merge(release: release))
+        package_release!(args: args, opts: opts)[:release_pack].tap do |pack|
+          unless pack.nil?
+            publish_release!(args: args, opts: opts.merge(release_pack: pack))
           end
         end
       end
       alias_method :deploy_profile!, :deploy_release!
       dispatch_task :package_release!, to: :repository, as: :package, locally: true
       dispatch_task :publish_release!, to: :publisher, as: :publish
+
+      def print_summary(result)
+        result.each do |entry|
+          s = entry[:summary]
+          puts "  [#{entry[:hostname]}] #{s[:status]} #{s[:name]} (#{s[:published]})"
+          puts "  [#{entry[:hostname]}]    #{s[:alert]}" unless s[:alert].nil?
+        end
+      end
     end
   end
 end

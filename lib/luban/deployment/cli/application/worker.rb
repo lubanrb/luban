@@ -25,6 +25,16 @@ module Luban
         def service_entry
           @service_entry ||= "#{env_name.gsub('/', '.')}.app"
         end
+
+        def release_tag; task.opts.release[:tag]; end
+
+        def releases_path
+          @releases_path ||= super.join('app')
+        end
+
+        def release_path
+          @release_path ||= releases_path.join(release_tag)
+        end
       end
     end
   end

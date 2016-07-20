@@ -4,52 +4,46 @@ module Luban
       class Controller < Worker
         include Luban::Deployment::Service::Controller::Base
 
-        def current_release?(_release_tag)
-          _release_tag =~ /^#{Regexp.escape(application_version)}/
+        def current_configured?; !!task.opts.release[:current]; end
+        alias_method :current?, :current_configured?
+
+        def current_symlinked?
+          release_tag == current_release_tag
         end
 
-        def current_symlinked?(_release_tag)
-          _release_tag == release_tag
-        end
-
-        def release_path
-          @release_path ||= Pathname.new(readlink(current_app_path))
-        end
-
-        def releases_path
-          @releases_path ||= release_path.dirname
-        end
-
-        def release_tag
-          @release_tag ||= release_path.basename.to_s
-        end
-
-        def show_current
-          update_result get_summary(release_tag)
-        end
-
-        def show_summary
-          update_result get_summary(*get_releases)
-        end
-
-        def get_releases
-          capture(:ls, '-xt', releases_path).split
-        end
-
-        protected
-
-        def get_status(tag)
-          if current_symlinked?(tag)
-            current_release?(tag) ? " *" : "s*"
+        def current_release_tag
+          if symlink?(current_app_path)
+            File.basename(readlink(current_app_path))
           else
-            (current_release?(tag) and !current_release?(release_tag)) ? "c*" : "  "
+            nil
           end
         end
 
-        def get_summary(*release_tags)
-          release_tags.inject([]) do |r, tag|
-            r.push "#{get_status(tag)} #{application_name}:#{tag} (published)"
-          end.join("\n")
+        def published?
+          directory?(release_path)
+        end
+
+        def get_summary
+          status = if current_symlinked?
+                     current? ? " *" : "s*"
+                   else
+                     current? ? "c*" : "  "
+                   end
+
+          if published?
+            published = 'published'
+            alert = case status
+                    when "s*"
+                      "Alert! #{application_name}:#{release_tag} is not the current version but symlinked IMPROPERLY. "
+                    when "c*"
+                      "Alert! #{application_name}:#{release_tag} is set as current version but NOT symlinked properly. "
+                    end
+          else
+            published = 'NOT published'
+            alert = nil
+          end
+          update_result summary: { name: "#{application_name}:#{release_tag}", published: published,
+                                   status: status, alert: alert }
         end
       end
     end
