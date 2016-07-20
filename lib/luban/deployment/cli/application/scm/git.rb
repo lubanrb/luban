@@ -4,14 +4,9 @@ module Luban
       class Repository
         module SCM
           module Git
-            attr_reader :tag
-            attr_reader :branch
+            attr_reader :version
 
             def git_cmd; :git; end
-
-            def ref
-              tag || branch || @ref
-            end
 
             def available?
               test(git_cmd, 'ls-remote --heads', from)
@@ -22,8 +17,8 @@ module Luban
             end
 
             def fetch_revision
-              within(clone_path) { capture(git_cmd, "rev-parse --short=#{rev_size} #{ref} 2>/dev/null") }
-              #within(clone_path) { capture(git_cmd, "rev-list --max-count=1 --abbrev-commit --abbrev=rev_size #{ref}") }
+              within(clone_path) { capture(git_cmd, "rev-parse --short=#{rev_size} #{version} 2>/dev/null") }
+              #within(clone_path) { capture(git_cmd, "rev-list --max-count=1 --abbrev-commit --abbrev=rev_size #{version}") }
             end
 
             def clone
@@ -35,11 +30,15 @@ module Luban
             end
 
             def release
-              within(clone_path) { test(git_cmd, :archive, ref, "--prefix=#{release_tag}/ -o #{release_package_path}") }
+              within(clone_path) { test(git_cmd, :archive, version, "--prefix=#{release_tag}/ -o #{release_package_path}") }
+            end
+
+            def reference?
+              !revision.nil? and (revision =~ /^#{version}/ or version =~ /^#{revision}/)
             end
 
             def release_tag
-              @release_tag ||= "#{ref}-#{revision}"
+              @release_tag ||= reference? ? "ref-#{revision}" : "#{version}-#{revision}"
             end
           end
         end
