@@ -210,7 +210,7 @@ module Luban
           end
 
           def process_grep(pattern = process_pattern)
-            capture(:pgrep, "-l -f \"#{pattern}\" 2>/dev/null").split("\n").inject({}) do |h, p|
+            capture(:pgrep, "-l -f -a \"#{pattern}\" 2>/dev/null").split("\n").inject({}) do |h, p|
               pid, pname = p.split(' ', 2)
               h[pid] = pname
               h
