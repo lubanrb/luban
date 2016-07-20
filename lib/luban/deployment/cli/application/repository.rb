@@ -12,6 +12,7 @@ module Luban
         attr_reader :scm
         attr_reader :revision
         attr_reader :rev_size
+        attr_reader :auto_cleanup
 
         def scm_module
           require_relative "scm/#{scm}"
@@ -74,13 +75,11 @@ module Luban
         def build
           assure_dirs(clone_path, releases_path)
           if cloned? and !force?
-            update_revision
-            update_result "Skipped! Local #{type} repository has been built ALREADY (#{revision}).", status: :skipped
+            update_result "Skipped! Local #{type} repository has been built ALREADY.", status: :skipped
           else
             if available?
               if build!
-                update_revision
-                update_result "Successfully built local #{type} repository (#{revision})."
+                update_result "Successfully built local #{type} repository."
               else
                 update_result "FAILED to build local #{type} repository!", status: :failed, level: :error
               end
@@ -93,12 +92,12 @@ module Luban
         def package
           if cloned?
             if package!
-              cleanup_releases
+              cleanup_releases if auto_cleanup
               update_result "Successfully package local #{type} repository to #{release_package_path}.", 
-                            release: { type: type, tag: release_tag,
-                                       path: release_package_path, 
-                                       md5: md5_for_file(release_package_path),
-                                       bundled_gems: bundle_gems }
+                            release_pack: { type: type, tag: release_tag,
+                                            path: release_package_path, 
+                                            md5: md5_for_file(release_package_path),
+                                            bundled_gems: bundle_gems }
             else
               update_result "FAILED to package local #{type} repository!", status: :failed, level: :error
             end
@@ -112,7 +111,11 @@ module Luban
         def init
           @rev_size = DefaultRevisionSize
           task.opts.repository.each_pair { |name, value| instance_variable_set("@#{name}", value) }
+          unless task.opts.release.nil?
+            task.opts.release.each_pair { |name, value| instance_variable_set("@#{name}", value) }
+          end
           load_scm
+          update_revision if cloned?
         end
 
         def load_scm
