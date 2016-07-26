@@ -9,8 +9,10 @@ module Luban
 
       attr_reader :packages
       attr_reader :services
+      attr_reader :current_app
       attr_reader :release_opts
-      attr_reader :current_version
+      attr_reader :current_profile
+      attr_reader :profile_opts
 
       def self.action_on_packages(action, as: action)
         define_method(action) do |args:, opts:|
@@ -67,7 +69,12 @@ module Luban
       alias_method :require_package, :package
 
       def profile(from = nil, **opts)
-        from.nil? ? @profile : (@profile = opts.merge(type: 'profile', from: from, auto_cleanup: true))
+        from.nil? ? @profile : (@profile = opts.merge(type: 'profile', from: from))
+      end
+
+      def profile_release(version, **opts)
+        @current_profile = version if opts[:current]
+        profile_opts[version] = opts.merge(version: version)
       end
 
       def source(from = nil, **opts)
@@ -75,7 +82,7 @@ module Luban
       end
 
       def release(version, **opts)
-        @current_version = version if opts[:current]
+        @current_app = version if opts[:current]
         release_opts[version] = opts.merge(version: version)
       end
 
@@ -84,6 +91,8 @@ module Luban
       end
 
       def versions; release_opts.keys; end
+      def deprecated_versions; release_opts.select {|r, o| o[:deprecated] }.keys; end
+      def deployable_versions; release_opts.select {|r, o| !o[:deprecated] }.keys; end
 
       def password_for(user); find_project.password_for(user); end
 
@@ -145,7 +154,7 @@ module Luban
       end
 
       def show_current_application(args:, opts:)
-        print_summary(get_summary(args: args, opts: opts.merge(version: current_version)))
+        print_summary(get_summary(args: args, opts: opts.merge(version: current_app)))
       end
 
       def show_summary_application(args:, opts:)
@@ -170,8 +179,8 @@ module Luban
         action_on_services "service_#{action}!", as: action
 
         define_method("application_#{action}") do |args:, opts:|
-          if current_version
-            send("application_#{action}!", args: args, opts: opts.merge(version: current_version))
+          if current_app
+            send("application_#{action}!", args: args, opts: opts.merge(version: current_app))
           else
             abort "Aborted! No current version of #{display_name} is specified."
           end
@@ -209,8 +218,9 @@ module Luban
         @packages = {}
         @services = {}
         @source = {}
-        @profile = {}
         @release_opts = {}
+        @profile = {}
+        @profile_opts = {}
       end
 
       def validate_parameters
@@ -234,7 +244,8 @@ module Luban
 
       def set_default_profile
         if config_finder[:application].has_profile?
-          profile(config_finder[:application].stage_profile_path, scm: :rsync) 
+          profile(config_finder[:application].stage_profile_path, scm: :rsync)
+          profile_release(stage, current: true)
         end
       end
 
@@ -275,8 +286,8 @@ module Luban
       end
 
       def update_release_tag(version:, **opts)
-        release_opts[version][:tag] ||= 
-          release_tag(args: {}, opts: opts.merge(repository: source))
+        opts[:release][:tag] ||=
+          release_tag(args: {}, opts: opts.merge(repository: source.merge(version: version)))
       end
       dispatch_task :release_tag, to: :repository, as: :release_tag, locally: true
 
@@ -292,19 +303,21 @@ module Luban
 
       def deploy_profile(args:, opts:)
         update_profile(args: args, opts: opts)
-        deploy_profile!(args: args, opts: opts.merge(version: current_version, repository: profile))
+        deploy_profile!(args: args, opts: opts.merge(repository: profile.merge(version: current_profile)))
       end
 
       def update_profile(args:, opts:)
-        update_profile!(args: args, opts: opts.merge(version: current_version))
+        update_profile!(args: args, opts: opts.merge(version: current_app))
         services.each_value { |s| s.send(:update_profile, args: args, opts: opts) }
       end
       dispatch_task :update_profile!, to: :configurator, as: :update_profile, locally: true
 
       def deploy_release(args:, opts:)
-        opts = opts.merge(repository: source)
-        versions.each do |version|
-          deploy_release!(args: args, opts: opts.merge(version: version))
+        deployable_versions.each do |version|
+          deploy_release!(args: args, opts: opts.merge(repository: source.merge(version: version)))
+        end
+        deprecated_versions.each do |version|
+          deprecate_release!(args: args, opts: opts.merge(repository: source.merge(version: version)))
         end
       end
 
@@ -318,6 +331,16 @@ module Luban
       alias_method :deploy_profile!, :deploy_release!
       dispatch_task :package_release!, to: :repository, as: :package, locally: true
       dispatch_task :publish_release!, to: :publisher, as: :publish
+
+      def deprecate_release!(args:, opts:)
+        deprecate_packaged_release!(args: args, opts: opts)[:release_pack].tap do |pack|
+          unless pack.nil?
+            deprecate_published_release!(args: args, opts: opts.merge(release_pack: pack))
+          end
+        end
+      end
+      dispatch_task :deprecate_packaged_release!, to: :repository, as: :deprecate, locally: true
+      dispatch_task :deprecate_published_release!, to: :publisher, as: :deprecate
 
       def print_summary(result)
         result.each do |entry|
