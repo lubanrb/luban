@@ -1,5 +1,25 @@
 # Change log
 
+## Version 0.6.5 (Jul 27, 2016)
+
+New features:
+  * Remade application release handling to manage multiple releases
+    * Supported deployment for multiple releases
+    * Supported release deprecation
+    * supported release summary
+    * Simplified release cleanup
+
+Minor enhancements:
+  * Changed release_tag format for git commit in Git scm strategy
+  * Used attribute :version to unify :branch, :tag and :ref in Git scm strategy
+  * Deprecated parameter #keep_releases
+    * Releases retension is changed to control by manual configurations
+  * Added option #force for command #deploy
+  * Minor code refactor and cleanup
+
+Bug fixes:
+  * Fixed display issue for pgrep under CentOS
+
 ## Version 0.6.2 (Jul 14, 2016)
 
 New features:
