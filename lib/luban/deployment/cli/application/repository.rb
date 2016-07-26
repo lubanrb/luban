@@ -12,7 +12,7 @@ module Luban
         attr_reader :scm
         attr_reader :revision
         attr_reader :rev_size
-        attr_reader :auto_cleanup
+        attr_reader :version
 
         def scm_module
           require_relative "scm/#{scm}"
@@ -52,7 +52,11 @@ module Luban
         end
 
         def release_tag
-          @release_tag ||= "#{stage}-#{revision}"
+          @release_tag ||= "#{version}-#{revision}"
+        end
+
+        def release_name
+          @release_name ||= "#{application}:#{type}:#{release_tag}"
         end
 
         def bundle_without
@@ -77,45 +81,63 @@ module Luban
           if cloned? and !force?
             update_result "Skipped! Local #{type} repository has been built ALREADY.", status: :skipped
           else
-            if available?
-              if build!
-                update_result "Successfully built local #{type} repository."
-              else
-                update_result "FAILED to build local #{type} repository!", status: :failed, level: :error
-              end
+            abort "Aborted! Remote #{type} repository is NOT available." unless available?
+            if build!
+              update_result "Successfully built local #{type} repository."
             else
-              update_result "Aborted! Remote #{type} repository is NOT available.", status: :failed, level: :error
+              abort "FAILED to build local #{type} repository!"
             end
           end
         end
 
+        def packaged?; file?(release_package_path); end
+
         def package
-          if cloned?
-            if package!
-              cleanup_releases if auto_cleanup
-              update_result "Successfully package local #{type} repository to #{release_package_path}.", 
-                            release_pack: { type: type, tag: release_tag,
-                                            path: release_package_path, 
-                                            md5: md5_for_file(release_package_path),
-                                            bundled_gems: bundle_gems }
-            else
-              update_result "FAILED to package local #{type} repository!", status: :failed, level: :error
-            end
+          abort "Aborted! Local #{type} repository is NOT built yet!" unless cloned?
+          abort "Aborted! FAILED to update local #{type} repository!" unless update
+          update_revision
+          abort "Aborted! Version to package is MISSING!" if version.nil?
+          release_package = ->{ { type: type, version: version, tag: release_tag,
+                                  path: release_package_path, 
+                                  md5: md5_for_file(release_package_path),
+                                  bundled_gems: bundle_gems } }
+          if packaged?
+              if force?
+                release
+              else
+                update_result "Skipped! ALREADY packaged #{release_name}.", status: :skipped,
+                              release_pack: release_package.call
+              end
           else
-            update_result "Aborted! Local #{type} package is NOT built yet!", status: :failed, level: :error
+            release
+            cleanup_releases
           end
+
+          if packaged?
+            update_result "Successfully packaged #{release_name} to #{release_package_path}."
+          else
+            abort "Aborted! FAILED to package #{release_name}!"
+          end
+          update_result release_pack: release_package.call
+        end
+
+        def deprecate
+          abort "Aborted! Local #{type} repository is NOT built yet!" unless cloned?
+          abort "Aborted! Version to deprecate is MISSING!" if version.nil?
+          if file?(release_package_path)
+            rm(release_package_path)
+            update_result "Successfully deprecated packaged release #{release_name}."
+          end
+          update_result release_pack: { type: type, version: version, tag: release_tag }
         end
 
         protected
 
         def init
           @rev_size = DefaultRevisionSize
-          task.opts.repository.each_pair { |name, value| instance_variable_set("@#{name}", value) }
-          unless task.opts.release.nil?
-            task.opts.release.each_pair { |name, value| instance_variable_set("@#{name}", value) }
-          end
+          task.opts.repository.each_pair { |k, v| instance_variable_set("@#{k}", v) }
           load_scm
-          update_revision if cloned?
+          update_revision if cloned? and !version.nil?
         end
 
         def load_scm
@@ -127,23 +149,15 @@ module Luban
           clone
         end
 
-        def package!
-          if update
-            update_revision
-            release
-          end
-        end
-
         def update_revision
           @revision = fetch_revision
         end
 
-        def cleanup_releases
-          files = capture(:ls, '-xt', releases_path).split
+        def cleanup_releases(keep_releases = 1)
+          path = releases_path.join("#{release_prefix}-#{version}-*.#{release_package_extname}")
+          files = capture(:ls, '-xt', path).split(" ")
           if files.count > keep_releases
-            within(releases_path) do
-              files.last(files.count - keep_releases).each { |f| rm(f) }
-            end
+            files.last(files.count - keep_releases).each { |f| rm(f) }
           end
         end
 
