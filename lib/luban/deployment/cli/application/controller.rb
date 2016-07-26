@@ -19,15 +19,14 @@ module Luban
           end
         end
 
-        def published?
-          directory?(release_path)
-        end
+        def published?; directory?(release_path); end
+        def deprecated?; !!task.opts.release[:deprecated]; end
 
         def get_summary
           status = if current_symlinked?
                      current? ? " *" : "s*"
                    else
-                     current? ? "c*" : "  "
+                     current? ? "c*" : (deprecated? ? " d" : "  ")
                    end
 
           if published?
