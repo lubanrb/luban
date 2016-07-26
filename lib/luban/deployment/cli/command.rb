@@ -84,6 +84,7 @@ module Luban
           def setup_deploy_tasks
             task :deploy do
               desc "Run deployment"
+              switch :force, "Force to deploy", short: :f
               action! :deploy
             end
           end
