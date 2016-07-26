@@ -3,6 +3,7 @@ module Luban
     class Application
       class Publisher < Worker
         def release_type; task.opts.release_pack[:type]; end
+        def release_version; task.opts.release_pack[:version]; end
         def release_tag; task.opts.release_pack[:tag]; end
         def release_package_path; task.opts.release_pack[:path]; end
         def release_md5; task.opts.release_pack[:md5]; end
@@ -14,8 +15,8 @@ module Luban
         def publish_app?; release_type == 'app'; end
         def publish_profile?; release_type == 'profile'; end
 
-        def display_name
-          @display_name ||= "#{application} #{release_type} (release: #{release_tag})"
+        def release_name
+          @release_name ||= "#{application}:#{release_type}:#{release_tag}"
         end
 
         def releases_path
@@ -58,9 +59,7 @@ module Luban
           @bundle_linked_dirs ||= %w(.bundle vendor/cache vendor/bundle)
         end
 
-        def published?
-          get_releases.include?(release_tag)
-        end
+        def published?; directory?(release_path); end
 
         def publish
           assure_dirs(releases_path)
@@ -68,7 +67,7 @@ module Luban
             if force?
               publish!
             else
-              update_result "Skipped! #{display_name} has been published ALREADY.", status: :skipped
+              update_result "Skipped! ALREADY published #{release_name}.", status: :skipped
               return
             end
           else
@@ -76,9 +75,16 @@ module Luban
           end
 
           if published?
-            update_result "Successfully published #{display_name}."
+            update_result "Successfully published #{release_name}."
           else
-            update_result "Failed to publish #{display_name}", status: :failed, level: :error
+            update_result "FAILED to publish #{release_name}.", status: :failed, level: :error
+          end
+        end
+
+        def deprecate
+          if directory?(release_path)
+            rmdir(release_path)
+            update_result "Successfully deprecated published release #{release_name}."
           end
         end
 
@@ -88,10 +94,6 @@ module Luban
         end
 
         protected
-
-        def get_releases
-          capture(:ls, '-xt', releases_path).split
-        end
 
         def publish!
           rollout_release
@@ -157,23 +159,13 @@ module Luban
         end
 
         def release_log_message
-          "Release #{display_name} in #{stage} #{project} is published successfully."
+          "#{release_name} in #{stage} #{project} is published successfully."
         end
 
-        def cleanup_releases
-          releases = get_releases
-          if releases.count > keep_releases
-            releases_to_keep = releases.first(keep_releases)
-            unless releases_to_keep.include?(release_tag)
-              releases_to_keep[-1] = release_tag
-            end
-            releases_to_remove = releases - releases_to_keep
-            releases_to_remove.each do |release| 
-              rmdir(releases_path.join(release))
-            end
-            info "Removed #{releases_to_remove.count} old releases."
-          else
-            info "No old releases to remove (keeping most recent #{keep_releases} releases)."
+        def cleanup_releases(keep_releases = 1)
+          files = capture(:ls, '-xtd', releases_path.join("#{release_version}-*")).split(" ")
+          if files.count > keep_releases
+            files.last(files.count - keep_releases).each { |f| rmdir(f) }
           end
         end
 
