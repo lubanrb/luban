@@ -4,8 +4,6 @@ module Luban
       class Repository
         module SCM
           module Git
-            attr_reader :version
-
             def git_cmd; :git; end
 
             def available?
@@ -33,12 +31,20 @@ module Luban
               within(clone_path) { test(git_cmd, :archive, version, "--prefix=#{release_tag}/ -o #{release_package_path}") }
             end
 
-            def reference?
-              !revision.nil? and (revision =~ /^#{version}/ or version =~ /^#{revision}/)
+            def branch?
+              within(clone_path) { test(git_cmd, :"show-ref", "--quite --verify refs/heads/#{version}") }
+            end
+
+            def tag?
+              within(clone_path) {test(git_cmd, :"show-ref", "--quite --verify refs/tags/#{version}") }
+            end
+
+            def commit?
+              version =~ /^\h+/ and !revision.nil?
             end
 
             def release_tag
-              @release_tag ||= reference? ? "ref-#{revision}" : "#{version}-#{revision}"
+              @release_tag ||= commit? ? "ref-#{revision}" : super
             end
           end
         end
