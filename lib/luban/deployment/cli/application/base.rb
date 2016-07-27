@@ -27,6 +27,20 @@ module Luban
         end
         protected action
       end
+
+      def self.application_action(action, dispatch_to: nil, as: action, locally: false, &blk)
+          define_method(action) do |args:, opts:|
+            if current_app
+              send("#{__method__}!", args: args, opts: opts.merge(version: current_app))
+            else
+              abort "Aborted! No current version of #{display_name} is specified."
+            end
+          end
+          unless dispatch_to.nil?
+            dispatch_task "#{action}!", to: dispatch_to, as: as, locally: locally, &blk
+            protected "#{action}!"
+          end
+        end
       
       def find_project; parent; end
       def find_application(name = nil)
@@ -177,15 +191,7 @@ module Luban
           send("application_#{action}", args: args, opts: opts) if has_source?
         end
         action_on_services "service_#{action}!", as: action
-
-        define_method("application_#{action}") do |args:, opts:|
-          if current_app
-            send("application_#{action}!", args: args, opts: opts.merge(version: current_app))
-          else
-            abort "Aborted! No current version of #{display_name} is specified."
-          end
-        end
-        dispatch_task "application_#{action}!", to: :controller, as: action
+        application_action "application_#{action}", dispatch_to: :controller, as: action
       end
 
       def init_profiles(args:, opts:)
