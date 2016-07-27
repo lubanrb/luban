@@ -216,10 +216,11 @@ module Luban
         locally ? result.first[:__return__] : result
       end
 
-      def default_templates_path(base_path = nil)
-        return @default_templates_path if base_path.nil?
+      def default_templates_path; nil; end
+
+      def base_templates_path(base_path)
         path = Pathname.new(base_path).dirname.join('templates')
-        @default_templates_path ||= path.exist? ? path.realpath : nil
+        path.exist? ? path.realpath : nil
       end
 
       def default_templates
