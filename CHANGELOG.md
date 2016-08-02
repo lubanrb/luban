@@ -1,6 +1,6 @@
 # Change log
 
-## Version 0.6.7 (Jul 28, 2016)
+## Version 0.6.7 (Aug 02, 2016)
 
 Minor enhancements:
   * Added convenient class method #applcation_action
