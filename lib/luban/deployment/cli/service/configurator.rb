@@ -24,8 +24,12 @@ module Luban
             [profile_templates_path, stage_profile_templates_path].each do |path|
               Dir.chdir(path) { @profile_templates |= Dir["**/*.#{format}"] } if path.directory?
             end
-            @profile_templates
+            @profile_templates.tap do |templates| 
+              templates.reject! { |t| exclude_template?(t) }
+            end
           end
+
+          def exclude_template?(template); false; end
 
           def default_templates; task.opts.default_templates; end
 
