@@ -1,5 +1,14 @@
 # Change log
 
+## Version 0.6.7 (Jul 28, 2016)
+
+Minor enhancements:
+  * Added convenient class method #applcation_action
+  * Removed support for Cluster in Service::Controller
+    * Support for Cluster has been moved to Rack::Controller (luban-rack)
+  * Added exclude filter, #exclude_template?, for #profile_templates in Service::Configurator
+    * Facilitate template filtering during profile rendering
+
 ## Version 0.6.6 (Jul 27, 2016)
 
 Bug fixes:
