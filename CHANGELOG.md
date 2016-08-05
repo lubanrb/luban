@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.6.8 (Aug 05, 2016)
+
+Bug fixes:
+  * Fixed missing default templates in application class inheritance
+
 ## Version 0.6.7 (Aug 02, 2016)
 
 Minor enhancements:
