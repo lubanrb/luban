@@ -103,7 +103,7 @@ module Luban
           end
 
           def project_target_path
-            @project_target_path ||= (work_dir or Pathname.pwd.join(project))
+            @project_target_path ||= (work_dir or Pathname.pwd.join("#{project}.deploy"))
           end
 
           def create_project_skeleton
