@@ -201,7 +201,9 @@ module Luban
             options << "--gemfile #{gemfile}"
             options << "--path #{bundle_path}"
             unless test(bundle_cmd, :check, *options)
-              options << "--without #{bundle_without.join(' ')}"
+              unless bundle_without.include?(stage.to_s)
+                options << "--without #{bundle_without.join(' ')}"
+              end
               options << bundle_flags.join(' ')
               execute(bundle_cmd, :install, *options)
             end

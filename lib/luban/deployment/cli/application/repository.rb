@@ -170,8 +170,14 @@ module Luban
           if test(:tar, "-tzf #{release_package_path} #{gemfile_path} > /dev/null 2>&1")
             within(workspace_path) do
               execute(:tar, "--strip-components=1 -xzf #{release_package_path} #{gemfile_path}")
-              unless test(:bundle, :check, "--path #{bundle_path}")
-                execute(:bundle, :install, "--path #{bundle_path} --without #{bundle_without.join(' ')} --quiet")
+              options = []
+              options << "--path #{bundle_path}"
+              unless test(:bundle, :check, *options)
+                unless bundle_without.include?(stage.to_s)
+                  options << "--without #{bundle_without.join(' ')}"
+                end
+                options << "--quiet"
+                execute(:bundle, :install, *options)
                 info "Package gems bundled in Gemfile"
                 execute(:bundle, :package, "--all --quiet")
               end
