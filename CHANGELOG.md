@@ -1,5 +1,14 @@
 # Change log
 
+## Version 0.6.9 (Aug 15, 2016)
+
+Minor enhancements:
+  * Set parameter #project in Lubanfile template used in project initiation
+  * Added suffix ".deploy" as extension to project target path as a convention
+
+Bug fixes:
+  * Handled bundle_without properly based on the deployment stage
+
 ## Version 0.6.8 (Aug 05, 2016)
 
 Bug fixes:
