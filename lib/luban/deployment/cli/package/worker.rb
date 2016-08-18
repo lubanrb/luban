@@ -31,8 +31,7 @@ module Luban
         end
 
         def parent; task.opts.parent; end
-        def child?; !parent.nil?; end
-        
+        def child?; !parent.nil?; end     
 
         def current_path
           @current_path ||= app_path.join(package_name)
