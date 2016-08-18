@@ -186,11 +186,11 @@ module Luban
           end
 
           def start_process!
-            capture("#{start_command} 2>&1")
+            capture(compose_command(start_command))
           end
 
           def stop_process!
-            capture("#{stop_command} 2>&1")
+            capture(compose_command(stop_command))
           end
 
           def check_process!
@@ -229,15 +229,15 @@ module Luban
           end
 
           def monitor_process!
-            test("#{monitor_command} 2>&1")
+            test(compose_command(monitor_command))
           end
 
           def unmonitor_process!
-            test("#{unmonitor_command} 2>&1")
+            test(compose_command(unmonitor_command))
           end
 
           def reload_monitor_process!
-            test("#{reload_monitor_command} 2>&1")
+            test(compose_command(reload_monitor_command))
           end
         end
         

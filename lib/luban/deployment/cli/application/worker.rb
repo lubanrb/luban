@@ -5,6 +5,10 @@ module Luban
         include Luban::Deployment::Worker::Paths::Remote
         include Luban::Deployment::Service::Worker::Base
 
+        def shell_setup_commands
+          super << "cd #{release_path}"
+        end
+
         %i(name full_name version major_version patch_level).each do |method|
           define_method("application_#{method}") { send("target_#{method}") }
         end

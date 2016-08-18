@@ -25,6 +25,7 @@ module Luban
 
         parameter :stages
         parameter :applications
+        parameter :env_vars
 
         parameter :work_dir
         parameter :apps_path
@@ -37,6 +38,7 @@ module Luban
         def set_default_general_parameters
           set_default :luban_roles, %i(app)
           set_default :luban_root_path, DefaultLubanRootPath
+          set_default :env_vars, {}
           set_default :user, ENV['USER']
           set_default :config_finder, {}
         end

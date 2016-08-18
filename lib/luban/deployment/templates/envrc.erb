@@ -22,6 +22,11 @@ else
   PATH="$LUBAN_ROOT/bin:$PATH"
   export LUBAN_ROOT
   export PATH
-
+  <%- env_vars.each_pair do |name, value| -%>
+  <%= name.upcase %>=<%= value.inspect %>
+  <%- end -%>
+  <%- env_vars.each_key do |name| -%>
+  export <%= name.upcase %>
+  <%- end -%>
   echo_line "Environment <%= env_name %> is activated!"
 fi

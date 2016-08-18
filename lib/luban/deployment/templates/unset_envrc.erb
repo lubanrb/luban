@@ -11,6 +11,9 @@ if [ -n "${LUBAN_ROOT:+x}" ]; then
     PATH=${PATH//$LUBAN_ROOT\/bin:/}
     unset LUBAN_ROOT
     export PATH
+    <%- env_vars.each_key do |name| -%>
+    unset <%= name.upcase %>
+    <%- end -%>
     echo_line "Environment <%= env_name %> is de-activated!"
   else
     local current_env=${LUBAN_ROOT##*env/}

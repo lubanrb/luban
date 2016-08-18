@@ -3,6 +3,14 @@ module Luban
     module Service
       class Worker < Luban::Deployment::Package::Worker
         module Base
+          def shell_setup_commands
+            @shell_setup_commands ||= ["source #{envrc_file}"]
+          end
+
+          def compose_command(cmd)
+            "#{shell_setup_commands.join('; ')}; #{cmd} 2>&1"
+          end
+          
           %i(name full_name version major_version patch_level).each do |method|
             define_method("service_#{method}") { send("target_#{method}") }
           end

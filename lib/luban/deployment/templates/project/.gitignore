@@ -2,4 +2,5 @@
 /Gemfile.lock
 .luban/
 vendor/cache/
+env_vars.rb
 .DS_Store
