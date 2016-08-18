@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.7.0 (Aug 18, 2016)
+
+New features:
+  * Supported app configuration stored in the environment variables
+
 ## Version 0.6.9 (Aug 15, 2016)
 
 Minor enhancements:
