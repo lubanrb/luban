@@ -1,5 +1,14 @@
 # Change log
 
+## Version 0.7.1 (Aug 19, 2016)
+
+Minor enhancements:
+  * Refactor shared symlink creation for linked_dirs and linked_files
+
+Bug fixes:
+  * Properly handled backtrace switch from commandline options
+  * Removed target directory/file if it exists already during creating symlinks for linked_dirs
+
 ## Version 0.7.0 (Aug 18, 2016)
 
 New features:
