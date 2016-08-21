@@ -190,7 +190,7 @@ module Luban
 
       def run_task(cmd: nil, args:, opts:, locally: false,
                    worker_class: self.class.default_worker_class, &blk)
-        backtrace = opts.delete(:backtrace)
+        backtrace = opts[:backtrace]
         task_args = compose_task_arguments(args)
         task_opts = compose_task_options(opts)
         run_opts = extract_run_options(task_opts)
