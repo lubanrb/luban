@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.7.2 (Aug 23, 2016)
+
+Minor enhancements:
+  * Better handled orphaned pid file removal
+
 ## Version 0.7.1 (Aug 19, 2016)
 
 Minor enhancements:
