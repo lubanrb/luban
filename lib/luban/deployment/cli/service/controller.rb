@@ -77,10 +77,10 @@ module Luban
             if check_until { process_stopped? }
               update_result "Stop #{service_full_name}: [OK] #{output}"
             else
-              remove_orphaned_pid_file
               update_result "Stop #{service_full_name}: [FAILED] #{output}",
                             status: :failed, level: :error
             end
+            remove_orphaned_pid_file
           end
 
           def restart_process
@@ -88,6 +88,7 @@ module Luban
               unmonitor_process
               output = stop_process!
               if check_until { process_stopped? }
+                remove_orphaned_pid_file
                 info "Stop #{service_full_name}: [OK] #{output}"
               else
                 remove_orphaned_pid_file
@@ -125,11 +126,11 @@ module Luban
             unmonitor_process
             output = kill_process!
             if check_until { process_stopped? }
-              remove_orphaned_pid_file
               update_result "Kill #{service_full_name}: [OK] #{output}"
             else
               update_result "Kill #{service_full_name}: [FAILED] #{output}"
             end
+            remove_orphaned_pid_file
           end
 
           def process_monitor_defined?
