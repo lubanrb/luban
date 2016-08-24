@@ -105,6 +105,7 @@ module Luban
           upload!(release_package_path.to_s, upload_to.to_s)
           if md5_matched?(upload_to, release_md5) and
              test(:tar, "-xzf #{upload_to} -C #{releases_path}")
+            execute(:touch, release_path)
             create_symlinks
             update_releases_log
           else
