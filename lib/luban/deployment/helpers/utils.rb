@@ -73,7 +73,7 @@ module Luban
         end
 
         def cp(*opts, source_path, target_path)
-          execute(*opts, source_path, target_path)
+          execute(:cp, *opts, source_path, target_path)
         end
 
         def readlink(source_file)
