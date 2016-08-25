@@ -100,6 +100,14 @@ module Luban
         release_opts[version] = opts.merge(version: version)
       end
 
+      def default_source_path
+        @default_source_path ||= config_finder[:application].stage_config_path.join('app')
+      end
+
+      def default_source?
+        has_source? and source[:from] == default_source_path
+      end
+
       def has_version?(version)
         release_opts.has_key?(version)
       end
@@ -198,7 +206,15 @@ module Luban
         show_app_environment
         init_profile(args: args, opts: opts)
         init_service_profiles(args: args, opts: opts)
+        init_source(args: args, opts: opts)
       end
+
+      def init_source(args:, opts:)
+        if default_source?
+          init_source!(args: args, opts: opts.merge(source: source))
+        end
+      end
+      dispatch_task :init_source!, to: :configurator, as: :init_source, locally: true
 
       def init_profile(args:, opts:)
         if opts[:app] or opts[:service].nil?
@@ -246,6 +262,11 @@ module Luban
       def set_default_application_parameters
         super
         linked_dirs.push('log', 'pids')
+      end
+
+      def set_default_source
+        source(default_source_path, scm: :rsync)
+        release(stage, current: true)
       end
 
       def set_default_profile
