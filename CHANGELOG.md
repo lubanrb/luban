@@ -1,5 +1,15 @@
 # Change log
 
+## Version 0.7.3 (Aug 25, 2016)
+
+New features:
+  * Added default/embeded source to support Ruby application like Fluentd whose source code contains Gemfile only
+  * Added .gitkeep to the .gitignore
+
+Bug fixes:
+  * Touch the last release mtime to ensure it will NOT be deleted during release cleanup
+  * Fixed the helper method #cp
+
 ## Version 0.7.2 (Aug 23, 2016)
 
 Minor enhancements:
