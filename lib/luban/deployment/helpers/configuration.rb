@@ -75,8 +75,6 @@ module Luban
           path
         end
 
-        def default_templates_paths; Finder.default_templates_paths; end
-
         protected
 
         def find_template_file_by_config_finder(file_name)

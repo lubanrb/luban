@@ -165,6 +165,16 @@ module Luban
       alias_method :undef_task, :undef_command
 
       class << self
+        def inherited(subclass)
+          super
+          # Ensure default_templates_paths from base class
+          # got inherited to its subclasses
+          paths = instance_variable_get('@default_templates_paths')
+          subclass.instance_variable_set('@default_templates_paths', paths.nil? ? [] : paths.clone)
+        end
+
+        attr_reader :default_templates_paths
+
         def default_worker_class
           Luban::Deployment::Worker::Base
         end
@@ -224,9 +234,11 @@ module Luban
       def default_templates
         return @default_templates unless @default_templates.nil?
         (@default_templates = []).tap do |t|
-          default_templates_paths[0...-1].each { |p| t.concat(p.children).uniq! }
+          default_templates_paths.each { |p| t.concat(p.children).uniq! }
         end
       end
+
+      def default_templates_paths; self.class.default_templates_paths; end
 
       protected
 
