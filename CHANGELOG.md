@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.7.4 (Aug 26, 2016)
+
+Bug fixes:
+  * Fixed reading the md5 file for the source package
+  * Changed default_templates_paths to an inheritable class instance variable to better handle inheritance for default template paths
+
 ## Version 0.7.3 (Aug 25, 2016)
 
 New features:
