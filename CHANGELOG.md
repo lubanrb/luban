@@ -1,5 +1,13 @@
 # Change log
 
+## Version 0.7.7 (Aug 31, 2016)
+
+Minor enhancements:
+  * Added start_sequence & stop_sequence in Project to customize the way to start/stop apps/serivces
+
+Bug fixes:
+  * Used snakecase (instead of downcase) to convert application class name to application name
+
 ## Version 0.7.6 (Aug 30, 2016)
 
 Bug fixes:
