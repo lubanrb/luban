@@ -54,10 +54,29 @@ module Luban
         end
       end
 
-      Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
+      #Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
+      #  define_method(action) do |args:, opts:|
+      #    apps.each_value do |app|
+      #      app.send(__method__, args: args, opts: opts) if app.controllable?
+      #    end
+      #  end
+      #end
+
+      def start_sequence; @start_sequence ||= apps.keys; end
+      def stop_sequence; @stop_sequence ||= start_sequence.reverse; end
+
+      %i(start_process restart_process check_process show_process).each do |action|
         define_method(action) do |args:, opts:|
-          apps.each_value do |app|
-            app.send(__method__, args: args, opts: opts) if app.controllable?
+          start_sequence.each do |app|
+            apps[app].send(__method__, args: args, opts: opts) if apps[app].controllable?
+          end
+        end
+      end
+
+      %i(stop_process kill_process).each do |action|
+        define_method(action) do |args:, opts:|
+          stop_sequence.each do |app|
+            apps[app].send(__method__, args: args, opts: opts) if apps[app].controllable?
           end
         end
       end
