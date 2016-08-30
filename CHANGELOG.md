@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.7.6 (Aug 30, 2016)
+
+Bug fixes:
+  * Used --no-rdoc and --no-ri instead of --no-document to be backward compatible
+  * Ensured extracting Gemfile and Gemfile.lock without raising any exceptions during app packaging
+
 ## Version 0.7.5 (Aug 30, 2016)
 
 Minor enhancements:
