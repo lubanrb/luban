@@ -1,6 +1,6 @@
 # Change log
 
-## Version 0.7.5 (Aug 29, 2016)
+## Version 0.7.5 (Aug 30, 2016)
 
 Minor enhancements:
   * Extracted linked_dirs/linked_files handling into LinkedPaths module
