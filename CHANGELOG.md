@@ -1,5 +1,15 @@
 # Change log
 
+## Version 0.7.5 (Aug 29, 2016)
+
+Minor enhancements:
+  * Extracted linked_dirs/linked_files handling into LinkedPaths module
+  * Used LinkedPaths module to change linked_dirs/linked_files into worker level instance variables instead of global configuration to better cope with different linked paths requirements among different worker classes from Application and Service, like Publisher and Installer
+
+Bug fixes:
+  * Correctly composed the bundle command when installing gems from cache in Publisher
+  * Extracted Gemfile.lock in addition to Gemfile if any from the release tarball to ensure deploy the exact same set of gems specified from the Gemfile.lock in code repository
+
 ## Version 0.7.4 (Aug 26, 2016)
 
 Bug fixes:
