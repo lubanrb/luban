@@ -1,6 +1,7 @@
 module Luban
   module Deployment
     class Application < Luban::Deployment::Command
+      using Luban::CLI::CoreRefinements
       include Luban::Deployment::Parameters::Project
       include Luban::Deployment::Parameters::Application
       include Luban::Deployment::Command::Tasks::Install
@@ -254,7 +255,7 @@ module Luban
       def set_default_parameters
         super
         set_default_project_parameters
-        set_default :application, self.class.name.split(':').last.downcase
+        set_default :application, self.class.name.split(':').last.snakecase
         set_default_application_parameters
         set_default_profile
       end
