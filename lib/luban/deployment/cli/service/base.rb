@@ -30,13 +30,6 @@ module Luban
         def init_profile(args:, opts:)
           orig_init_profile(args: args, opts: opts.merge(default_templates: default_templates))
         end
-
-        protected
-
-        def set_parameters
-          super
-          linked_dirs.push('log', 'pids')
-        end
       end
     end
   end

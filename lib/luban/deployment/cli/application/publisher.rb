@@ -2,6 +2,8 @@ module Luban
   module Deployment
     class Application
       class Publisher < Worker
+        include Luban::Deployment::Helpers::LinkedPaths
+
         def release_type; task.opts.release_pack[:type]; end
         def release_version; task.opts.release_pack[:version]; end
         def release_tag; task.opts.release_pack[:tag]; end
@@ -118,8 +120,7 @@ module Luban
         def create_symlinks
           send("create_#{release_type}_symlinks")
           if file?(gemfile)
-            create_shared_symlinks_for(bundle_linked_dirs, type: :directory,
-                                       from: linked_dirs_from, to: linked_dirs_to)
+            create_linked_dirs(bundle_linked_dirs, from: shared_path, to: release_path)
           end
         end
 
@@ -130,38 +131,22 @@ module Luban
 
         def create_app_symlinks
           create_release_symlink(app_path)
-          create_shared_symlinks_for_linked_dirs
-          create_shared_symlinks_for_linked_files
+          assure_linked_dirs
+          create_symlinks_for_linked_dirs
+          create_symlinks_for_linked_files
         end
 
         def create_release_symlink(target_dir)
           assure_symlink(release_path, target_dir.join(release_type))
         end
 
-        def create_shared_symlinks_for_linked_dirs
-          create_shared_symlinks_for(linked_dirs, type: :directory, 
-                                     from: linked_dirs_from, to: linked_dirs_to)
+        def create_symlinks_for_linked_dirs
+          create_linked_dirs(linked_dirs, from: shared_path, to: release_path)
         end
 
-        def create_shared_symlinks_for_linked_files
-          create_shared_symlinks_for(linked_files, type: :file, 
-                                     from: linked_files_from, to: linked_files_to)
+        def create_symlinks_for_linked_files
+          create_linked_files(linked_files, from: profile_path, to: release_path.join('config'))
         end
-
-        def create_shared_symlinks_for(linked_paths, type:, from:, to:)
-          linked_paths.each do |path|
-            target_path = to.join(path)
-            assure_dirs(target_path.dirname)
-            rm('-r', target_path) if send("#{type}?", target_path)
-            source_path = from.join(path)
-            assure_symlink(source_path, target_path) if send("#{type}?", source_path)
-          end
-        end
-
-        def linked_dirs_from; shared_path; end
-        def linked_dirs_to; release_path; end
-        def linked_files_from; profile_path; end
-        def linked_files_to; release_path.join('config'); end
 
         def create_etc_symlinks
           create_logrotate_symlinks
@@ -216,17 +201,15 @@ module Luban
         end
 
         def install_gems_from_cache
-          within(release_path) do
-            options = []
-            options << "--gemfile #{gemfile}"
-            options << "--path #{bundle_path}"
-            unless test(bundle_cmd, :check, *options)
-              unless bundle_without.include?(stage.to_s)
-                options << "--without #{bundle_without.join(' ')}"
-              end
-              options << bundle_flags.join(' ')
-              execute(bundle_cmd, :install, *options)
+          options = []
+          options << "--gemfile #{gemfile}"
+          options << "--path #{bundle_path}"
+          unless test(bundle_cmd, :check, *options)
+            unless bundle_without.include?(stage.to_s)
+              options << "--without #{bundle_without.join(' ')}"
             end
+            options << bundle_flags.join(' ')
+            execute(bundle_cmd, :install, *options)
           end
         end
       end

@@ -111,16 +111,12 @@ module Luban
 
         parameter :application
         parameter :scm_role
-        parameter :linked_dirs
-        parameter :linked_files
         parameter :logrotate_files
 
         protected
 
         def set_default_application_parameters
           set_default :scm_role, :scm
-          set_default :linked_dirs, []
-          set_default :linked_files, []
           set_default :logrotate_files, []
 
           setup_default_application_config_finder

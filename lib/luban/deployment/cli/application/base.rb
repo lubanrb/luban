@@ -259,11 +259,6 @@ module Luban
         set_default_profile
       end
 
-      def set_default_application_parameters
-        super
-        linked_dirs.push('log', 'pids')
-      end
-
       def set_default_source
         source(default_source_path, scm: :rsync)
         release(stage, current: true)

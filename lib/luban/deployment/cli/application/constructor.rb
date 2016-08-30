@@ -42,15 +42,6 @@ module Luban
           assure_dirs(logrotate_path, downloads_path,
                       tmp_path, app_bin_path, app_tmp_path, 
                       releases_path, shared_path)
-          assure_linked_dirs
-        end
-
-        def assure_linked_dirs
-          return if linked_dirs.empty?
-          linked_dirs.each do |dir|
-            linked_dir = shared_path.join(dir)
-            assure(:directory, linked_dir) { mkdir(linked_dir) }
-          end
         end
 
         def create_envrc_files
