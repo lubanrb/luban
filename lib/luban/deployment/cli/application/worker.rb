@@ -13,19 +13,6 @@ module Luban
           define_method("application_#{method}") { send("target_#{method}") }
         end
 
-        def packages; task.opts.packages; end
-
-        def package_version(package_name); packages[package_name.to_sym].current_version; end
-
-        def package_path(package_name)
-          @package_path ||= luban_install_path.join('pkg', package_name.to_s, 'versions', 
-                                                    package_version(package_name))
-        end
-
-        def package_bin_path(package_name)
-          @package_bin_path ||= package_path(package_name).join('bin')
-        end
-
         def profile_name; 'app'; end
 
         def release_tag; task.opts.release[:tag]; end

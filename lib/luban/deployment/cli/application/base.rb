@@ -77,7 +77,7 @@ module Luban
               else
                 command(name, base: Luban::Deployment::Package::Base.package_class(name))
               end
-        pkg.update_package_options(version, opts)
+        pkg.update_package_options(version, opts.merge(packages: packages))
         services[name] = pkg if pkg.is_a?(Luban::Deployment::Service::Base)
         packages[name] = pkg
       end

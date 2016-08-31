@@ -76,6 +76,12 @@ module Luban
           def luban_install_path
             @luban_install_path ||= project_path.join('.luban')
           end
+
+          def package_bin_path(package_name)
+            @package_bin_path ||= 
+              luban_install_path.join('pkg', package_name.to_s, 'versions',
+                                      packages[package_name.to_sym].current_version, 'bin')
+          end
         end
       end
     end
