@@ -5,17 +5,17 @@ module Luban
         module Base
           def stage_profile_path
             @stage_profile_path ||= 
-              config_finder[:application].stage_profile_path.join(service_name)
+              config_finder[:application].stage_profile_path.join(profile_name)
           end
 
           def profile_templates_path
             @profile_templates_path ||= 
-              config_finder[:application].profile_templates_path.join(service_name)
+              config_finder[:application].profile_templates_path.join(profile_name)
           end
 
           def stage_profile_templates_path
             @stage_profile_templates_path ||= 
-              config_finder[:application].stage_profile_templates_path.join(service_name)
+              config_finder[:application].stage_profile_templates_path.join(profile_name)
           end
 
           def profile_templates(format: "erb")
@@ -75,7 +75,7 @@ module Luban
             profile_file = stage_profile_path.join(template_file).sub_ext('')
             assure_dirs(profile_file.dirname)
             upload_by_template(file_to_upload: profile_file,
-                               template_file: find_template_file(File.join(service_name, template_file)),
+                               template_file: find_template_file(File.join(profile_name, template_file)),
                                auto_revision: true)
           end
 

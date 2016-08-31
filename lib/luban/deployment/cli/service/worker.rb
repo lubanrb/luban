@@ -15,12 +15,14 @@ module Luban
             define_method("service_#{method}") { send("target_#{method}") }
           end
 
+          def profile_name; service_name; end
+
           def service_entry
-            @service_entry ||= "#{env_name.gsub('/', '.')}.#{service_name}"
+            @service_entry ||= "#{env_name.gsub('/', '.')}.#{profile_name}"
           end
 
           def profile_path
-            @profile_path ||= shared_path.join('profile', service_name)
+            @profile_path ||= shared_path.join('profile', profile_name)
           end
 
           def log_path
