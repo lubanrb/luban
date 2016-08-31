@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.7.8 (Aug 31, 2016)
+
+Minor enhancements:
+  * Refactored to use #profile_name to define the name of the profile folder for applications and services to avoid profile collision between applications and services.
+  * Cleanedup leftover from last install if any
+
 ## Version 0.7.7 (Aug 31, 2016)
 
 Minor enhancements:
