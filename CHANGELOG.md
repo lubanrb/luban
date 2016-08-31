@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.7.9 (Aug 31, 2016)
+
+Minor enhancements:
+  * Injected #packages into deployment worker in order to make each package available to others
+
 ## Version 0.7.8 (Aug 31, 2016)
 
 Minor enhancements:
