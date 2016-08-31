@@ -227,6 +227,7 @@ module Luban
         end
 
         def install!
+          cleanup_build! # Cleanup leftover from last install if any
           upload_package
           uncompress_package
           build_package
