@@ -64,10 +64,21 @@ module Luban
           def update_binstubs!; end
 
           def install_package!
+            if file?(bundler_executable)
+              uninstall_bundler! and install_bundler!
+            else
+              install_bundler!
+            end
+          end
+
+          def uninstall_bundler!
+            test("#{gem_executable} uninstall bundler -a -x -I >> #{install_log_file_path} 2>&1")
+          end
+
+          def install_bundler!
             install_opts = ['--local']
             #install_opts << "--no-document" unless install_doc?
             install_opts << "--no-rdoc --no-ri" unless install_doc?
-            test("#{gem_executable} uninstall bundler -a -x -I >> #{install_log_file_path} 2>&1") and
             test("#{gem_executable} install #{install_opts.join(' ')} #{src_cache_path} >> #{install_log_file_path} 2>&1")
           end
         end
