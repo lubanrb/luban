@@ -8,7 +8,7 @@ module Luban
           end
 
           def compose_command(cmd)
-            "#{shell_setup_commands.join('; ')}; #{cmd} 2>&1"
+            "#{shell_setup_commands.join(' && ')} && #{cmd} 2>&1"
           end
           
           %i(name full_name version major_version patch_level).each do |method|
