@@ -14,6 +14,12 @@ module Luban
           end
         end
 
+        apply_to '<= 1.8.7' do
+          before_install do
+            depend_on 'openssl', version: '0.9.8zh'
+          end
+        end
+
         apply_to '1.9.1' do
           before_install do
             depend_on 'yaml', version: '0.1.6'
