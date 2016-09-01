@@ -7,7 +7,12 @@ module Luban
             @shell_setup_commands ||= ["source #{envrc_file}"]
           end
 
+          def shell_command_prefix
+            @shell_command_prefix ||= []
+          end
+
           def compose_command(cmd)
+            cmd = "#{shell_command_prefix.join(' ')} #{cmd}" unless shell_command_prefix.empty?
             "#{shell_setup_commands.join(' && ')} && #{cmd} 2>&1"
           end
           

@@ -29,14 +29,6 @@ module Luban
           @releases_log_path ||= app_path.join('releases.log')
         end
 
-        def gemfile
-          @gemfile ||= release_path.join('Gemfile')
-        end
-
-        def bundle_cmd
-          @bundle_cmd ||= app_bin_path.join('bundle')
-        end
-
         def bundle_config_path
           @bundle_config_path ||= shared_path.join('.bundle')
         end
@@ -119,7 +111,7 @@ module Luban
 
         def create_symlinks
           send("create_#{release_type}_symlinks")
-          if file?(gemfile)
+          if has_gemfile?
             create_linked_dirs(bundle_linked_dirs, from: shared_path, to: release_path)
           end
         end
@@ -204,12 +196,12 @@ module Luban
           options = []
           options << "--gemfile #{gemfile}"
           options << "--path #{bundle_path}"
-          unless test(bundle_cmd, :check, *options)
+          unless test(bundle_executable, :check, *options)
             unless bundle_without.include?(stage.to_s)
               options << "--without #{bundle_without.join(' ')}"
             end
             options << bundle_flags.join(' ')
-            execute(bundle_cmd, :install, *options)
+            execute(bundle_executable, :install, *options)
           end
         end
       end

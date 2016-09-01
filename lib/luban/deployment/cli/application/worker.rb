@@ -5,8 +5,14 @@ module Luban
         include Luban::Deployment::Worker::Paths::Remote
         include Luban::Deployment::Service::Worker::Base
 
+        def gemfile
+          @gemfile ||= release_path.join('Gemfile')
+        end
+
+        def has_gemfile?; file?(gemfile); end
+
         def shell_setup_commands
-          super << "cd #{release_path}"
+          @shell_setup_commands ||= super << "cd #{release_path}"
         end
 
         %i(name full_name version major_version patch_level).each do |method|
@@ -23,6 +29,14 @@ module Luban
 
         def release_path
           @release_path ||= releases_path.join(release_tag)
+        end
+
+        def ruby_bin_path
+          @ruby_bin_path ||= package_bin_path('ruby')
+        end
+
+        def bundle_executable
+          @bundle_executable ||= ruby_bin_path.join('bundle')
         end
       end
     end
