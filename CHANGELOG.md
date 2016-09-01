@@ -1,5 +1,12 @@
 # Change log
 
+## Version 0.7.10 (Sept 01, 2016)
+
+Bug fixes:
+  * Used "&&" instead of ";" to join shell setup commands to ensure the rest of the commands would not be executed if one is broken
+  * Added install dependency on OpenSSL version 0.9.8zh for Ruby 1.8.7 or earlier because OpenSSL 1.x.x version does not support Ruby 1.8 in general
+  * Handled first Bundler installation without uninstalling older versions of Bundler
+
 ## Version 0.7.9 (Aug 31, 2016)
 
 Minor enhancements:
