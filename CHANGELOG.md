@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.7.11 (Sept 01, 2016)
+
+Minor enhancements:
+  * Supported shell command prefix
+  * Minor code refactoring
+
 ## Version 0.7.10 (Sept 01, 2016)
 
 Bug fixes:
