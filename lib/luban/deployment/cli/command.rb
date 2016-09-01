@@ -380,7 +380,6 @@ module Luban
                 backend.ssh_options.merge(user: user).merge!(ssh_options)
             end
           end
-          #bundle_bins.each { |cmd| sshkit.command_map.prefix[cmd.to_sym].push("bundle exec") }
         end
 
         configure_airbrussh if format == :airbrussh
