@@ -11,9 +11,14 @@ module Luban
             @shell_command_prefix ||= []
           end
 
-          def compose_command(cmd)
+          def shell_command_output
+            @shell_command_output ||= '2>&1'
+          end
+
+          def compose_command(cmd, delimiter: ';')
             cmd = "#{shell_command_prefix.join(' ')} #{cmd}" unless shell_command_prefix.empty?
-            "#{shell_setup_commands.join(' && ')} && #{cmd} 2>&1"
+            cmd = "#{cmd} #{shell_command_output}" unless shell_command_output.empty?
+            "#{shell_setup_commands.join(' ' + delimiter + ' ')} #{delimiter} #{cmd}"
           end
           
           %i(name full_name version major_version patch_level).each do |method|
