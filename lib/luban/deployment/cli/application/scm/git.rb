@@ -11,7 +11,11 @@ module Luban
             end
 
             def cloned?
-              file?(clone_path.join("HEAD"))
+              file?(clone_path.join("HEAD")) and from == remote_origin
+            end
+
+            def remote_origin
+              within(clone_path) { capture(git_cmd, "config --get remote.origin.url 2>/dev/null") }
             end
 
             def fetch_revision
