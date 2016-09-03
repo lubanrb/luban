@@ -59,6 +59,7 @@ module Luban
           assure_dirs(releases_path)
           if published?
             if force?
+              rmdir(release_path)
               publish!
             else
               update_result "Skipped! ALREADY published #{release_name}.", status: :skipped
