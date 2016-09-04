@@ -1,5 +1,17 @@
 # Change log
 
+## Version 0.7.13 (WIP)
+
+Minor enhancements:
+  * Enhanced to check if the remote origin URL matches the specified Git repository URL during build
+  * Added two install options #install_tcl and #install_tk for Ruby
+    * By default, both install options are turn off
+  * Created symlinks for Ruby header files that are needed for native gem installation
+    * This is useful to solve native gem installation for Ruby 1.8
+
+Bug fixes:
+  * Cleaned up published content before publish it again forcely
+
 ## Version 0.7.12 (Sept 02, 2016)
 
 Minor enhancements:
