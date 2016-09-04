@@ -69,6 +69,8 @@ module Luban
         def setup_install_tasks
           super
           commands[:install].switch :install_doc, "Install Ruby document"
+          commands[:install].switch :install_tcl, "Install with Tcl"
+          commands[:install].switch :install_tk, "Install with Tk"
           commands[:install].option :bundler, "Bundler version"
           commands[:install].option :openssl, "OpenSSL version (effective for v1.9.3 or above)"
         end
@@ -78,6 +80,14 @@ module Luban
 
           def install_doc?
             task.opts.install_doc
+          end
+
+          def install_tcl?
+            task.opts.install_tcl
+          end
+
+          def install_tk?
+            task.opts.install_tk
           end
 
           define_executable 'ruby'
@@ -113,9 +123,9 @@ module Luban
 
           def configure_build_options
             super
-            unless install_doc?
-              @configure_opts.unshift("--disable-install-doc") 
-            end
+            @configure_opts.unshift("--disable-install-doc") unless install_doc?
+            @configure_opts << "--without-tcl" unless install_tcl?
+            @configure_opts << "--without-tk" unless install_tk?
             @opt_dirs = []
           end
 
@@ -123,6 +133,31 @@ module Luban
             @configure_opts << "--with-opt-dir=#{@opt_dirs.join(':')}"
             super
           end
+
+          def after_install
+            super
+            create_symlinks_for_header_files
+          end
+
+          def create_symlinks_for_header_files
+            if !header_file_exists?("ruby/version.h") and
+               (source_path = find_header_file("version.h"))
+              assure_dirs(target_path = source_path.dirname.join('ruby'))
+              ln(source_path, target_path.join('version.h'))
+            end
+            if !header_file_exists?("ruby/io.h") and
+               (source_path = find_header_file("*/rubyio.h"))
+              assure_dirs(target_path = source_path.dirname.join('ruby'))
+              ln(source_path, target_path.join('io.h'))
+            end
+          end
+
+          def find_header_file(file)
+            f = capture(:find, install_path.to_s, "-wholename '*/#{file}'")
+            f.empty? ? nil : Pathname.new(f)
+          end
+
+          def header_file_exists?(file); !!find_header_file(file); end
         end
       end
     end
