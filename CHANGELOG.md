@@ -1,6 +1,15 @@
 # Change log
 
-## Version 0.7.13 (WIP)
+## Version 0.7.14 (Sept 06, 2016)
+
+Minor enhancements:
+  * Properly handled different download URL for recent/old releases of OpenSSL
+
+Bug fixes:
+  * Checked if a given package is downloaded first before installing the package
+  * Checked the existence of the MD5 file for source package before reading it
+
+## Version 0.7.13 (Sept 05, 2016)
 
 Minor enhancements:
   * Enhanced to check if the remote origin URL matches the specified Git repository URL during build
