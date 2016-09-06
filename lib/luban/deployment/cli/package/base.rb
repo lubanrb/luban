@@ -104,8 +104,10 @@ module Luban
         end
 
         def install(args:, opts:)
-          download_package(args: args, opts: opts)
-          install_package(args: args, opts: opts)
+          result = download_package(args: args, opts: opts)
+          unless result.nil? or result.status == :failed
+            install_package(args: args, opts: opts)
+          end
         end
 
         def install_all(args:, opts:)
