@@ -5,7 +5,7 @@ module Luban
         class InstallFailure < Luban::Deployment::Error; end
 
         def src_file_md5
-          @src_file_md5 ||= File.read(src_md5_file_path).chomp
+          @src_file_md5 ||= File.file?(src_md5_file_path) ? File.read(src_md5_file_path).chomp : ''
         end
 
         def required_packages
