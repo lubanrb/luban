@@ -169,7 +169,8 @@ module Luban
           gems = bundled_gems[:gems] = {}
           if test(:tar, "-tzf #{release_package_path} #{gemfile_path} > /dev/null 2>&1")
             within(workspace_path) do
-              execute(:tar, "--strip-components=1 -xzf #{release_package_path} #{gemfile_path} #{gemfile_path}.lock > /dev/null 2>&1; true")
+              paths_to_extract = [gemfile_path, "#{gemfile_path}.lock", "#{release_tag}/vendor/gems"]
+              execute(:tar, "--strip-components=1 -xzf #{release_package_path} #{paths_to_extract.join(' ')} > /dev/null 2>&1; true")
               options = []
               options << "--path #{bundle_path}"
               unless test(:bundle, :check, *options)
