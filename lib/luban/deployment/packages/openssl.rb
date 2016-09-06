@@ -23,6 +23,10 @@ module Luban
             @source_url_root ||= "source"
           end
 
+          def old_source_url_root
+            @old_source_url_root ||= "source/old/#{package_version.gsub(/[a-z]/, '')}"
+          end
+
           def installed?
             return false unless file?(openssl_executable)
             match?("#{openssl_executable} version", package_version)
@@ -37,6 +41,22 @@ module Luban
           def configure_build_options
             super
             @configure_opts.unshift(OSXArchArgs[hardware_name.to_sym]) if osx?
+          end
+
+          def switch_source_url_root
+            @source_url_root = old_source_url_root
+            @download_url = nil
+          end
+
+          def validate_download_url!
+            unless url_exists?(download_url)
+              switch_source_url_root
+              unless url_exists?(download_url)
+                task.result.status = :failed
+                task.result.message = "Package #{package_full_name} is NOT found from url: #{download_url}."
+                raise InstallFailure, task.result.message
+              end
+            end
           end
 
           def make_package!
