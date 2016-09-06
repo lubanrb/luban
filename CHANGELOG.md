@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.7.15 (Sept 07, 2016)
+
+Minor enhancements:
+  * During app packaging, extracted vendor/gems from the source code if any along with Gemfile/Gemfile.lock
+
 ## Version 0.7.14 (Sept 06, 2016)
 
 Minor enhancements:
