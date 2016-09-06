@@ -4,6 +4,7 @@
 
 Minor enhancements:
   * During app packaging, extracted vendor/gems from the source code if any along with Gemfile/Gemfile.lock
+    * As a result, bump up gem dependency on luban-cli to version 0.4.5 or above
 
 ## Version 0.7.14 (Sept 06, 2016)
 
