@@ -120,6 +120,7 @@ module Luban
 
         def upload_by_template(file_to_upload:, template_file:, 
                                header_file: find_template_file('header.erb'), 
+                               footer_file: nil,
                                auto_revision: false, **opts)
           content = render_template(template_file, context: binding)
 
@@ -130,9 +131,10 @@ module Luban
             return if revision_match?(file_to_upload, revision)
           end
 
-          header = render_template(header_file, context: binding)
+          header = header_file.nil? ? '' : render_template(header_file, context: binding)
+          footer = footer_file.nil? ? '' : render_template(footer_file, context: binding)
 
-          upload!(StringIO.new(header + content), file_to_upload)
+          upload!(StringIO.new(header + content + footer), file_to_upload)
           yield file_to_upload if block_given?
         end
 
