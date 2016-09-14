@@ -15,10 +15,15 @@ module Luban
             @shell_command_output ||= '2>&1'
           end
 
-          def compose_command(cmd, delimiter: ';')
-            cmd = "#{shell_command_prefix.join(' ')} #{cmd}" unless shell_command_prefix.empty?
-            cmd = "#{cmd} #{shell_command_output}" unless shell_command_output.empty?
-            "#{shell_setup_commands.join(' ' + delimiter + ' ')} #{delimiter} #{cmd}"
+          def shell_command_delimiter
+            @delimiter ||= ';'
+          end
+
+          def compose_command(cmd, setup: shell_setup_commands, prefix: shell_command_prefix, 
+                                   output: shell_command_output, delimiter: shell_command_delimiter)
+            cmd = "#{prefix.join(' ')} #{cmd}" unless prefix.empty?
+            cmd = "#{cmd} #{output}" unless output.empty?
+            "#{setup.join(' ' + delimiter + ' ')} #{delimiter} #{cmd}"
           end
           
           %i(name full_name version major_version patch_level).each do |method|
