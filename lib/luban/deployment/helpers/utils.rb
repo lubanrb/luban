@@ -128,7 +128,7 @@ module Luban
           if auto_revision
             require 'digest/md5'
             revision = Digest::MD5.hexdigest(content)
-            return if revision_match?(file_to_upload, revision)
+            return false if revision_match?(file_to_upload, revision)
           end
 
           header = header_file.nil? ? '' : render_template(header_file, context: binding)
@@ -136,6 +136,7 @@ module Luban
 
           upload!(StringIO.new(header + content + footer), file_to_upload)
           yield file_to_upload if block_given?
+          true
         end
 
         def render_template(template_file, context: binding)

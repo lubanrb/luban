@@ -6,4 +6,5 @@ require_relative 'application/repository'
 require_relative 'application/publisher'
 require_relative 'application/configurator'
 require_relative 'application/controller'
+require_relative 'application/crontab'
 

@@ -31,7 +31,7 @@ module Luban
         end
 
         def properties
-          @properties ||= { :roles => Set.new }
+          @properties ||= { :roles => Set.new, :cronjobs => Set.new }
         end
 
         def [](key)
@@ -57,13 +57,27 @@ module Luban
         end
         alias_method :set, :[]=
 
-       def add_properties(_properties)
+        def add_properties(_properties)
           _properties.each { |k, v| self[k] = v }
         end
 
         def primary?
           self[:primary]
         end
+
+        def cronjobs
+          self[:cronjobs]
+        end
+
+        def add_cronjobs(cronjobs)
+          cronjobs.each { |cronjob| add_cronjob(cronjob) }
+        end 
+        alias_method :cronjobs=, :add_cronjobs
+
+        def add_cronjob(cronjob)
+          cronjobs.add(cronjob)
+        end
+        alias_method :cronjob=, :add_cronjob
       end
     end
   end

@@ -1,0 +1,6 @@
+<% unless has_cronjobs? -%>
+# !!! No cronjobs for <%= user %> !!!
+<% end -%>
+<% cronjobs.each do |cronjob| -%>
+<%= "#{compose_cronjob(cronjob)}" %>
+<% end -%>

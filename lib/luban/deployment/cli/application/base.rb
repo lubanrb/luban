@@ -7,6 +7,7 @@ module Luban
       include Luban::Deployment::Command::Tasks::Install
       include Luban::Deployment::Command::Tasks::Deploy
       include Luban::Deployment::Command::Tasks::Control
+      include Luban::Deployment::Command::Tasks::Crontab
 
       attr_reader :packages
       attr_reader :services
@@ -54,7 +55,7 @@ module Luban
       def has_services?; !services.empty?; end
 
       def installable?;  has_packages?; end
-      def deployable?;   has_source?  or has_profile? end
+      def deployable?;   has_source? or has_profile? end
       def controllable?; has_source? or has_services?; end
 
       def use_package?(package_name, package_version, servers: [])
@@ -191,7 +192,9 @@ module Luban
         show_app_environment
         deploy_release(args: args, opts: opts) if has_source?
         deploy_profile(args: args, opts: opts) if has_profile?
+        deploy_cronjobs(args: args, opts: opts)
       end
+      dispatch_task :deploy_cronjobs, to: :crontab, as: :deploy_cronjobs
 
       Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
         define_method(action) do |args:, opts:|
@@ -231,6 +234,16 @@ module Luban
         else
           services.each_value { |s| s.init_profile(args: args, opts: opts) }
         end
+      end
+
+      Luban::Deployment::Command::Tasks::Crontab::Actions.each do |action|
+        define_method(action) do |args:, opts:|
+          show_app_environment
+          opts = opts.merge(version: current_app) if current_app
+          send("#{action}!", args: args, opts: opts)
+        end
+        dispatch_task "#{action}!", to: :crontab, as: action
+        protected "#{action}!" 
       end
 
       protected
@@ -285,6 +298,7 @@ module Luban
       def setup_tasks
         setup_init_profiles
         super
+        setup_crontab_tasks
       end
 
       def setup_init_profiles

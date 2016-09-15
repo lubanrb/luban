@@ -141,6 +141,46 @@ module Luban
             end
           end
         end
+
+        module Crontab
+          Actions = %i(update_cronjobs list_cronjobs)
+          Actions.each do |action|
+            define_method(action) do |args:, opts:|
+              raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
+            end
+          end
+
+          def cronjobs; @cronjobs ||= []; end
+
+          def has_cronjobs?; !cronjobs.empty?; end
+
+          def cronjob(schedule:, command:, output:, disabled: false, roles: nil, hosts: nil, **job)
+            if cronjobs.any? { |j| j[:command] == command }
+              abort "Aborted! Duplicate cron job is found: #{command}"
+            end
+            job.merge!(schedule: schedule, command: command, output: output, disabled: disabled)
+            roles = Array(roles)
+            hosts = Array(hosts)
+            servers = select_servers(roles, hosts)
+            servers.each { |s| server(s, cronjob: job) }
+            cronjobs << job
+          end
+
+          protected
+
+          def setup_crontab_tasks
+            task :cronjobs_update do
+              desc 'Update cron jobs'
+              action! :update_cronjobs
+            end
+
+            task :cronjobs_list do
+              desc 'List cron jobs'
+              switch :all, "List all cron jobs"
+              action! :list_cronjobs
+            end
+          end
+        end
       end
 
       using Luban::CLI::CoreRefinements
