@@ -38,6 +38,10 @@ module Luban
         def bundle_executable
           @bundle_executable ||= ruby_bin_path.join('bundle')
         end
+
+        def bundle_exec(cmd, **opts)
+          compose_command("#{bundle_executable} exec #{cmd}", **opts)
+        end
       end
     end
   end
