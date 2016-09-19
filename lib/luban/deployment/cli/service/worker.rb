@@ -20,7 +20,7 @@ module Luban
             when :stdout
               "2>&1"
             when nil
-              ">> /dev/null 2>&1"
+              "> /dev/null 2>&1"
             when ""
               ""
             else
