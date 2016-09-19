@@ -33,22 +33,6 @@ module Luban
             end
           end
 
-          def monitor_executable
-            @monitor_executable ||= env_path.join("#{stage}.#{process_monitor[:env]}", 'bin', process_monitor[:name])
-          end
-
-          def monitor_command
-            @monitor_command ||= shell_command("#{monitor_executable} monitor #{service_entry}")
-          end
-
-          def unmonitor_command
-            @unmonitor_command ||= shell_command("#{monitor_executable} unmonitor #{service_entry}")
-          end
-
-          def reload_monitor_command
-            @reload_monitor_command ||= shell_command("#{monitor_executable} reload")
-          end
-
           def start_process
             if process_started?
               update_result "Skipped! Already started #{service_full_name}", status: :skipped
@@ -58,7 +42,7 @@ module Luban
             output = start_process!
             if check_until { process_started? }
               update_result "Start #{service_full_name}: [OK] #{output}"
-              monitor_process
+              monitor_process unless process_monitor?
             else
               remove_orphaned_pid_file
               update_result "Start #{service_full_name}: [FAILED] #{output}", 
@@ -72,7 +56,7 @@ module Luban
               return
             end
 
-            unmonitor_process
+            unmonitor_process unless process_monitor?
             output = stop_process! || 'OK'
             if check_until { process_stopped? }
               update_result "Stop #{service_full_name}: [OK] #{output}"
@@ -85,7 +69,7 @@ module Luban
 
           def restart_process
             if process_started?
-              unmonitor_process
+              unmonitor_process unless process_monitor?
               output = stop_process!
               if check_until { process_stopped? }
                 remove_orphaned_pid_file
@@ -101,7 +85,7 @@ module Luban
             output = start_process!
             if check_until { process_started? }
               update_result "Restart #{service_full_name}: [OK] #{output}"
-              monitor_process
+              monitor_process unless process_monitor?
             else
               remove_orphaned_pid_file
               update_result "Restart #{service_full_name}: [FAILED] #{output}", 
@@ -123,7 +107,7 @@ module Luban
               return
             end
 
-            unmonitor_process
+            unmonitor_process unless process_monitor?
             output = kill_process!
             if check_until { process_stopped? }
               update_result "Kill #{service_full_name}: [OK] #{output}"
@@ -176,6 +160,19 @@ module Luban
             reload_monitor_process
           end
 
+          def init
+            load_process_monitor_commands
+          end
+
+          def load_process_monitor_commands
+            singleton_class.send(:prepend, 
+              process_monitor_module.const_get("Controller::Commands::Public"))
+          end
+
+          def process_monitor_module
+            self.class.package_class(process_monitor[:name])
+          end
+
           def check_until(pending_seconds: default_pending_seconds, 
                           pending_interval: default_pending_interval)
             succeeded = false
@@ -225,11 +222,11 @@ module Luban
           end
 
           def monitor_process!
-            test(monitor_command)
+            test(monitor_command(service_entry))
           end
 
           def unmonitor_process!
-            test(unmonitor_command)
+            test(unmonitor_command(service_entry))
           end
 
           def reload_monitor_process!
