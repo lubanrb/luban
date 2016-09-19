@@ -11,8 +11,8 @@ module Luban
 
         def has_gemfile?; file?(gemfile); end
 
-        def shell_setup_commands
-          @shell_setup_commands ||= super << "cd #{release_path}"
+        def shell_setup
+          @shell_setup ||= super << "cd #{release_path}"
         end
 
         %i(name full_name version major_version patch_level).each do |method|
@@ -39,8 +39,8 @@ module Luban
           @bundle_executable ||= ruby_bin_path.join('bundle')
         end
 
-        def bundle_exec(cmd, **opts)
-          compose_command("#{bundle_executable} exec #{cmd}", **opts)
+        def bundle_command(cmd, **opts)
+          shell_command("#{bundle_executable} exec #{cmd}", **opts)
         end
       end
     end
