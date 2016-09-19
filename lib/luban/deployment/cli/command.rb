@@ -154,11 +154,8 @@ module Luban
 
           def has_cronjobs?; !cronjobs.empty?; end
 
-          def cronjob(schedule:, command:, output:, disabled: false, roles: nil, hosts: nil, **job)
-            if cronjobs.any? { |j| j[:command] == command }
-              abort "Aborted! Duplicate cron job is found: #{command}"
-            end
-            job.merge!(schedule: schedule, command: command, output: output, disabled: disabled)
+          def cronjob(roles: nil, hosts: nil, **job)
+            validate_cronjob(job)
             roles = Array(roles)
             hosts = Array(hosts)
             servers = select_servers(roles, hosts)
@@ -167,6 +164,18 @@ module Luban
           end
 
           protected
+
+          def validate_cronjob(job)
+            if job[:command].nil?
+              abort "Aborted! Cron job command is MISSING."
+            end
+            if job[:schedule].nil?
+              abort "Aborted! Cron job schedule is MISSING for command: #{job[:command]}"
+            end
+            if cronjobs.any? { |j| j[:command] == job[:command] }
+              abort "Aborted! Duplicate command is FOUND: #{job[:command]}"
+            end
+          end
 
           def setup_crontab_tasks
             task :cronjobs_update do
