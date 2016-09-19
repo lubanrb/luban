@@ -38,15 +38,15 @@ module Luban
           end
 
           def monitor_command
-            @monitor_command ||= "#{monitor_executable} monitor #{service_entry}"
+            @monitor_command ||= shell_command("#{monitor_executable} monitor #{service_entry}")
           end
 
           def unmonitor_command
-            @unmonitor_command ||= "#{monitor_executable} unmonitor #{service_entry}"
+            @unmonitor_command ||= shell_command("#{monitor_executable} unmonitor #{service_entry}")
           end
 
           def reload_monitor_command
-            @reload_monitor_command ||= "#{monitor_executable} reload"
+            @reload_monitor_command ||= shell_command("#{monitor_executable} reload")
           end
 
           def start_process
@@ -186,13 +186,8 @@ module Luban
             succeeded
           end
 
-          def start_process!
-            capture(compose_command(start_command))
-          end
-
-          def stop_process!
-            capture(compose_command(stop_command))
-          end
+          def start_process!; capture(start_command); end
+          def stop_process!; capture(stop_command); end
 
           def check_process!
             if pid_file_missing?
@@ -230,15 +225,15 @@ module Luban
           end
 
           def monitor_process!
-            test(compose_command(monitor_command))
+            test(monitor_command)
           end
 
           def unmonitor_process!
-            test(compose_command(unmonitor_command))
+            test(unmonitor_command)
           end
 
           def reload_monitor_process!
-            test(compose_command(reload_monitor_command))
+            test(reload_monitor_command)
           end
         end
         

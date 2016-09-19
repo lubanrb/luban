@@ -2,5 +2,5 @@
 # !!! No cronjobs for <%= user %> !!!
 <% end -%>
 <% cronjobs.each do |cronjob| -%>
-<%= "#{compose_cronjob(cronjob)}" %>
+<%= "#{crontab_entry(**cronjob)}" %>
 <% end -%>

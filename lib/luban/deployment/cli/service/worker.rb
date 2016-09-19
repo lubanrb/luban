@@ -3,29 +3,31 @@ module Luban
     module Service
       class Worker < Luban::Deployment::Package::Worker
         module Base
-          def shell_setup_commands
-            @shell_setup_commands ||= ["source #{envrc_file}"]
-          end
+          def shell_setup; @shell_setup ||= ["source #{envrc_file}"]; end
+          def shell_prefix; @shell_prefix ||= []; end
+          def shell_output; @shell_output ||= :stdout; end
+          def shell_delimiter; @shell_delimiter ||= ';'; end
 
-          def shell_command_prefix
-            @shell_command_prefix ||= []
-          end
-
-          def shell_command_output
-            @shell_command_output ||= '2>&1'
-          end
-
-          def shell_command_delimiter
-            @delimiter ||= ';'
-          end
-
-          def compose_command(cmd, setup: shell_setup_commands, prefix: shell_command_prefix, 
-                                   output: shell_command_output, delimiter: shell_command_delimiter)
+          def shell_command(cmd, setup: shell_setup, prefix: shell_prefix, 
+                                 output: shell_output, delimiter: shell_delimiter)
             cmd = "#{prefix.join(' ')} #{cmd}" unless prefix.empty?
-            cmd = "#{cmd} #{output}" unless output.empty?
+            cmd = "#{cmd} #{output_redirection(output)}"
             "#{setup.join(' ' + delimiter + ' ')} #{delimiter} #{cmd}"
           end
-          
+
+          def output_redirection(output)
+            case output
+            when :stdout
+              "2>&1"
+            when nil
+              ">> /dev/null 2>&1"
+            when ""
+              ""
+            else
+              ">> #{output} 2>&1"
+            end
+          end
+
           %i(name full_name version major_version patch_level).each do |method|
             define_method("service_#{method}") { send("target_#{method}") }
           end

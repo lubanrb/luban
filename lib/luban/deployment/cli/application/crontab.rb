@@ -76,13 +76,11 @@ module Luban
           end
         end
 
-        def shell_setup_commands
-          @shell_setup_commands ||= task.opts.release.nil? ? ["source #{envrc_file}"] : super
+        def shell_setup
+          @shell_setup ||= task.opts.release.nil? ? ["source #{envrc_file}"] : super
         end
 
-        def shell_command_delimiter
-          @delimiter ||= '&&'
-        end
+        def shell_delimiter; @shell_delimiter ||= '&&'; end
 
         protected
 
@@ -95,11 +93,17 @@ module Luban
                              auto_revision: true)
         end
 
-        def compose_cronjob(cronjob)
-          output_path = log_path.join("cron.#{cronjob[:output]}")
-          cmd = compose_command(cronjob[:command], output: ">> #{output_path} 2>&1")
-          entry = "#{cronjob[:schedule]} #{cmd}"
-          cronjob[:disabled] ? "# DISABLED - #{entry}" : entry
+        def crontab_entry(command:, schedule:, output: "", type: :shell, disabled: false)
+          if output.is_a?(String) and !output.empty?
+            output = log_path.join("cron.#{output}")
+          end
+          command_composer = "#{type}_command"
+          unless respond_to?(command_composer)
+            abort "Aborted! Unknown cronjob type: #{type.inspect}"
+          end
+          command = send(command_composer, command, output: output)
+          entry = "#{schedule} #{command}"
+          disabled ? "# DISABLED - #{entry}" : entry
         end
 
         def update_cronjobs!
