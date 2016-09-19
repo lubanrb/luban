@@ -1,5 +1,17 @@
 # Change log
 
+## Version 0.8.0 (Sept 19, 2016)
+
+# New features:
+  * Supported cronjob deployment
+
+Minor enhancements:
+  * Refactored Service::Worker#compose_command to be more flexible
+  * Enhanced util method #upload_by_template to handle header and footer template rendering
+  * Added convenient method #bundle_command to compose command running within the bundler context
+  * Refactored the way of composing shell commands including cronjob commands
+  * Minor code cleanup
+
 ## Version 0.7.15 (Sept 07, 2016)
 
 Minor enhancements:
