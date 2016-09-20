@@ -1,5 +1,13 @@
 # Change log
 
+## Version 0.8.1 (Sept 20, 2016)
+
+Minor enhancements:
+  * Refactored process monitor commands
+
+Bug fixes:
+  * Fixed a typo in output redirection for /dev/null
+
 ## Version 0.8.0 (Sept 19, 2016)
 
 # New features:
