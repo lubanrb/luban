@@ -71,6 +71,7 @@ module Luban
           commands[:install].switch :install_doc, "Install Ruby document"
           commands[:install].switch :install_tcl, "Install with Tcl"
           commands[:install].switch :install_tk, "Install with Tk"
+          commands[:install].option :rubygems, "Rubygems version (effective for v1.9.2 or below)"
           commands[:install].option :bundler, "Bundler version"
           commands[:install].option :openssl, "OpenSSL version (effective for v1.9.3 or above)"
         end
