@@ -33,6 +33,14 @@ module Luban
             end
           end
 
+          def process_monitor?
+            service_entry == process_monitor[:service_entry]
+          end
+
+          def monitor_executable
+            @monitor_executable ||= env_path.join(process_monitor[:env], 'bin', process_monitor[:name])
+          end
+
           def start_process
             if process_started?
               update_result "Skipped! Already started #{service_full_name}", status: :skipped
@@ -157,7 +165,7 @@ module Luban
           protected
 
           def before_start_process
-            reload_monitor_process
+            reload_monitor_process unless process_monitor?
           end
 
           def init
