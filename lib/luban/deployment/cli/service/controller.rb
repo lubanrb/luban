@@ -170,7 +170,7 @@ module Luban
           end
 
           def process_monitor_module
-            self.class.package_class(process_monitor[:name])
+            Luban::Deployment::Package::Base.package_class(process_monitor[:name])
           end
 
           def check_until(pending_seconds: default_pending_seconds, 
