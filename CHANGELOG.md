@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.8.2 (Sept 20, 2016)
+
+Minor enhancements:
+  * Added option #rubygems to specify the version of Rubygems to install
+    * Effective for Ruby v1.9.2 or below
+
 ## Version 0.8.1 (Sept 20, 2016)
 
 Minor enhancements:
