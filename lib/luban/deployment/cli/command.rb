@@ -104,8 +104,7 @@ module Luban
           def process_monitor_via(monitor, env: "uber/lubmon")
             monitor = monitor.to_s.downcase
             env = "#{stage}.#{env.to_s.downcase}"
-            process_monitor name: monitor, env: env, 
-                            service_entry: "#{env.gsub('/', '.')}.#{monitor}"
+            process_monitor name: monitor, env: env
           end
 
           protected
