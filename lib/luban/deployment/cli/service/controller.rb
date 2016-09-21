@@ -33,12 +33,26 @@ module Luban
             end
           end
 
+          def process_monitorable?
+            process_monitor_defined? and !process_monitor?
+          end
+
+          def process_monitor_defined?
+            !process_monitor[:name].nil?
+          end
+
           def process_monitor?
-            service_entry == process_monitor[:service_entry]
+            env_name == process_monitor[:env]
           end
 
           def monitor_executable
-            @monitor_executable ||= env_path.join(process_monitor[:env], 'bin', process_monitor[:name])
+            @monitor_executable ||= env_path.join(process_monitor[:env], 'bin', 
+                                                  process_monitor[:name])
+          end
+
+          def monitor_control_file_path
+            @monitor_control_file_path ||= env_path.join(process_monitor[:env], 'shared', 'profile',
+                                                         process_monitor[:name], monitor_control_file_name)
           end
 
           def start_process
@@ -50,7 +64,10 @@ module Luban
             output = start_process!
             if check_until { process_started? }
               update_result "Start #{service_full_name}: [OK] #{output}"
-              monitor_process unless process_monitor?
+              if process_monitorable?
+                reload_monitor_process
+                monitor_process 
+              end
             else
               remove_orphaned_pid_file
               update_result "Start #{service_full_name}: [FAILED] #{output}", 
@@ -64,7 +81,7 @@ module Luban
               return
             end
 
-            unmonitor_process unless process_monitor?
+            unmonitor_process if process_monitorable?
             output = stop_process! || 'OK'
             if check_until { process_stopped? }
               update_result "Stop #{service_full_name}: [OK] #{output}"
@@ -77,7 +94,7 @@ module Luban
 
           def restart_process
             if process_started?
-              unmonitor_process unless process_monitor?
+              unmonitor_process if process_monitorable?
               output = stop_process!
               if check_until { process_stopped? }
                 remove_orphaned_pid_file
@@ -93,7 +110,7 @@ module Luban
             output = start_process!
             if check_until { process_started? }
               update_result "Restart #{service_full_name}: [OK] #{output}"
-              monitor_process unless process_monitor?
+              monitor_process if process_monitorable?
             else
               remove_orphaned_pid_file
               update_result "Restart #{service_full_name}: [FAILED] #{output}", 
@@ -115,7 +132,7 @@ module Luban
               return
             end
 
-            unmonitor_process unless process_monitor?
+            unmonitor_process if process_monitorable?
             output = kill_process!
             if check_until { process_stopped? }
               update_result "Kill #{service_full_name}: [OK] #{output}"
@@ -125,37 +142,27 @@ module Luban
             remove_orphaned_pid_file
           end
 
-          def process_monitor_defined?
-            !process_monitor[:name].nil?
-          end
-
           def monitor_process
-            if process_monitor_defined?
-              if monitor_process!
-                info "Turned on process monitor for #{service_entry}"
-              else
-                info "Failed to turn on process monitor for #{service_entry}"
-              end
+            if monitor_process!
+              info "Turned on process monitor for #{service_entry}"
+            else
+              info "Failed to turn on process monitor for #{service_entry}"
             end
           end
 
           def unmonitor_process
-            if process_monitor_defined?
-              if unmonitor_process!
-                info "Turned off process monitor for #{service_entry}"
-              else
-                info "Failed to turn off process monitor for #{service_entry}"
-              end
+            if unmonitor_process!
+              info "Turned off process monitor for #{service_entry}"
+            else
+              info "Failed to turn off process monitor for #{service_entry}"
             end
           end
 
           def reload_monitor_process
-            if process_monitor_defined?
-              if reload_monitor_process!
-                info "Reloaded process monitor for #{service_entry}"
-              else
-                info "Failed to reload process monitor for #{service_entry}"
-              end
+            if reload_monitor_process!
+              info "Reloaded process monitor for #{service_entry}"
+            else
+              info "Failed to reload process monitor for #{service_entry}"
             end
           end
 
@@ -164,16 +171,12 @@ module Luban
 
           protected
 
-          def before_start_process
-            reload_monitor_process unless process_monitor?
-          end
-
           def init
-            load_process_monitor_commands
+            load_process_monitor_commands if process_monitorable?
           end
 
           def load_process_monitor_commands
-            singleton_class.send(:prepend, 
+            singleton_class.send(:include, 
               process_monitor_module.const_get("Controller::Commands::Public"))
           end
 
