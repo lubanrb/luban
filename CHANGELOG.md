@@ -1,5 +1,14 @@
 # Change log
 
+## Version 0.8.3 (Sept 21, 2016)
+
+Minor enhancements:
+  * Simplified process_monitor settings
+  * Checked if process is monitorable before any monitoring related operations
+    * thru convenient method #process_monitorable?
+  * Added control file for process monitor
+  * Used #include instead of #prepend when loading monitoring public commands
+
 ## Version 0.8.2 (Sept 20, 2016)
 
 Minor enhancements:
