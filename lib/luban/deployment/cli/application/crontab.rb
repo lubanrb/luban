@@ -109,21 +109,18 @@ module Luban
         def update_cronjobs!
           crontab = capture(:crontab, "-l")
           new_crontab = capture(:cat, crontab_file_path, "2>/dev/null")
-          old = false
+          found = false
           crontab = crontab.split("\n").inject([]) do |lines, line|
-            if old || line == crontab_open
-              lines << new_crontab unless (old = line != crontab_close)
+            if found || line == crontab_open
+              lines << new_crontab unless (found = line != crontab_close)
             else
               lines << line
             end
             lines
           end
-          if crontab.empty?
-            test(:crontab, crontab_file_path, "2>&1")
-          else
-            upload!(StringIO.new(crontab.join("\n")), tmp_crontab_file_path)
-            test(:crontab, tmp_crontab_file_path, "2>&1")
-          end
+          crontab << new_crontab unless found
+          upload!(StringIO.new(crontab.join("\n")), tmp_crontab_file_path)
+          test(:crontab, tmp_crontab_file_path, "2>&1")
         ensure
           rm(tmp_crontab_file_path)
         end
@@ -132,11 +129,11 @@ module Luban
           crontab = capture(:crontab, "-l")
           return crontab if all
 
-          old = false
+          found = false
           crontab.split("\n").inject([]) do |lines, line|
-            if old || line == crontab_open
+            if found || line == crontab_open
               lines << line
-              old = line != crontab_close
+              found = line != crontab_close
             end
             lines
           end.join("\n")
