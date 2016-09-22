@@ -162,6 +162,7 @@ module Luban
         end
 
         def bundle_gems
+          bundle_cmd = fetch(:bundle_via, :bundle)
           gemfile_path = Pathname.new(release_tag).join('Gemfile')
           gems_cache = Pathname.new('vendor').join('cache')
           bundle_path = Pathname.new('vendor').join('bundle')
@@ -173,14 +174,14 @@ module Luban
               execute(:tar, "--strip-components=1 -xzf #{release_package_path} #{paths_to_extract.join(' ')} > /dev/null 2>&1; true")
               options = []
               options << "--path #{bundle_path}"
-              unless test(:bundle, :check, *options)
+              unless test(bundle_cmd, :check, *options)
                 unless bundle_without.include?(stage.to_s)
                   options << "--without #{bundle_without.join(' ')}"
                 end
                 options << "--quiet"
-                execute(:bundle, :install, *options)
+                execute(bundle_cmd, :install, *options)
                 info "Package gems bundled in Gemfile"
-                execute(:bundle, :package, "--all --quiet")
+                execute(bundle_cmd, :package, "--all --quiet")
               end
               gem_files = capture(:ls, '-xt', gems_cache.join('*.gem')).split
               gem_files.each do |gem_file|

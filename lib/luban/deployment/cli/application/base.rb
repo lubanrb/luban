@@ -84,6 +84,12 @@ module Luban
       end
       alias_method :require_package, :package
 
+      def bundle_via(ruby:)
+        bundle_cmd = luban_root_path.join("env", "#{stage}.#{project}", ".luban", "pkg",
+                                          "ruby", "versions", ruby.to_s.downcase, 'bin', 'bundle')
+        set :bundle_via, bundle_cmd
+      end
+
       def profile(from = nil, **opts)
         from.nil? ? @profile : (@profile = opts.merge(type: 'profile', from: from))
       end
@@ -194,7 +200,6 @@ module Luban
         deploy_profile(args: args, opts: opts) if has_profile?
         deploy_cronjobs(args: args, opts: opts)
       end
-      dispatch_task :deploy_cronjobs, to: :crontab, as: :deploy_cronjobs
 
       Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
         define_method(action) do |args:, opts:|
@@ -378,6 +383,12 @@ module Luban
       end
       dispatch_task :deprecate_packaged_release!, to: :repository, as: :deprecate, locally: true
       dispatch_task :deprecate_published_release!, to: :publisher, as: :deprecate
+
+      def deploy_cronjobs(args:, opts:)
+        opts = opts.merge(version: current_app) if has_source?
+        deploy_cronjobs!(args: args, opts: opts)
+      end
+      dispatch_task :deploy_cronjobs!, to: :crontab, as: :deploy_cronjobs
 
       def print_summary(result)
         result.each do |entry|
