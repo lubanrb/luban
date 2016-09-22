@@ -1,5 +1,16 @@
 # Change log
 
+## Version 0.8.4 (Sept 22, 2016)
+
+Minor enhancements:
+  * Added #bundle_via to specify Ruby version to bundle gems with
+    * This is useful for bundling gems that requires specific Ruby version
+  * Forced bundler using the gems already present in vendor/cache thru option "--local"
+
+Bug fixes:
+  * Added source release to cronjob deployment if source is provided
+  * Properly update cronjob if the crontab contains other unrelated entries
+
 ## Version 0.8.3 (Sept 21, 2016)
 
 Minor enhancements:
