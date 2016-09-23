@@ -1,9 +1,15 @@
 # Change log
 
+## Version 0.8.5 (Sept 23, 2016)
+
+Minor enhancemnets:
+  * Added extra parameter :project in #bundle_via to specify project to find bundler
+    * Default project is set to "uber"
+
 ## Version 0.8.4 (Sept 22, 2016)
 
 Minor enhancements:
-  * Added #bundle_via to specify Ruby version to bundle gems with
+  * Added method #bundle_via to specify Ruby version to bundle gems with
     * This is useful for bundling gems that requires specific Ruby version
   * Forced bundler using the gems already present in vendor/cache thru option "--local"
 
