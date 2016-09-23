@@ -84,7 +84,7 @@ module Luban
       end
       alias_method :require_package, :package
 
-      def bundle_via(ruby:)
+      def bundle_via(ruby:, project: "uber")
         bundle_cmd = luban_root_path.join("env", "#{stage}.#{project}", ".luban", "pkg",
                                           "ruby", "versions", ruby.to_s.downcase, 'bin', 'bundle')
         set :bundle_via, bundle_cmd

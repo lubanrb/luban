@@ -59,6 +59,15 @@ module Luban
           @release_name ||= "#{application}:#{type}:#{release_tag}"
         end
 
+        def bundle_cmd
+          return @bundle_cmd unless @bundle_cmd.nil?
+          @bundle_cmd = fetch(:bundle_via, :bundle).tap do |cmd|
+            if cmd.is_a?(Pathname) and !file?(cmd)
+              abort "Aborted! Bundler command is NOT found: #{cmd}"
+            end
+          end
+        end
+
         def bundle_without
           @bundle_without ||= %w(development test)
         end
@@ -162,7 +171,6 @@ module Luban
         end
 
         def bundle_gems
-          bundle_cmd = fetch(:bundle_via, :bundle)
           gemfile_path = Pathname.new(release_tag).join('Gemfile')
           gems_cache = Pathname.new('vendor').join('cache')
           bundle_path = Pathname.new('vendor').join('bundle')
