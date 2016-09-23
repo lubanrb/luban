@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.8.6 (Sept 23, 2016)
+
+Bug fixes:
+  * Fixed a bug for properly updating crontab when other unrelated crontab entries exist
+
 ## Version 0.8.5 (Sept 23, 2016)
 
 Minor enhancemnets:
