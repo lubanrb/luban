@@ -118,7 +118,7 @@ module Luban
             end
             lines
           end
-          crontab << new_crontab unless found
+          crontab << new_crontab unless crontab.include?(new_crontab)
           upload!(StringIO.new(crontab.join("\n")), tmp_crontab_file_path)
           test(:crontab, tmp_crontab_file_path, "2>&1")
         ensure
