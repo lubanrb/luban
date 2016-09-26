@@ -196,7 +196,7 @@ module Luban
                 gem_name = File.basename(gem_file)
                 md5_file = "#{gem_file}.md5"
                 gems[gem_name] =
-                  if file?(md5_file)
+                  if file?(workspace_path.join(md5_file))
                     gems[gem_name] = capture(:cat, md5_file)
                   else
                     md5_for_file(gem_file).tap { |md5|
