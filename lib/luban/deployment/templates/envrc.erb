@@ -10,7 +10,7 @@ if [ -n "${LUBAN_ROOT:+x}" ]; then
   if [[ "$LUBAN_ROOT" == "<%= app_path %>" ]]; then
     echo_line "Environment <%= env_name %> has ALREADY been activated!"
   else
-    local current_env=${LUBAN_ROOT##*env/}
+    current_env=${LUBAN_ROOT##*env/}
     echo_line "Environment $current_env is STILL active!"
     echo_line "Please de-activate it first:"
     echo_line "\tunset_lubenv $current_env"
