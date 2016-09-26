@@ -32,7 +32,7 @@ module Luban
             end
 
             def release
-              within(clone_path) { test(git_cmd, :archive, version, "--prefix=#{release_tag}/ -o #{release_package_path}") }
+              within(clone_path) { test(git_cmd, :archive, version, "--format=#{release_package_extname} --prefix=#{release_tag}/ -o #{release_package_path}") }
             end
 
             def branch?
