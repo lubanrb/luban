@@ -1,5 +1,17 @@
 # Change log
 
+## Version 0.8.7 (Sept 27, 2016)
+
+Minor enhancements:
+  * Added option #format to specify archive file format explicitly
+  * Added subcommands to manage process monitor: #monitor_on, #monitor_off and #monitor_reload
+  * Refactored convenient methods to handle process monitor
+
+Bug fixes:
+  * Fixed local variables in global context in .envrc/.unset_envrc files to void bash warnings
+  * Skipped md5 checksum calculation for gem packages if md5 has been generated previously
+  * Handled result update more appropriately
+
 ## Version 0.8.6 (Sept 23, 2016)
 
 Bug fixes:
