@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.8.8 (Sept 28, 2016)
+
+Minor enhancements:
+  * Applied subcommand grouping for better clarity
+    * As a result, bump up gem dependency of Luban::CLI to version 0.4.6
+
 ## Version 0.8.7 (Sept 27, 2016)
 
 Minor enhancements:
