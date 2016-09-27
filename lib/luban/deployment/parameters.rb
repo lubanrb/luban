@@ -74,6 +74,14 @@ module Luban
         parameter :ssh_options
         parameter :use_sudo
 
+        def process_monitor_via(monitor, env: "uber/lubmon")
+          monitor = monitor.to_s.downcase
+          env = "#{stage}.#{env.to_s.downcase}"
+          process_monitor name: monitor, env: env
+        end
+
+        def monitor_defined?; !process_monitor.empty?; end
+
         protected
 
         def set_default_project_parameters
@@ -95,7 +103,7 @@ module Luban
         end
 
         def validate_project_parameters
-          unless process_monitor.empty?
+          if monitor_defined?
             if process_monitor[:name].nil?
               abort "Aborted! Please specify the process monitor."
             end
@@ -112,6 +120,18 @@ module Luban
         parameter :application
         parameter :scm_role
         parameter :logrotate_files
+
+        def env_name
+          @env_name ||= "#{stage}.#{project}/#{application}"
+        end
+
+        def monitor_itself?
+          env_name == process_monitor[:env]
+        end
+
+        def monitorable?
+          monitor_defined? and !monitor_itself?
+        end
 
         protected
 
