@@ -25,10 +25,6 @@ module Luban
         def osx?; os_name == 'Darwin'; end
         def linux?; os_name == 'Linux'; end
 
-        def env_name
-          @env_name ||= "#{stage}.#{project}/#{application}"
-        end
-
         def target_name; task.opts.name; end
         def target_full_name; "#{target_name}-#{target_version}"; end
 
@@ -71,8 +67,8 @@ module Luban
 
         def update_result(message = nil, status: :succeeded, level: :info, **attrs)
           task.result.tap do |r|
-            r.status = status
-            r.level = level
+            r.status = status unless status.nil? or !r.status.nil?
+            r.level = level unless level.nil? or !r.level.nil?
             r.message = message unless message.nil? or !r.message.nil?
             attrs.each_pair { |k, v| r.send("#{k}=", v) }
             unless message.nil? or message.empty?
