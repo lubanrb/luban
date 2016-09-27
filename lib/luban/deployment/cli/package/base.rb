@@ -71,6 +71,8 @@ module Luban
         include Luban::Deployment::Parameters::Application
         include Luban::Deployment::Command::Tasks::Install
 
+        def monitorable?; false; end
+
         def find_project; parent.parent; end
         def find_application(name = nil)
           name.nil? ? parent : find_project.apps[name.to_sym]

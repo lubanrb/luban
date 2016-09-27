@@ -7,6 +7,7 @@ module Luban
       include Luban::Deployment::Command::Tasks::Install
       include Luban::Deployment::Command::Tasks::Deploy
       include Luban::Deployment::Command::Tasks::Control
+      include Luban::Deployment::Command::Tasks::Monitor
       include Luban::Deployment::Command::Tasks::Crontab
 
       attr_reader :packages
@@ -201,7 +202,8 @@ module Luban
         deploy_cronjobs(args: args, opts: opts)
       end
 
-      Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
+      (Luban::Deployment::Command::Tasks::Control::Actions |
+       Luban::Deployment::Command::Tasks::Monitor::Actions).each do |action|
         define_method(action) do |args:, opts:|
           show_app_environment
           send("service_#{action}!", args: args, opts: opts)

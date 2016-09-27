@@ -101,12 +101,6 @@ module Luban
 
           def controllable?; true; end
 
-          def process_monitor_via(monitor, env: "uber/lubmon")
-            monitor = monitor.to_s.downcase
-            env = "#{stage}.#{env.to_s.downcase}"
-            process_monitor name: monitor, env: env
-          end
-
           protected
 
           def setup_control_tasks
@@ -138,6 +132,38 @@ module Luban
             task :process do
               desc "Show running process if any"
               action! :show_process
+            end
+          end
+        end
+
+        module Monitor
+          Actions = %i(monitor_on monitor_off monitor_reload)
+          Actions.each do |action|
+            define_method(action) do |args:, opts:|
+              raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
+            end
+          end
+
+          def monitorable?
+            controllable? and monitor_defined? and !monitor_itself?
+          end
+
+          protected
+
+          def setup_monitor_tasks
+            task :monitor_on do
+              desc "Turn on process monitor"
+              action! :monitor_on
+            end
+
+            task :monitor_off do
+              desc "Turn off process monitor"
+              action! :monitor_off
+            end
+
+            task :monitor_reload do
+              desc "Reload monitor configuration"
+              action! :monitor_reload
             end
           end
         end
@@ -201,6 +227,7 @@ module Luban
       def installable?;  false; end
       def deployable?;   false; end
       def controllable?; false; end
+      def monitorable?;  false; end
 
       def task(cmd, **opts, &blk)
         command(cmd, **opts, &blk).tap do |c|
@@ -344,6 +371,7 @@ module Luban
         setup_install_tasks if installable?
         setup_deploy_tasks if deployable?
         setup_control_tasks if controllable?
+        setup_monitor_tasks if monitorable?
       end
 
       %i(install deploy control).each do |action|

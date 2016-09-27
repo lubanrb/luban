@@ -3,6 +3,7 @@ module Luban
     module Service
       class Base < Luban::Deployment::Package::Base
         include Luban::Deployment::Command::Tasks::Control
+        include Luban::Deployment::Command::Tasks::Monitor
 
         def self.service_action(action, dispatch_to: nil, as: action, locally: false, &blk)
           define_method(action) do |args:, opts:|
@@ -18,7 +19,8 @@ module Luban
           end
         end
 
-        Luban::Deployment::Command::Tasks::Control::Actions.each do |action|
+        (Luban::Deployment::Command::Tasks::Control::Actions |
+         Luban::Deployment::Command::Tasks::Monitor::Actions).each do |action|
           service_action action, dispatch_to: :controller
         end
         %i(init_profile update_profile).each do |action| 
