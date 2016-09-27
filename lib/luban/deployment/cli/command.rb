@@ -2,7 +2,7 @@ module Luban
   module Deployment
     class Command < Luban::CLI::Command
       module Tasks
-        module Install
+        module Provision
           Actions = %i(setup build destroy cleanup binstubs
                        show_current show_summary which whence)
           Actions.each do |action|
@@ -11,60 +11,64 @@ module Luban
             end
           end
 
-          def installable?; true; end
+          def provisionable?; true; end
+
+          def provision_tasks; commands[:provision].commands; end
 
           protected
 
-          def setup_install_tasks
+          def setup_provision_tasks
             _self = self
-            task :setup do
-              desc "Setup #{_self.display_name} environment"
-              action! :setup
-            end
+            command :provision do
+              task :setup do
+                desc "Setup #{_self.display_name} environment"
+                action! :setup
+              end
 
-            task :build do
-              desc "Build #{_self.display_name} environment"
-              switch :force, "Force to build", short: :f
-              action! :build
-            end
+              task :build do
+                desc "Build #{_self.display_name} environment"
+                switch :force, "Force to build", short: :f
+                action! :build
+              end
 
-            task :destroy do
-              desc "Destroy #{_self.display_name} environment"
-              switch :force, "Force to destroy", short: :f, required: true
-              action! :destroy
-            end
+              task :destroy do
+                desc "Destroy #{_self.display_name} environment"
+                switch :force, "Force to destroy", short: :f, required: true
+                action! :destroy
+              end
 
-            task :cleanup do
-              desc "Clean up temporary files during installation"
-              action! :cleanup
-            end
+              task :cleanup do
+                desc "Clean up temporary files during installation"
+                action! :cleanup
+              end
 
-            task :binstubs do
-              desc "Update binstubs for required packages"
-              switch :force, "Force to update binstubs", short: :f
-              action! :binstubs
-            end
+              task :binstubs do
+                desc "Update binstubs for required packages"
+                switch :force, "Force to update binstubs", short: :f
+                action! :binstubs
+              end
 
-            task :version do
-              desc "Show current version for app/required packages"
-              action! :show_current
-            end
+              task :version do
+                desc "Show current version for app/required packages"
+                action! :show_current
+              end
 
-            task :versions do
-              desc "Show app/package installation summary"
-              action! :show_summary
-            end
+              task :versions do
+                desc "Show app/package installation summary"
+                action! :show_summary
+              end
 
-            task :which do
-              desc "Show the real path for the given executable"
-              argument :executable, "Executable to which"
-              action! :which
-            end
+              task :which do
+                desc "Show the real path for the given executable"
+                argument :executable, "Executable to which"
+                action! :which
+              end
 
-            task :whence do
-              desc "List packages with the given executable"
-              argument :executable, "Executable to whence"
-              action! :whence
+              task :whence do
+                desc "List packages with the given executable"
+                argument :executable, "Executable to whence"
+                action! :whence
+              end
             end
           end
         end
@@ -101,37 +105,41 @@ module Luban
 
           def controllable?; true; end
 
+          def control_tasks; commands[:control].commands; end
+
           protected
 
           def setup_control_tasks
-            task :start do
-              desc "Start process"
-              action! :start_process
-            end
+            command :control do
+              task :start do
+                desc "Start process"
+                action! :start_process
+              end
 
-            task :stop do
-              desc "Stop process"
-              action! :stop_process
-            end
+              task :stop do
+                desc "Stop process"
+                action! :stop_process
+              end
 
-            task :restart do
-              desc "Restart process"
-              action! :restart_process
-            end
+              task :restart do
+                desc "Restart process"
+                action! :restart_process
+              end
 
-            task :kill do
-              desc "Kill process forcely"
-              action! :kill_process
-            end
+              task :kill do
+                desc "Kill process forcely"
+                action! :kill_process
+              end
 
-            task :status do
-              desc "Check process status"
-              action! :check_process
-            end
+              task :status do
+                desc "Check process status"
+                action! :check_process
+              end
 
-            task :process do
-              desc "Show running process if any"
-              action! :show_process
+              task :process do
+                desc "Show running process if any"
+                action! :show_process
+              end
             end
           end
         end
@@ -148,22 +156,26 @@ module Luban
             controllable? and monitor_defined? and !monitor_itself?
           end
 
+          def monitor_tasks; commands[:monitor].commands; end
+
           protected
 
           def setup_monitor_tasks
-            task :monitor_on do
-              desc "Turn on process monitor"
-              action! :monitor_on
-            end
+            command :monitor do
+              task :on do
+                desc "Turn on process monitor"
+                action! :monitor_on
+              end
 
-            task :monitor_off do
-              desc "Turn off process monitor"
-              action! :monitor_off
-            end
+              task :off do
+                desc "Turn off process monitor"
+                action! :monitor_off
+              end
 
-            task :monitor_reload do
-              desc "Reload monitor configuration"
-              action! :monitor_reload
+              task :reload do
+                desc "Reload monitor configuration"
+                action! :monitor_reload
+              end
             end
           end
         end
@@ -189,6 +201,8 @@ module Luban
             cronjobs << job
           end
 
+          def crontab_tasks; commands[:conjobs].commands; end
+
           protected
 
           def validate_cronjob(job)
@@ -204,15 +218,17 @@ module Luban
           end
 
           def setup_crontab_tasks
-            task :cronjobs_update do
-              desc 'Update cron jobs'
-              action! :update_cronjobs
-            end
+            command :cronjobs do
+              task :update do
+                desc 'Update cron jobs'
+                action! :update_cronjobs
+              end
 
-            task :cronjobs_list do
-              desc 'List cron jobs'
-              switch :all, "List all cron jobs"
-              action! :list_cronjobs
+              task :list do
+                desc 'List cron jobs'
+                switch :all, "List all cron jobs"
+                action! :list_cronjobs
+              end
             end
           end
         end
@@ -224,21 +240,10 @@ module Luban
 
       def display_name; @display_name ||= name.camelcase; end
 
-      def installable?;  false; end
-      def deployable?;   false; end
-      def controllable?; false; end
-      def monitorable?;  false; end
-
-      def task(cmd, **opts, &blk)
-        command(cmd, **opts, &blk).tap do |c|
-          add_common_task_options(c)
-          if !c.summary.nil? and c.description.empty?
-            c.long_desc "#{c.summary} in #{self.class.name}"
-          end
-        end
-      end
-
-      alias_method :undef_task, :undef_command
+      def provisionable?; false; end
+      def deployable?;    false; end
+      def controllable?;  false; end
+      def monitorable?;   false; end
 
       class << self
         def inherited(subclass)
@@ -368,7 +373,7 @@ module Luban
       def setup_descriptions; end
 
       def setup_tasks
-        setup_install_tasks if installable?
+        setup_provision_tasks if provisionable?
         setup_deploy_tasks if deployable?
         setup_control_tasks if controllable?
         setup_monitor_tasks if monitorable?

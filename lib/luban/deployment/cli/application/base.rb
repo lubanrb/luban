@@ -4,7 +4,7 @@ module Luban
       using Luban::CLI::CoreRefinements
       include Luban::Deployment::Parameters::Project
       include Luban::Deployment::Parameters::Application
-      include Luban::Deployment::Command::Tasks::Install
+      include Luban::Deployment::Command::Tasks::Provision
       include Luban::Deployment::Command::Tasks::Deploy
       include Luban::Deployment::Command::Tasks::Control
       include Luban::Deployment::Command::Tasks::Monitor
@@ -55,7 +55,7 @@ module Luban
       def has_packages?; !packages.empty?; end
       def has_services?; !services.empty?; end
 
-      def installable?;  has_packages?; end
+      def provisionable?;  has_packages?; end
       def deployable?;   has_source? or has_profile? end
       def controllable?; has_source? or has_services?; end
 

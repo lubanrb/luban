@@ -66,14 +66,15 @@ module Luban
         
         protected
 
-        def setup_install_tasks
+        def setup_provision_tasks
           super
-          commands[:install].switch :install_doc, "Install Ruby document"
-          commands[:install].switch :install_tcl, "Install with Tcl"
-          commands[:install].switch :install_tk, "Install with Tk"
-          commands[:install].option :rubygems, "Rubygems version (effective for v1.9.2 or below)"
-          commands[:install].option :bundler, "Bundler version"
-          commands[:install].option :openssl, "OpenSSL version (effective for v1.9.3 or above)"
+
+          provision_tasks[:install].switch :install_doc, "Install Ruby document"
+          provision_tasks[:install].switch :install_tcl, "Install with Tcl"
+          provision_tasks[:install].switch :install_tk, "Install with Tk"
+          provision_tasks[:install].option :rubygems, "Rubygems version (effective for v1.9.2 or below)"
+          provision_tasks[:install].option :bundler, "Bundler version"
+          provision_tasks[:install].option :openssl, "OpenSSL version (effective for v1.9.3 or above)"
         end
 
         class Installer < Luban::Deployment::Package::Installer

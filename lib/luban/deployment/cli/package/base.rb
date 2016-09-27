@@ -69,7 +69,7 @@ module Luban
 
         include Luban::Deployment::Parameters::Project
         include Luban::Deployment::Parameters::Application
-        include Luban::Deployment::Command::Tasks::Install
+        include Luban::Deployment::Command::Tasks::Provision
 
         def monitorable?; false; end
 
@@ -188,7 +188,7 @@ module Luban
 
         def setup_tasks
           super
-          setup_install_tasks
+          setup_provision_tasks
         end
 
         def compose_task_options(opts)
@@ -206,40 +206,42 @@ module Luban
           long_desc "Manage the deployment of package #{display_name} in #{parent.class.name}"
         end
 
-        def setup_install_tasks
+        def setup_provision_tasks
           super
 
-          undef_task :setup
-          undef_task :build
-          undef_task :destroy
+          commands[:provision].undef_task :setup
+          commands[:provision].undef_task :build
+          commands[:provision].undef_task :destroy
 
           _package = self
-          task :install do
-            desc "Install a given version"
-            option :version, "Version to install", short: :v, required: true,
-                   assure: ->(v){ _package.versions.include?(v) }
-            switch :force, "Force to install", short: :f
-            action! :install
-          end
+          commands[:provision].alter do
+            task :install do
+              desc "Install a given version"
+              option :version, "Version to install", short: :v, required: true,
+                     assure: ->(v){ _package.versions.include?(v) }
+              switch :force, "Force to install", short: :f
+              action! :install
+            end
 
-          task :install_all do
-            desc "Install all versions"
-            switch :force, "Force to install", short: :f
-            action! :install_all
-          end
+            task :install_all do
+              desc "Install all versions"
+              switch :force, "Force to install", short: :f
+              action! :install_all
+            end
 
-          task :uninstall do
-            desc "Uninstall a given version"
-            option :version, "Version to uninstall", short: :v, required: true,
-                    assure: ->(v){ _package.versions.include?(v) }
-            switch :force, "Force to uninstall", short: :f
-            action! :uninstall
-          end
+            task :uninstall do
+              desc "Uninstall a given version"
+              option :version, "Version to uninstall", short: :v, required: true,
+                      assure: ->(v){ _package.versions.include?(v) }
+              switch :force, "Force to uninstall", short: :f
+              action! :uninstall
+            end
 
-          task :uninstall_all do
-            desc "Uninstall all versions"
-            switch :force, "Force to uninstall", short: :f, required: true
-            action! :uninstall_all
+            task :uninstall_all do
+              desc "Uninstall all versions"
+              switch :force, "Force to uninstall", short: :f, required: true
+              action! :uninstall_all
+            end
           end
         end
 

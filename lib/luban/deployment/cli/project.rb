@@ -3,7 +3,7 @@ module Luban
     class Project < Luban::Deployment::Command
       using Luban::CLI::CoreRefinements
       include Luban::Deployment::Parameters::Project
-      include Luban::Deployment::Command::Tasks::Install
+      include Luban::Deployment::Command::Tasks::Provision
       include Luban::Deployment::Command::Tasks::Deploy
       include Luban::Deployment::Command::Tasks::Control
 
@@ -30,16 +30,16 @@ module Luban
         end
       end
 
-      %i(installable? deployable? controllable?).each do |method|
+      %i(provisionable? deployable? controllable?).each do |method|
         define_method(method) do
           apps.values.any? { |app| app.send(__method__) }
         end
       end
 
-      (Luban::Deployment::Command::Tasks::Install::Actions | %i(destroy_project)).each do |action|
+      (Luban::Deployment::Command::Tasks::Provision::Actions | %i(destroy_project)).each do |action|
         define_method(action) do |args:, opts:|
           apps.each_value do |app|
-            app.send(__method__, args: args, opts: opts) if app.installable?
+            app.send(__method__, args: args, opts: opts) if app.provisionable?
           end
         end
       end

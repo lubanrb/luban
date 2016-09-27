@@ -4,9 +4,9 @@ module Luban
       class Bundler < Luban::Deployment::Package::Base
         protected
 
-        def setup_install_tasks
+        def setup_provision_tasks
           super
-          commands[:install].switch :install_doc, "Install Bundler document"
+          provision_tasks[:install].switch :install_doc, "Install Bundler document"
         end
 
         class Installer < Luban::Deployment::Package::Installer

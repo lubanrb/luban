@@ -10,9 +10,9 @@ module Luban
 
         protected
 
-        def setup_install_tasks
+        def setup_provision_tasks
           super
-          commands[:install].option :openssl, "OpenSSL version"
+          provision_tasks[:install].option :openssl, "OpenSSL version"
         end
 
         class Installer < Luban::Deployment::Package::Installer

@@ -4,9 +4,9 @@ module Luban
       class Rubygems < Luban::Deployment::Package::Base
         protected
 
-        def setup_install_tasks
+        def setup_provision_tasks
           super
-          commands[:install].switch :install_doc, "Install Rubygems document"
+          provision_tasks[:install].switch :install_doc, "Install Rubygems document"
         end
 
         class Installer < Luban::Deployment::Package::Installer
