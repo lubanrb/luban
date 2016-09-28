@@ -6,6 +6,7 @@ module Luban
       include Luban::Deployment::Command::Tasks::Provision
       include Luban::Deployment::Command::Tasks::Deploy
       include Luban::Deployment::Command::Tasks::Control
+      include Luban::Deployment::Command::Tasks::Monitor
 
       attr_reader :apps
 
@@ -30,7 +31,7 @@ module Luban
         end
       end
 
-      %i(provisionable? deployable? controllable?).each do |method|
+      %i(provisionable? deployable? controllable? monitorable?).each do |method|
         define_method(method) do
           apps.values.any? { |app| app.send(__method__) }
         end
@@ -77,6 +78,14 @@ module Luban
         define_method(action) do |args:, opts:|
           stop_sequence.each do |app|
             apps[app].send(__method__, args: args, opts: opts) if apps[app].controllable?
+          end
+        end
+      end
+
+      Luban::Deployment::Command::Tasks::Monitor::Actions.each do |action|
+        define_method(action) do |args:, opts:|
+          apps.each_value do |app|
+            app.send(__method__, args: args, opts: opts) if app.monitorable?
           end
         end
       end
