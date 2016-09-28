@@ -1,5 +1,13 @@
 # Change log
 
+## Version 0.8.9 (Sept 28, 2016)
+
+Minor enhancements:
+  * Added monitoring support for Luban::Deployment::Project
+
+Bug fixes:
+  * Added descriptions for subcommand groups: provision, control, monitor and crontab
+
 ## Version 0.8.8 (Sept 28, 2016)
 
 Minor enhancements:
