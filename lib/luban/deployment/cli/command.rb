@@ -20,6 +20,8 @@ module Luban
           def setup_provision_tasks
             _self = self
             command :provision do
+              desc "Run provision tasks"
+
               task :setup do
                 desc "Setup #{_self.display_name} environment"
                 action! :setup
@@ -111,6 +113,8 @@ module Luban
 
           def setup_control_tasks
             command :control do
+              desc "Run process control tasks"
+
               task :start do
                 desc "Start process"
                 action! :start_process
@@ -162,6 +166,7 @@ module Luban
 
           def setup_monitor_tasks
             command :monitor do
+              desc "Run process monitoring tasks"
               task :on do
                 desc "Turn on process monitor"
                 action! :monitor_on
@@ -219,6 +224,8 @@ module Luban
 
           def setup_crontab_tasks
             command :cronjobs do
+              desc "Run crontab tasks"
+
               task :update do
                 desc 'Update cron jobs'
                 action! :update_cronjobs
