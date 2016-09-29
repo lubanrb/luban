@@ -1,5 +1,13 @@
 # Change log
 
+## Version 0.8.10 (Sept 29, 2016)
+
+Minor enhancements:
+  * Enhanced monitor status check up by service/application
+
+Bug fixes:
+  * Increased keep_releases from 1 to 5 in Publisher to solve puma restart failure
+
 ## Version 0.8.9 (Sept 28, 2016)
 
 Minor enhancements:
