@@ -160,7 +160,7 @@ module Luban
           "#{release_name} in #{stage} #{project} is published successfully."
         end
 
-        def cleanup_releases(keep_releases = 1)
+        def cleanup_releases(keep_releases = 5)
           files = capture(:ls, '-xtd', releases_path.join("#{release_version}-*")).split(" ")
           if files.count > keep_releases
             files.last(files.count - keep_releases).each { |f| rmdir(f) }
