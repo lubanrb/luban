@@ -149,7 +149,7 @@ module Luban
         end
 
         module Monitor
-          Actions = %i(monitor_on monitor_off monitor_reload)
+          Actions = %i(monitor_on monitor_off monitor_reload monitor_check)
           Actions.each do |action|
             define_method(action) do |args:, opts:|
               raise NotImplementedError, "#{self.class.name}##{__method__} is an abstract method."
@@ -180,6 +180,12 @@ module Luban
               task :reload do
                 desc "Reload monitor configuration"
                 action! :monitor_reload
+              end
+
+              task :status do
+                desc "Check monitor status"
+                switch :summary, "Show status summary", short: :s
+                action! :monitor_check
               end
             end
           end

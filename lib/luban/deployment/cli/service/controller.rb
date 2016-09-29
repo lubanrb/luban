@@ -139,6 +139,10 @@ module Luban
             reload_monitor_process(output: :update_result)
           end
 
+          def monitor_check
+            check_monitor_status(output: :update_result)
+          end
+
           def monitor_process(output: :info)
             if monitor_process!
               send(output, "Turned on process monitor for #{service_entry}")
@@ -161,6 +165,10 @@ module Luban
             else
               send(output, "Failed to reload process monitor for #{service_entry}")
             end
+          end
+
+          def check_monitor_status(output: :info)
+            send(output, check_monitor_status!)
           end
 
           def default_pending_seconds; 30; end
@@ -239,6 +247,10 @@ module Luban
 
           def reload_monitor_process!
             test(reload_monitor_command)
+          end
+
+          def check_monitor_status!
+            capture(check_monitor_command(service_entry, summary: task.opts.summary))
           end
         end
         
