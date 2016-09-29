@@ -92,7 +92,7 @@ module Luban
 
         def publish!
           rollout_release
-          cleanup_releases
+          send("cleanup_#{release_type}_releases")
         end
 
         def rollout_release
@@ -160,12 +160,15 @@ module Luban
           "#{release_name} in #{stage} #{project} is published successfully."
         end
 
-        def cleanup_releases(keep_releases = 5)
+        def cleanup_releases(keep_releases = 1)
           files = capture(:ls, '-xtd', releases_path.join("#{release_version}-*")).split(" ")
           if files.count > keep_releases
             files.last(files.count - keep_releases).each { |f| rmdir(f) }
           end
         end
+
+        def cleanup_app_releases; cleanup_releases(5); end
+        def cleanup_profile_releases; cleanup_releases; end
 
         def bundle_gems
           assure_dirs(bundle_config_path, gems_cache_path, bundle_path)
