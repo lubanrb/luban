@@ -52,6 +52,14 @@ module Luban
           execute(:mkdir, '-p', *opts, path)
         end
 
+        def truncate(path)
+          execute(:cat, "/dev/null", ">", path)
+        end
+
+        def touch(path)
+          execute(:touch, path)
+        end
+
         def rm(*opts, path)
           execute(:rm, '-f', *opts, path)
         end
@@ -106,13 +114,10 @@ module Luban
 
         def url_exists?(url)
           # Sent HEAD request to avoid downloading the file contents
-          test("curl -s -L -I -o /dev/null -f #{url}")
-
-          # Other effective ways to check url existence with curl
-
+          test("curl -s -L -I -o /dev/null -f #{url}") or
           # In case HEAD request is refused, 
           # only the first byte of the file is requested
-          # test("curl -s -L -o /dev/null -f -r 0-0 #{url}")
+          test("curl -s -L -o /dev/null -f -r 0-0 #{url}")
 
           # Alternatively, http code (200) can be validated
           # capture("curl -s -L -I -o /dev/null -w '%{http_code}' #{url}") == '200'
