@@ -56,7 +56,7 @@ module Luban
       def has_services?; !services.empty?; end
 
       def provisionable?;  has_packages?; end
-      def deployable?;   has_source? or has_profile? end
+      def deployable?; true; end
       def controllable?; has_source? or has_services?; end
 
       def use_package?(package_name, package_version, servers: [])
