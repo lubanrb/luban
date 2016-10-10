@@ -18,15 +18,23 @@ module Luban
               config_finder[:application].stage_profile_templates_path.join(profile_name)
           end
 
-          def profile_templates(format: "erb")
-            return @profile_templates unless @profile_templates.nil?
-            @profile_templates = []
+          def available_profile_templates(format: "erb")
+            return @available_profile_templates unless @available_profile_templates.nil?
+            templates = []
             [profile_templates_path, stage_profile_templates_path].each do |path|
-              Dir.chdir(path) { @profile_templates |= Dir["**/*.#{format}"] } if path.directory?
+              Dir.chdir(path) { templates |= Dir["**/*.#{format}"] } if path.directory?
             end
-            @profile_templates.tap do |templates| 
-              templates.reject! { |t| exclude_template?(t) }
-            end
+            @available_profile_templates = templates
+          end
+
+          def profile_templates(format: "erb")
+            @profile_templates ||= 
+              available_profile_templates(format: format).reject { |t| exclude_template?(t) }
+          end
+
+          def excluded_profile_templates(format: "erb")
+            @excluded_profile_templates ||= 
+              available_profile_templates(format: format).select { |t| exclude_template?(t) }
           end
 
           def exclude_template?(template); false; end
@@ -43,7 +51,7 @@ module Luban
           def update_profile
             assure_dirs(stage_profile_path)
             render_profile
-            update_logrotate_files
+            cleanup_profile
           end
 
           protected
@@ -79,9 +87,10 @@ module Luban
                                auto_revision: true)
           end
 
-          def update_logrotate_files
-            if file?(stage_profile_path.join(logrotate_file_name))
-              logrotate_files.push(logrotate_file_path)
+          def cleanup_profile
+            excluded_profile_templates.each do |template_file|
+              profile_file = stage_profile_path.join(template_file).sub_ext('')
+              rm(profile_file) if file?(profile_file)
             end
           end
         end
