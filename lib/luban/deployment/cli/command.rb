@@ -203,7 +203,7 @@ module Luban
 
           def has_cronjobs?; !cronjobs.empty?; end
 
-          def cronjob(roles: nil, hosts: nil, **job)
+          def cronjob(roles: luban_roles, hosts: nil, **job)
             validate_cronjob(job)
             roles = Array(roles)
             hosts = Array(hosts)
