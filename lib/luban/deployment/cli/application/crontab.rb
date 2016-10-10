@@ -55,7 +55,11 @@ module Luban
             return
           end
           if updated?
-            update_result "Skipped! ALREADY updated crontab.", status: :skipped
+            if has_cronjobs?
+              update_result "Skipped! ALREADY updated crontab.", status: :skipped
+            else
+              update_result "Skipped! No crontab for #{user}.", status: :skipped
+            end
             return
           end
 
@@ -86,11 +90,19 @@ module Luban
 
         def deploy_cronjobs!
           rm(crontab_file_path) if force?
-          upload_by_template(file_to_upload: crontab_file_path,
-                             template_file:  crontab_template_file,
-                             header_file: crontab_header_template_file,
-                             footer_file: crontab_footer_template_file,
-                             auto_revision: true)
+          if has_cronjobs?
+            upload_by_template(file_to_upload: crontab_file_path,
+                               template_file:  crontab_template_file,
+                               header_file: crontab_header_template_file,
+                               footer_file: crontab_footer_template_file,
+                               auto_revision: true)
+          else
+            if file?(crontab_file_path, "-s")
+              truncate(crontab_file_path)
+            else
+              touch(crontab_file_path) unless file?(crontab_file_path)
+            end
+          end
         end
 
         def crontab_entry(command:, schedule:, output: "", type: :shell, disabled: false)
@@ -101,6 +113,7 @@ module Luban
           unless respond_to?(command_composer)
             abort "Aborted! Unknown cronjob type: #{type.inspect}"
           end
+          command = instance_exec(&command) if command.respond_to?(:call)
           command = send(command_composer, command, output: output)
           entry = "#{schedule} #{command}"
           disabled ? "# DISABLED - #{entry}" : entry
@@ -112,15 +125,21 @@ module Luban
           found = false
           crontab = crontab.split("\n").inject([]) do |lines, line|
             if found || line == crontab_open
-              lines << new_crontab unless (found = line != crontab_close)
+              unless (found = line != crontab_close)
+                lines << new_crontab unless new_crontab.empty?
+              end
             else
               lines << line
             end
             lines
           end
-          crontab << new_crontab unless crontab.include?(new_crontab)
-          upload!(StringIO.new(crontab.join("\n")), tmp_crontab_file_path)
-          test(:crontab, tmp_crontab_file_path, "2>&1")
+          crontab << new_crontab unless new_crontab.empty? or crontab.include?(new_crontab)
+          if crontab.empty?
+            test(:crontab, "-r", "2>&1")
+          else
+            upload!(StringIO.new(crontab.join("\n")), tmp_crontab_file_path)
+            test(:crontab, tmp_crontab_file_path, "2>&1")
+          end
         ensure
           rm(tmp_crontab_file_path)
         end
