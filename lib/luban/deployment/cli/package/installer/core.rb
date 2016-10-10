@@ -46,8 +46,7 @@ module Luban
         def configure_build_env_variables          
           @build_env_vars = { 
             ldflags: [ENV['LDFLAGS'].to_s],
-            cflags: [ENV['CFLAGS'].to_s],
-            cppflags: [ENV['CPPFLAGS'].to_s]
+            cflags: [ENV['CFLAGS'].to_s]
           }
           if child?
             configure_parent_build_env_variables
@@ -58,12 +57,18 @@ module Luban
         def configure_parent_build_env_variables
           parent.build_env_vars[:ldflags] << "-L#{lib_path}"
           parent.build_env_vars[:cflags] << "-I#{include_path}"
-          parent.build_env_vars[:cppflags] << "-I#{include_path}"
         end
 
         def configure_parent_build_options
           if parent.respond_to?("with_#{package_name}_dir")
             parent.send("with_#{package_name}_dir", install_path)
+          end
+        end
+
+        def compose_build_env_variables
+          build_env_vars.inject({}) do |vars, (k, v)|
+            vars[k] = "#{v.join(' ').strip}" unless v.all?(&:empty?)
+            vars
           end
         end
 
