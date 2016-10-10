@@ -23,7 +23,7 @@ module Luban
             assure_dirs(target_path.dirname)
             rmdir(target_path) if directory?(target_path)
             source_path = from.join(path)
-            assure_symlink(source_path, target_path) #if directory?(source_path)
+            assure_symlink(source_path, target_path) 
           end
         end
 
@@ -33,7 +33,7 @@ module Luban
             assure_dirs(target_path.dirname)
             rm(target_path) if file?(target_path)
             source_path = from.join(path)
-            assure_symlink(source_path, target_path) #if file?(source_path)
+            assure_symlink(source_path, target_path)
           end
         end
       end
