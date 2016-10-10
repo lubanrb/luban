@@ -302,7 +302,7 @@ module Luban
         end
 
         def bootstrap_install
-          assure_dirs(etc_path, tmp_path, app_bin_path, 
+          assure_dirs(tmp_path, app_bin_path, 
                       package_tmp_path, install_path, install_log_path)
         end
 

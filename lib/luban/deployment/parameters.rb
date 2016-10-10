@@ -119,7 +119,6 @@ module Luban
 
         parameter :application
         parameter :scm_role
-        parameter :logrotate_files
 
         def env_name
           @env_name ||= "#{stage}.#{project}/#{application}"
@@ -137,8 +136,6 @@ module Luban
 
         def set_default_application_parameters
           set_default :scm_role, :scm
-          set_default :logrotate_files, []
-
           setup_default_application_config_finder
         end
 

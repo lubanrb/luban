@@ -20,13 +20,11 @@ module Luban
         end
 
         def destroy_project
-          rm(etc_path.join('*', "#{stage}.#{project}.*"))
           rmdir(project_path)
           update_result "The project environment is destroyed."
         end
 
         def destroy_app
-          rm(etc_path.join('*', "#{stage}.#{project}.#{application}.*"))
           rmdir(app_path)
           update_result "The application environment is destroyed."
         end
@@ -39,7 +37,7 @@ module Luban
         protected
 
         def bootstrap
-          assure_dirs(logrotate_path, downloads_path,
+          assure_dirs(downloads_path, archived_logs_path, 
                       tmp_path, app_bin_path, app_tmp_path, 
                       releases_path, shared_path)
         end

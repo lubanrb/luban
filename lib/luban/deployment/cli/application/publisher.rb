@@ -100,7 +100,7 @@ module Luban
           upload!(release_package_path.to_s, upload_to.to_s)
           if md5_matched?(upload_to, release_md5) and
              test(:tar, "-xzf #{upload_to} -C #{releases_path}")
-            execute(:touch, release_path)
+            touch(release_path)
             create_symlinks
             update_releases_log
           else
@@ -119,7 +119,6 @@ module Luban
 
         def create_profile_symlinks
           create_release_symlink(shared_path)
-          create_etc_symlinks
         end
 
         def create_app_symlinks
@@ -135,21 +134,11 @@ module Luban
 
         def create_symlinks_for_linked_dirs
           create_linked_dirs(linked_dirs, from: shared_path, to: release_path)
+          assure_symlink(archived_logs_path, log_path.join(archived_logs_path.basename))
         end
 
         def create_symlinks_for_linked_files
           create_linked_files(linked_files, from: profile_path, to: release_path.join('config'))
-        end
-
-        def create_etc_symlinks
-          create_logrotate_symlinks
-        end
-
-        def create_logrotate_symlinks
-          logrotate_files.each do |path|
-            target_file = "#{stage}.#{project}.#{application}.#{path.basename}"
-            assure_symlink(path, logrotate_path.join(target_file))
-          end
         end
 
         def update_releases_log

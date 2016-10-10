@@ -73,14 +73,6 @@ module Luban
           def control_file_name
             @control_file_name ||= "#{service_name}.conf"
           end
-
-          def logrotate_file_path
-            @logrotate_file_path ||= profile_path.join(logrotate_file_name)
-          end
-
-          def logrotate_file_name
-            @logrotate_file_name ||= "#{service_name}.logrotate"
-          end
         end
 
         include Base

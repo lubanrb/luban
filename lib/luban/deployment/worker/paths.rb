@@ -21,12 +21,8 @@ module Luban
             @env_path ||= luban_root_path.join('env')
           end
 
-          def etc_path
-            @etc_path ||= luban_root_path.join('etc')
-          end
-
-          def logrotate_path
-            @logrotate_path = etc_path.join('logrotate')
+          def archives_path
+            @archives_path ||= luban_root_path.join('archives')
           end
 
           def tmp_path
