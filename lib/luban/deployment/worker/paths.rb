@@ -24,6 +24,7 @@ module Luban
           def archives_path
             @archives_path ||= luban_root_path.join('archives')
           end
+          alias_method :local_archives_path, :archives_path
 
           def tmp_path
             @tmp_path ||= luban_root_path.join('tmp')
