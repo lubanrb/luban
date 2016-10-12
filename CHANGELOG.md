@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.9.2 (Oct 13, 2016)
+
+Bug fixes:
+  * Checked nullity for #scm_role and #archive_role before setup promptless SSH authentication
+
 ## Version 0.9.1 (Oct 13, 2016)
 
 New features:
