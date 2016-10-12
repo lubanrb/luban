@@ -119,6 +119,7 @@ module Luban
 
         parameter :application
         parameter :scm_role
+        parameter :archive_role
 
         def env_name
           @env_name ||= "#{stage}.#{project}/#{application}"
@@ -136,6 +137,7 @@ module Luban
 
         def set_default_application_parameters
           set_default :scm_role, :scm
+          set_default :archive_role, :archive
           setup_default_application_config_finder
         end
 
