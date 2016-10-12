@@ -33,11 +33,12 @@ module Luban
             server
           else
             all << new_server
-            new_server.roles.each do |role| 
+            new_server
+          end.tap do |s|
+            s.roles.each do |role| 
               @servers[role] ||= []
               @servers[role] << new_server
             end
-            new_server
           end
         end
 
