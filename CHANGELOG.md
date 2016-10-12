@@ -1,5 +1,33 @@
 # Change log
 
+## Version 0.9.0 (Oct 12, 2016)
+
+New features:
+  * Added package for Logrotate
+    * Added dependent package for Popt
+  * Added support for log archival which is done thru Uber
+  * Added two convenient methods, #touch and #truncate, in module Utils
+
+Minor enhancements:
+  * Set keep_releases differently for app and profile publication
+  * Made application always deployable
+    * Application has/has no cronjobs to update which implies deployable
+  * Deprecated symlinks for logrotate configuration files
+    * As a result, directory "etc" is removed as well since it is no more necessary
+  * No more place holder cronjob entries if there are no more cronjobs defined
+  * Refactored profile templates handling in service configurator
+  * Cleaned up profile files that have been excluded
+  * Made luban_roles as the default roles when setting up cronjobs
+  * Added back support for build environment variables like LDFLAGS/CFLAGS
+  * Upgraded OpenSSL for Ruby to version 1.0.2j
+  * Upgraded Bundler for Ruby to version 1.13.3
+  * Added Rubygems dependency for Ruby (version >= 1.9.3)
+    * As a side effect, package option #rubygems for Ruby can be set for all Ruby versions
+  * Minor code cleanup
+
+Bug fixes:
+  * Added an extra validation for URL existence test
+
 ## Version 0.8.10 (Sept 29, 2016)
 
 Minor enhancements:
