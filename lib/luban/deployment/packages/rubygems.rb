@@ -33,7 +33,6 @@ module Luban
           end
 
           def source_repo
-            #@source_repo ||= "http://production.cf.rubygems.org"
             @source_repo ||= "https://rubygems.org"
           end
 
