@@ -47,13 +47,14 @@ module Luban
         apply_to '>= 1.9.3' do
           before_install do
             depend_on 'openssl', version: '1.0.2j'
+            depend_on 'rubygems', version: '2.6.7'
             #depend_on 'yaml', version: '0.1.6'
           end
         end
 
         apply_to :all do
           after_install do
-            depend_on 'bundler', version: '1.12.3'
+            depend_on 'bundler', version: '1.13.3'
           end
         end
         
@@ -72,7 +73,7 @@ module Luban
           provision_tasks[:install].switch :install_doc, "Install Ruby document"
           provision_tasks[:install].switch :install_tcl, "Install with Tcl"
           provision_tasks[:install].switch :install_tk, "Install with Tk"
-          provision_tasks[:install].option :rubygems, "Rubygems version (effective for v1.9.2 or below)"
+          provision_tasks[:install].option :rubygems, "Rubygems version"
           provision_tasks[:install].option :bundler, "Bundler version"
           provision_tasks[:install].option :openssl, "OpenSSL version (effective for v1.9.3 or above)"
         end
