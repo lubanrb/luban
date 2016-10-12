@@ -130,10 +130,16 @@ module Luban
       def promptless_authen(args:, opts:)
         opts = opts.merge(app: self, public_keys: Array(public_key!(args: args, opts: opts)))
         public_keys = promptless_authen!(args: args, opts: opts).collect { |r| r[:public_key] }
-        opts = opts.merge(roles: [scm_role, archive_role])
-        promptless_authen!(args: args, opts: opts)
-        opts = opts.merge(roles: [archive_role], public_keys: public_keys)
-        promptless_authen!(args: args, opts: opts)
+
+        opts[:roles] = []
+        opts[:roles] << scm_role unless scm_role.nil?
+        opts[:roles] << archive_role unless archive_role.nil?
+        promptless_authen!(args: args, opts: opts) unless opts[:roles].empty?
+
+        unless archive_role.nil?
+          opts = opts.merge(roles: [archive_role], public_keys: public_keys)
+          promptless_authen!(args: args, opts: opts)
+        end
       end
       dispatch_task :public_key!, to: :authenticator, as: :public_key, locally: true
       dispatch_task :promptless_authen!, to: :authenticator, as: :promptless_authen
