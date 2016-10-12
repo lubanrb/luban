@@ -1,5 +1,15 @@
 # Change log
 
+## Version 0.9.1 (Oct 13, 2016)
+
+New features:
+  * Setup password-less SSH connection to central archives server if it is provided
+    * From application servers to central archives server
+    * From deployment server to central archives server
+
+Bug fixes:
+  * Ensure server set for a given role is updated when an existing server is assigned a new role
+
 ## Version 0.9.0 (Oct 12, 2016)
 
 New features:
