@@ -47,8 +47,10 @@ module Luban
         apply_to '>= 1.9.3' do
           before_install do
             depend_on 'openssl', version: '1.0.2j'
-            depend_on 'rubygems', version: '2.6.7'
             #depend_on 'yaml', version: '0.1.6'
+          end
+          after_install do
+            depend_on 'rubygems-update', version: 'latest'
           end
         end
 
@@ -123,6 +125,10 @@ module Luban
           alias_method :with_yaml_dir, :with_opt_dir
 
           protected
+
+          def create_task(task)
+            super.tap { |t| t.opts.send("rubygems-update=", t.opts.rubygems) }
+          end
 
           def configure_build_options
             super
