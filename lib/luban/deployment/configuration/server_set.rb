@@ -37,7 +37,7 @@ module Luban
           end.tap do |s|
             s.roles.each do |role| 
               @servers[role] ||= []
-              @servers[role] << new_server
+              @servers[role] << s unless @servers[role].include?(s)
             end
           end
         end
