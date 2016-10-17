@@ -4,6 +4,8 @@ module Luban
       class Rubygems < Luban::Deployment::Package::Base
         protected
 
+        def self.get_latest_version; RubygemsUpdate.get_latest_version; end
+
         def setup_provision_tasks
           super
           provision_tasks[:install].switch :install_doc, "Install Rubygems document"
