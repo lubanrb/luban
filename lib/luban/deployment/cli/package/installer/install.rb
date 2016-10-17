@@ -195,6 +195,7 @@ module Luban
           required_packages[type].each do |d|
             version = task.opts.send(d.name) || d.version
             next if version == 'default'
+            version = self.class.package_class(d.name).latest_version if version == 'latest'
             self.class.worker_class(:installer, package: d.name).new(
               config: config, backend: backend,
               cmd: cmd, args: {},

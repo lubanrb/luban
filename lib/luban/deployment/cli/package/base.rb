@@ -52,6 +52,18 @@ module Luban
             { major_version: version, patch_level: '' }
           end
 
+          def version_mutex; @version_mutex ||= Mutex.new; end
+
+          def latest_version
+            version_mutex.synchronize do
+              @latest_version ||= get_latest_version
+            end
+          end
+
+          def get_latest_version
+            raise NotImplementedError, "#{self.class.name}#get_latest_version is an abstract method."
+          end
+
           protected
 
           def package_require_path(package_name)
@@ -84,6 +96,7 @@ module Luban
 
         def update_package_options(version, **opts)
           unless has_version?(version)
+            version = self.class.package_class(name).latest_version if version == 'latest'
             package_options[version] = 
               { name: name.to_s }.merge!(self.class.decompose_version(version))
           end
