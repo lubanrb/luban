@@ -1,6 +1,6 @@
 # Change log
 
-## Version 0.9.3 (Oct 17, 2016)
+## Version 0.9.4 (Oct 17, 2016)
 
 New feature:
   * Supported Rubygems-update for Ruby version 1.9.3 or above
