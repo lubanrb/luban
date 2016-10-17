@@ -1,5 +1,20 @@
 # Change log
 
+## Version 0.9.3 (Oct 17, 2016)
+
+New feature:
+  * Supported Rubygems-update for Ruby version 1.9.3 or above
+
+Minor enhancements:
+  * Refactored gem installer and applied changes to gem installers for Bundler and RubygemsUpdates
+  * Added abstract methods to get latest version in Package::Base
+    * Retrieved latest package version if the version is specified as "latest"
+  * Upgraded Bundler to 1.13.5 in Ruby
+
+
+Bug fixes:
+  * Fixed a bug in adding host to a given role
+
 ## Version 0.9.2 (Oct 13, 2016)
 
 Bug fixes:
