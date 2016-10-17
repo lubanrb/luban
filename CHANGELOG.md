@@ -11,9 +11,9 @@ Minor enhancements:
     * Retrieved latest package version if the version is specified as "latest"
   * Upgraded Bundler to 1.13.5 in Ruby
 
-
 Bug fixes:
   * Fixed a bug in adding host to a given role
+  * Ensured symlink for archived logs path to be created for profile-based application publication
 
 ## Version 0.9.2 (Oct 13, 2016)
 
