@@ -1,5 +1,15 @@
 # Change log
 
+## Version 0.9.5 (Oct 18, 2016)
+
+New features:
+  * Added package support for Curl
+
+Minor enhancements:
+  * Upgraded the dependency on OpenSSL in Git to version 1.0.2j
+  * Refactored symlink creation for archived logs
+  * Updated package dependency of rubygems-update in Ruby to version 2.6.7 instead of latest to avoid unnecessary network query
+
 ## Version 0.9.4 (Oct 17, 2016)
 
 New feature:
