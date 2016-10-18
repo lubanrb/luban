@@ -11,8 +11,8 @@ module Luban
           def shell_command(cmd, setup: shell_setup, prefix: shell_prefix, 
                                  output: shell_output, delimiter: shell_delimiter)
             cmd = "#{prefix.join(' ')} #{cmd}" unless prefix.empty?
-            cmd = "#{cmd} #{output_redirection(output)}"
-            "#{setup.join(' ' + delimiter + ' ')} #{delimiter} #{cmd}"
+            cmd = "#{setup.join(' ' + delimiter + ' ')} #{delimiter} #{cmd}" unless setup.empty?
+            "#{cmd} #{output_redirection(output)}"
           end
 
           def output_redirection(output)
