@@ -2,6 +2,12 @@ module Luban
   module Deployment
     class Application
       class Authenticator < Luban::Deployment::Worker::Base
+        def public_keys
+          @public_keys = task.opts.public_keys || []
+          @public_keys.uniq!
+          @public_keys
+        end
+
         def private_key_file_name
           @private_key_file_name ||= "id_#{authen_key_type}"
         end
@@ -64,7 +70,7 @@ module Luban
         def promptless_authen_enabled?
           origin_auth_methods = host.ssh_options[:auth_methods]
           host.ssh_options[:auth_methods] = %w(publickey)
-          capture('echo ok') == 'ok'
+          capture('echo ok') == 'ok' and keys_authorzied?
         rescue Net::SSH::AuthenticationFailed
           false
         ensure
@@ -84,8 +90,6 @@ module Luban
         end
 
         def add_authorized_keys
-          public_keys = task.opts.public_keys || []
-          public_keys.uniq!
           if file?(authorized_keys_file_path)
             public_keys.each { |k| add_authorized_key(k) unless key_authorized?(k) }
           else
@@ -99,6 +103,14 @@ module Luban
 
         def key_authorized?(key)
           test("grep -v \"^#\" #{authorized_keys_file_path} | grep -Fxq \"#{key}\"")
+        end
+
+        def keys_authorzied?
+          if file?(authorized_keys_file_path)
+            public_keys.all? { |k| key_authorized?(k) }
+          else
+            false
+          end
         end
       end
     end
