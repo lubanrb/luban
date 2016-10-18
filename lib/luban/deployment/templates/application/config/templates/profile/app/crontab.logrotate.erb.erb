@@ -1,0 +1,15 @@
+# Crontab logrotate configuration
+
+<%%= log_path.join('cron.*.log') %> {
+  hourly
+  maxsize 5M
+  maxage 14
+  rotate <%%= 14 * 24 * (60 / 10) %>
+  missingok
+  compress
+  compresscmd <%%= `which gzip`.chomp %>
+  delaycompress
+  dateext
+  dateformat -%Y%m%d-%H%M%S
+  olddir archived_logs
+}
