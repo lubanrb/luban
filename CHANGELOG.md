@@ -1,5 +1,14 @@
 # Change log
 
+## Version 0.9.6 (Oct 18, 2016)
+
+Minor enhancements:
+  * Added logrotate configuration template for cronjobs in deployment application skeleton
+
+Bug fixes:
+  * Checked authorization for all public keys before setting up promptless authentication
+    * Especially useful for multiple public keys passed in to setup promptless authentication
+
 ## Version 0.9.5 (Oct 18, 2016)
 
 New features:
