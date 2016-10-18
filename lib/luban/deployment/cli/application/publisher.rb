@@ -119,7 +119,6 @@ module Luban
 
         def create_profile_symlinks
           create_release_symlink(shared_path)
-          create_symlinks_for_archived_logs
         end
 
         def create_app_symlinks
@@ -140,10 +139,6 @@ module Luban
 
         def create_symlinks_for_linked_files
           create_linked_files(linked_files, from: profile_path, to: release_path.join('config'))
-        end
-
-        def create_symlinks_for_archived_logs
-          assure_symlink(archived_logs_path, log_path.join(archived_logs_path.basename))
         end
 
         def update_releases_log

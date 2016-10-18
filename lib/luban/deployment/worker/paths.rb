@@ -79,6 +79,15 @@ module Luban
               luban_install_path.join('pkg', package_name.to_s, 'versions',
                                       packages[package_name.to_sym].current_version, 'bin')
           end
+
+          def app_archives_path
+            @app_archives_path ||= 
+              archives_path.join("#{stage}.#{project}", application, hostname)
+          end
+
+          def archived_logs_path
+            @archived_logs_path ||= app_archives_path.join('archived_logs')
+          end
         end
       end
     end

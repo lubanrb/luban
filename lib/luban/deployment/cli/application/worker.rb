@@ -42,15 +42,6 @@ module Luban
         def bundle_command(cmd, **opts)
           shell_command("#{bundle_executable} exec #{cmd}", **opts)
         end
-
-        def app_archives_path
-          @app_archives_path ||= 
-            archives_path.join("#{stage}.#{project}", application, hostname)
-        end
-
-        def archived_logs_path
-          @archived_logs_path ||= app_archives_path.join('archived_logs')
-        end
       end
     end
   end

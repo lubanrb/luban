@@ -16,6 +16,7 @@ module Luban
           super
           create_symlinks_for_linked_dirs
           create_symlinks_for_linked_files
+          create_symlinks_for_archived_logs
         end
 
         def create_symlinks_for_linked_dirs

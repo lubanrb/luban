@@ -36,6 +36,10 @@ module Luban
             assure_symlink(source_path, target_path)
           end
         end
+
+        def create_symlinks_for_archived_logs
+          assure_symlink(archived_logs_path, log_path.join(archived_logs_path.basename))
+        end
       end
     end
   end
