@@ -50,7 +50,7 @@ module Luban
             #depend_on 'yaml', version: '0.1.6'
           end
           after_install do
-            depend_on 'rubygems-update', version: 'latest'
+            depend_on 'rubygems-update', version: '2.6.7'
           end
         end
 
