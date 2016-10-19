@@ -117,9 +117,14 @@ module Luban
       module Application
         extend Base
 
+        DefaultLogrotateMaxAge = 7 # days
+        DefaultLogrotateInterval = 10 # mins
+
         parameter :application
         parameter :scm_role
         parameter :archive_role
+        parameter :logrotate_max_age
+        parameter :logrotate_interval
 
         def env_name
           @env_name ||= "#{stage}.#{project}/#{application}"
@@ -133,11 +138,18 @@ module Luban
           monitor_defined? and !monitor_itself?
         end
 
+        def logrotate_count
+          logrotate_max_age * 24 * (60 / logrotate_interval)
+        end
+
         protected
 
         def set_default_application_parameters
           set_default :scm_role, :scm
           set_default :archive_role, :archive
+          set_default :logrotate_max_age, DefaultLogrotateMaxAge
+          set_default :logrotate_interval, 
+                      (ENV['LUBAN_LOGROTATE_INTERVAL'] || DefaultLogrotateInterval).to_i
           setup_default_application_config_finder
         end
 
