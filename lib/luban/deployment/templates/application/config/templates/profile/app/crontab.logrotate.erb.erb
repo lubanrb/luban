@@ -3,8 +3,8 @@
 <%%= log_path.join('cron.*.log') %> {
   hourly
   maxsize 5M
-  maxage 14
-  rotate <%%= 14 * 24 * (60 / 10) %>
+  maxage <%= logrotate_max_age %>
+  rotate <%= logrotate_count %>
   missingok
   compress
   compresscmd <%%= `which gzip`.chomp %>
