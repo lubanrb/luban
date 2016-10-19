@@ -1,5 +1,14 @@
 # Change log
 
+## Version 0.9.8 (Oct 19, 2016)
+
+New features:
+  * Added new parameters, #logrotate_max_age, #logrotate_interval and #logrotate_count for log rotation control
+    * Refactored these out from logrotate config to make change easier & cleaner
+    * Respected the environment variable, #LUBAN_LOGROTATE_INTERVAL, to receive the default value
+    * Updated crontab logrotate configuration to utilize the new parameters
+  * Bump up gem dependency of luban-cli to 0.4.8
+
 ## Version 0.9.7 (Oct 19, 2016)
 
 Bug fixes:
