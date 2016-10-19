@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.9.7 (Oct 19, 2016)
+
+Bug fixes:
+  * Handled empty shell setup appropriately when composing shell command
+
 ## Version 0.9.6 (Oct 18, 2016)
 
 Minor enhancements:
