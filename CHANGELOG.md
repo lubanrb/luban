@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.9.9 (Oct 20, 2016)
+
+Bug fixes:
+  * Fixed a template issue for crontab.logrotate.erb.erb
+
 ## Version 0.9.8 (Oct 19, 2016)
 
 New features:
