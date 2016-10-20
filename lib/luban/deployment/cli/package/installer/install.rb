@@ -207,7 +207,7 @@ module Luban
         end
 
         def before_install
-          bootstrap_install unless installed?
+          bootstrap_install
           install_required_packages(:before_install)          
         end
 
