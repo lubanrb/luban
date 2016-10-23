@@ -194,9 +194,9 @@ module Luban
           Time.now().strftime("%d/%m/%Y %H:%M:%S")
         end
 
-        def method_missing(sym, *args, &blk)
-          backend.respond_to?(sym) ? backend.send(sym, *args, &blk) : super
-        end
+        #def method_missing(sym, *args, &blk)
+        #  backend.respond_to?(sym) ? backend.send(sym, *args, &blk) : super
+        #end
       end
     end
   end
