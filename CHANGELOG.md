@@ -1,5 +1,23 @@
 # Change log
 
+## Version 0.9.10 (Oct 24, 2016)
+
+Minor enhancements:
+  * Refactored and enhanced the design and implementation of parameters in a deployment project
+    * Supported default value for a given parameter
+      * set method for default value should be in the form of "set_default_for_parameter_name"
+      * any methods following the above convention will be called during default value setup
+    * Supported parameter validation by convention
+      * validation method name should be in the form of "validate_for_parameter_name"
+      * any methods following the above convention will be called during parameter validation
+    * Injected parameters from service package, if any, into the application
+  * Automated default source handling and thus no more manual set_default_source
+    * Two default source paths under application base path and stage config path
+
+
+Bug fixes:
+  * Ensured linked dirs to be created in package installer
+
 ## Version 0.9.9 (Oct 20, 2016)
 
 Bug fixes:
