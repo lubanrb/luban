@@ -14,7 +14,7 @@ module Luban
       end
 
       def set_default(key, value)
-        set(key, value) unless @variables.has_key?(key)
+        set(key, value) if @variables[key].nil?
       end
 
       def delete(key)
@@ -35,6 +35,10 @@ module Luban
 
       def keys
         @variables.keys
+      end
+
+      def has_key?(key)
+        @variables.has_key?(key)
       end
 
       def role(name, hosts, **properties)

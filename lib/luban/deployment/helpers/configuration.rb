@@ -157,7 +157,6 @@ module Luban
           end
 
           def load_stage_configuration
-            target.load_configuration_file(stage_config_file)
             if File.directory?(stage_config_path)
               ["*.rb", "{packages}/**/*.rb"].each do |pattern|
                 Dir[stage_config_path.join(pattern)].each do |file|
@@ -165,6 +164,7 @@ module Luban
                 end
               end
             end
+            target.load_configuration_file(stage_config_file)
           end
 
           def find_template_file(file_name)

@@ -80,7 +80,10 @@ module Luban
                 command(name, base: Luban::Deployment::Package::Base.package_class(name))
               end
         pkg.update_package_options(version, opts.merge(packages: packages))
-        services[name] = pkg if pkg.is_a?(Luban::Deployment::Service::Base)
+        if pkg.is_a?(Luban::Deployment::Service::Base)
+          services[name] = pkg
+          add_service_parameters(pkg)
+        end
         packages[name] = pkg
       end
       alias_method :require_package, :package
@@ -110,7 +113,11 @@ module Luban
       end
 
       def default_source_path
-        @default_source_path ||= config_finder[:application].stage_config_path.join('app')
+        @default_source_path ||=
+          [config_finder[:application].stage_config_path.join('app'),
+           config_finder[:application].base_path.join('app')].find do |source_path|
+            File.directory?(source_path)
+          end
       end
 
       def default_source?
@@ -275,26 +282,19 @@ module Luban
         @profile_opts = {}
       end
 
-      def validate_parameters
-        super
-        validate_project_parameters
-        validate_application_parameters
-      end
-
       def set_default_parameters
+        set :application, self.class.name.split(':').last.snakecase
         super
-        set_default_project_parameters
-        set_default :application, self.class.name.split(':').last.snakecase
-        set_default_application_parameters
-        set_default_profile
       end
 
-      def set_default_source
-        source(default_source_path, scm: :rsync)
-        release(stage, current: true)
+      def set_default_for_source
+        unless default_source_path.nil?
+          source(default_source_path, scm: :rsync)
+          release(stage, current: true)
+        end
       end
 
-      def set_default_profile
+      def set_default_for_profile
         if config_finder[:application].has_profile?
           profile(config_finder[:application].stage_profile_path, scm: :rsync)
           profile_release(stage, current: true)
@@ -315,6 +315,12 @@ module Luban
         setup_init_profiles
         super
         setup_crontab_tasks
+      end
+
+      def add_service_parameters(service)
+        service.class.parameters.each_pair do |param, default|
+          singleton_class.send(:parameter, param, default: default)
+        end
       end
 
       def setup_init_profiles

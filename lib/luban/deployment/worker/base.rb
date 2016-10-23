@@ -38,6 +38,15 @@ module Luban
           update_result(__return__: @run_blk ? run_with_block : run_with_command).to_h
         end
 
+        def method_missing(sym, *args, &blk)
+          if args.empty? and blk.nil? and config.has_key?(sym)
+            singleton_class.send(:define_method, sym) { config.fetch(__method__) }
+            send(sym)
+          else
+            super
+          end
+        end
+
         protected
 
         def create_task(task)

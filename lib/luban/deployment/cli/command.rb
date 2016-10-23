@@ -365,13 +365,17 @@ module Luban
       end
 
       def set_default_parameters
-        set_default_general_parameters
+        find_instance_methods(/^set_default_for_/).each { |m| send(m) }
+      end
+
+      def find_instance_methods(pattern)
+        singleton_class.instance_methods.select { |m| m.to_s =~ pattern }.reverse
       end
 
       def load_configuration; end
 
       def validate_parameters
-        validate_general_parameters
+        find_instance_methods(/^validate_for_/).each { |m| send(m) }
       end
 
       def load_libraries; end

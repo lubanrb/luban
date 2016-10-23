@@ -2,12 +2,12 @@ module Luban
   module Deployment
     module Parameters
       module Base
-        def parameter(*params)
-          params.each do |param|
-            define_method(param) do |value = nil|
-              value.nil? ? fetch(__method__) : set(__method__, value)
-            end
+        def parameter(param, default: nil)
+          define_method(param) do |value = nil|
+            value.nil? ? fetch(__method__) : set(__method__, value)
           end
+          define_method("set_default_for_#{param}") { set_default param, default }
+          protected "set_default_for_#{param}"
         end
       end
 
@@ -20,37 +20,35 @@ module Luban
           mod.extend(Base)
         end
 
-        parameter :luban_roles
-        parameter :luban_root_path
+        parameter :luban_roles, default: %i(app)
+        parameter :luban_root_path, default: DefaultLubanRootPath
 
         parameter :stages
         parameter :applications
-        parameter :env_vars
+        parameter :env_vars, default: ->{ Hash.new }
 
         parameter :work_dir
         parameter :apps_path
         parameter :project
-        parameter :user
-        parameter :config_finder
+        parameter :user, default: ENV['USER']
+        parameter :config_finder, default: ->{ Hash.new }
 
         protected
 
-        def set_default_general_parameters
-          set_default :luban_roles, %i(app)
-          set_default :luban_root_path, DefaultLubanRootPath
-          set_default :env_vars, {}
-          set_default :user, ENV['USER']
-          set_default :config_finder, {}
-        end
-
-        def validate_general_parameters
+        def validate_for_user
           if user != ENV['USER']
             abort "Aborted! Given deployment user (#{user.inspect}) is NOT the current user #{ENV['USER'].inspect}" +
                   "Please switch to the deployment user before any deployments."
           end
+        end
+
+        def validate_for_project
           if project.nil?
             abort "Aborted! Please specify the project name: project 'project name'"
           end
+        end
+
+        def validate_for_luban_root_path
           if luban_root_path.is_a?(String)
             luban_root_path Pathname.new(luban_root_path)
           end
@@ -65,14 +63,14 @@ module Luban
 
         parameter :stage
 
-        parameter :process_monitor
-        parameter :sshkit_backend
-        parameter :authen_key_type
-        parameter :default_env
-        parameter :pty
-        parameter :connection_timeout
-        parameter :ssh_options
-        parameter :use_sudo
+        parameter :process_monitor, default: ->{ Hash.new }
+        parameter :sshkit_backend, default: SSHKit::Backend::Netssh
+        parameter :authen_key_type, default: 'rsa'
+        parameter :default_env, default: ->{ { path: '$PATH:/usr/local/bin' } }
+        parameter :pty, default: false
+        parameter :connection_timeout, default: 30 # second
+        parameter :ssh_options, default: ->{ Hash.new }
+        parameter :use_sudo, default: false # Turn off sudo by default
 
         def process_monitor_via(monitor, env: "uber/lubmon")
           monitor = monitor.to_s.downcase
@@ -84,25 +82,12 @@ module Luban
 
         protected
 
-        def set_default_project_parameters
-          set_default :process_monitor, {}
-          set_default :sshkit_backend, SSHKit::Backend::Netssh
-          set_default :authen_key_type, 'rsa'
-          set_default :default_env, { path: '$PATH:/usr/local/bin' }
-          set_default :pty, false
-          set_default :connection_timeout, 30 # second
-          set_default :ssh_options, {}
-          set_default :use_sudo, false # Turn off sudo by default
-
-          setup_default_project_config_finder
-        end
-
-        def setup_default_project_config_finder
+        def set_default_for_project_config_finder
           config_finder[:project] ||=
             Luban::Deployment::Helpers::Configuration::Finder.project(self)
         end
 
-        def validate_project_parameters
+        def validate_for_process_monitor
           if monitor_defined?
             if process_monitor[:name].nil?
               abort "Aborted! Please specify the process monitor."
@@ -121,10 +106,10 @@ module Luban
         DefaultLogrotateInterval = 10 # mins
 
         parameter :application
-        parameter :scm_role
-        parameter :archive_role
-        parameter :logrotate_max_age
-        parameter :logrotate_interval
+        parameter :scm_role, default: :scm
+        parameter :archive_role, default: :archive
+        parameter :logrotate_max_age, default: DefaultLogrotateMaxAge
+        parameter :logrotate_interval, default: (ENV['LUBAN_LOGROTATE_INTERVAL'] || DefaultLogrotateInterval).to_i
 
         def env_name
           @env_name ||= "#{stage}.#{project}/#{application}"
@@ -144,21 +129,12 @@ module Luban
 
         protected
 
-        def set_default_application_parameters
-          set_default :scm_role, :scm
-          set_default :archive_role, :archive
-          set_default :logrotate_max_age, DefaultLogrotateMaxAge
-          set_default :logrotate_interval, 
-                      (ENV['LUBAN_LOGROTATE_INTERVAL'] || DefaultLogrotateInterval).to_i
-          setup_default_application_config_finder
-        end
-
-        def setup_default_application_config_finder
+        def set_default_for_application_config_finder
           config_finder[:application] ||= 
             Luban::Deployment::Helpers::Configuration::Finder.application(self)
         end
 
-        def validate_application_parameters
+        def validate_for_application
           if application.nil?
             abort "Aborted! Please specify the application name - application 'app name'"
           end
