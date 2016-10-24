@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.9.11 (Oct 24, 2016)
+
+Bug fixes:
+  * Eval the parameter default value block (if given) under the context of the instance instead of the class
+
 ## Version 0.9.10 (Oct 24, 2016)
 
 Minor enhancements:
