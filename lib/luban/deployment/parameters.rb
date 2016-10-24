@@ -6,7 +6,13 @@ module Luban
           define_method(param) do |value = nil|
             value.nil? ? fetch(__method__) : set(__method__, value)
           end
-          define_method("set_default_for_#{param}") { set_default param, default }
+          define_method("set_default_for_#{param}") do
+            if default.respond_to?(:call)
+              set_default param, instance_exec(&default)
+            else 
+              set_default param, default
+            end
+          end
           protected "set_default_for_#{param}"
         end
       end
