@@ -98,12 +98,16 @@ module Luban
 
       protected
 
-      def set_default_parameters
+      def set_parameters
+        super
         set :stage, self.class.name.split('::').first.snakecase
         set :project, self.class.name.split('::').last.snakecase
+      end
+
+      def set_default_parameters
+        super
         @passwords = {}
         @passwords_mutex = Mutex.new
-        super
       end
 
       def load_libraries

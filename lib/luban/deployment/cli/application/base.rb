@@ -274,17 +274,13 @@ module Luban
       def set_parameters
         super
         copy_parameters_from_parent(:stage, :project, :process_monitor)
+        set :application, self.class.name.split(':').last.snakecase
         @packages = {}
         @services = {}
         @source = {}
         @release_opts = {}
         @profile = {}
         @profile_opts = {}
-      end
-
-      def set_default_parameters
-        set :application, self.class.name.split(':').last.snakecase
-        super
       end
 
       def set_default_for_source
