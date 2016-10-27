@@ -112,16 +112,19 @@ module Luban
         release_opts[version] = opts.merge(version: version)
       end
 
-      def default_source_path
-        @default_source_path ||=
-          [config_finder[:application].stage_config_path.join('app'),
-           config_finder[:application].base_path.join('app')].find do |source_path|
-            File.directory?(source_path)
-          end
+      def local_source_path
+        @local_source_path ||= [local_source_stage_path, local_source_base_path].find do |path|
+                                  File.directory?(path)
+                                end
       end
 
-      def default_source?
-        has_source? and source[:from] == default_source_path
+      def local_source_stage_path
+        @local_source_stage_path ||= config_finder[:application].stage_config_path.join('app')
+      end
+      alias_method :default_source_path, :local_source_stage_path
+
+      def local_source_base_path
+        @local_source_base_path ||= config_finder[:application].base_path.join('app')
       end
 
       def has_version?(version)
@@ -237,8 +240,10 @@ module Luban
       end
 
       def init_source(args:, opts:)
-        if default_source?
-          init_source!(args: args, opts: opts.merge(source: source))
+        if respond_to?(:default_source_template_path, true)
+          init_source!(args: args, 
+                       opts: opts.merge(default_source_template_path: default_source_template_path,
+                                        default_source_path: default_source_path))
         end
       end
       dispatch_task :init_source!, to: :configurator, as: :init_source, locally: true
@@ -284,8 +289,8 @@ module Luban
       end
 
       def set_default_for_source
-        unless default_source_path.nil?
-          source(default_source_path, scm: :rsync)
+        unless local_source_path.nil?
+          source(local_source_path, scm: :rsync)
           release(stage, current: true)
         end
       end

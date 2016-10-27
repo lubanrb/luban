@@ -5,11 +5,11 @@ module Luban
         include Luban::Deployment::Service::Configurator::Base
 
         def default_source_path
-          task.opts.source[:from]
+          task.opts.default_source_path
         end
 
         def default_source_template_path
-          raise NotImplementedError, "#{self.class.name}#default_source_template_path is an abstract method."
+          task.opts.default_source_template_path
         end
 
         def init_source
