@@ -1,5 +1,13 @@
 # Change log
 
+## Version 0.9.13 (Oct 28, 2016)
+
+New features:
+  * Added Luban::Deployment::Script to handle deployment for script-based application
+
+Bug fixes:
+  * Ensured only one controller from service or application controller can be executed
+
 ## Version 0.9.12 (Oct 27, 2016)
 
 Bug fixes:
