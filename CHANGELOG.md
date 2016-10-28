@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.9.12 (Oct 27, 2016)
+
+Bug fixes:
+  * Fixed local source initialization issue
+    * As a side effect, refactored local source handling
+
 ## Version 0.9.11 (Oct 24, 2016)
 
 Bug fixes:
