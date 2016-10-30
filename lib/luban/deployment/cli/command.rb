@@ -203,12 +203,8 @@ module Luban
 
           def has_cronjobs?; !cronjobs.empty?; end
 
-          def cronjob(roles: luban_roles, hosts: nil, **job)
+          def cronjob(**job)
             validate_cronjob(job)
-            roles = Array(roles)
-            hosts = Array(hosts)
-            servers = select_servers(roles, hosts)
-            servers.each { |s| server(s, cronjob: job) }
             cronjobs << job
           end
 
@@ -226,6 +222,17 @@ module Luban
             if cronjobs.any? { |j| j[:command] == job[:command] }
               abort "Aborted! Duplicate command is FOUND: #{job[:command]}"
             end
+          end
+
+          def assign_cronjobs
+            cronjobs.each { |job| assign_cronjob(**job) }
+          end
+
+          def assign_cronjob(roles: luban_roles, hosts: nil, **job)
+            roles = Array(roles)
+            hosts = Array(hosts)
+            servers = select_servers(roles, hosts)
+            servers.each { |s| server(s, cronjob: job) }
           end
 
           def setup_crontab_tasks

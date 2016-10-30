@@ -321,6 +321,11 @@ module Luban
         setup_crontab_tasks
       end
 
+      def after_configure
+        super
+        assign_cronjobs if has_cronjobs?
+      end
+
       def add_service_parameters(service)
         service.class.parameters.each_pair do |param, default|
           singleton_class.send(:parameter, param, default: default)
