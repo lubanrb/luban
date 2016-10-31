@@ -1,5 +1,15 @@
 # Change log
 
+## Version 0.9.14 (Oct 31, 2016)
+
+Minor enhancements:
+  * Assigned cronjobs to each host after configuration is loaded
+
+Bug fixes:
+  * Ensured only one controller from service or application controller can be executed
+    * Rolledback the last change and
+    * Enforced the logic in the control/monitor actions instead
+
 ## Version 0.9.13 (Oct 28, 2016)
 
 New features:
