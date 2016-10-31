@@ -197,11 +197,8 @@ module Luban
       %i(show_current show_summary).each do |action|
         define_method(action) do |args:, opts:|
           show_app_environment
-          if has_services?
-            send("#{action}_packages!", args: args, opts: opts)
-          elsif has_source?
-            send("#{action}_application", args: args, opts: opts)
-          end
+          send("#{action}_packages!", args: args, opts: opts)
+          send("#{action}_application", args: args, opts: opts) if has_source?
         end
         action_on_packages "#{action}_packages!", as: action
       end
@@ -228,8 +225,11 @@ module Luban
        Luban::Deployment::Command::Tasks::Monitor::Actions).each do |action|
         define_method(action) do |args:, opts:|
           show_app_environment
-          send("service_#{action}!", args: args, opts: opts)
-          send("application_#{action}", args: args, opts: opts) if has_source?
+          if has_services?
+            send("service_#{action}!", args: args, opts: opts)
+          elsif has_source?
+            send("application_#{action}", args: args, opts: opts)
+          end
         end
         action_on_services "service_#{action}!", as: action
         application_action "application_#{action}", dispatch_to: :controller, as: action
