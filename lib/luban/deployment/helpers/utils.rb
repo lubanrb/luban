@@ -88,8 +88,17 @@ module Luban
           capture("$(type -p readlink greadlink|head -1) #{source_file}") 
         end
 
+        def md5_for(path)
+          file?(path) ? md5_for_file(path) : md5_for_dir(path)
+        end
+
         def md5_for_file(file)
           capture(:cat, "#{file} 2>/dev/null | openssl md5")[/\h+$/]
+        end
+
+        def md5_for_dir(dir)
+          #capture(:tar, "-cf - #{dir} 2>/dev/null | openssl md5")[/\h+$/]
+          capture(:find, "#{dir} -type f 2>/dev/null | LC_ALL=C sort -u | xargs cat | openssl md5")[/\h+$/]
         end
 
         def sudo(*args)
@@ -165,8 +174,8 @@ module Luban
           backend.capture(*args, raise_on_non_zero_exit: false, &blk).chomp
         end
 
-        def md5_matched?(file_path, md5)
-          file?(file_path) and md5 == md5_for_file(file_path)
+        def md5_matched?(path, md5)
+          file?(path) ? md5 == md5_for_file(path) : md5 == md5_for_dir(path)
         end
 
         #def execute(*args, &blk)
