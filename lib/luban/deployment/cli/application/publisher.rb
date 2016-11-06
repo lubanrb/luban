@@ -85,7 +85,7 @@ module Luban
 
         def after_publish
           create_symlinks
-          bundle_gems unless gems.empty?
+          bundle_gems unless locked_gemfile.nil?
         end
 
         protected
@@ -167,13 +167,14 @@ module Luban
         end
 
         def sync_gems_cache
-          capture(:ls, '-xt', gems_cache_path).split.each do |gem_name|
-            rm(gems_cache_path.join(gem_name)) unless gems.has_key?(gem_name)
-          end
           gems.each_pair do |gem_name, md5|
             gem_path = gems_cache_path.join(gem_name)
             unless md5_matched?(gem_path, md5)
-              upload!(gems_source.join(gem_name).to_s, gem_path.to_s)
+              if file?(gem_file = gems_source[:path].join(gem_name))
+                upload!(gem_file.to_s, gem_path.to_s)
+              else
+                upload!("#{gem_file.to_s}/", gem_path.to_s, recursive: true)
+              end
             end
           end
         end

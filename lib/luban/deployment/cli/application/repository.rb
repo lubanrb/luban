@@ -23,6 +23,10 @@ module Luban
           @workspace_path ||= app_path.join('.luban')
         end
 
+        def gems_path
+          @gems_path ||= workspace_path.join('gems')
+        end
+
         def clone_path
           @clone_path ||= workspace_path.join('repositories', type)
         end
@@ -170,45 +174,57 @@ module Luban
           end
         end
 
+        def release_with_gemfile?(gemfile_path)
+          test(:tar, "-tzf #{release_package_path} #{gemfile_path} > /dev/null 2>&1")
+        end
+
         def bundle_gems
           gemfile_path = Pathname.new(release_tag).join('Gemfile')
           gems_cache = Pathname.new('vendor').join('cache')
           bundle_path = Pathname.new('vendor').join('bundle')
+          if release_with_gemfile?(gemfile_path)
+            assure_dirs(gems_path)
+            bundle_gems!(gemfile_path, gems_cache, bundle_path)
+          else
+            {}
+          end
+        end
+
+        def bundle_gems!(gemfile_path, gems_cache, bundle_path)
           bundled_gems = {}
           gems = bundled_gems[:gems] = {}
-          if test(:tar, "-tzf #{release_package_path} #{gemfile_path} > /dev/null 2>&1")
-            within(workspace_path) do
-              paths_to_extract = [gemfile_path, "#{gemfile_path}.lock", "#{release_tag}/vendor/gems"]
-              execute(:tar, "--strip-components=1 -xzf #{release_package_path} #{paths_to_extract.join(' ')} > /dev/null 2>&1; true")
-              options = []
-              options << "--path #{bundle_path}"
-              unless test(bundle_cmd, :check, *options)
-                unless bundle_without.include?(stage.to_s)
-                  options << "--without #{bundle_without.join(' ')}"
+          within(gems_path) do
+            paths_to_extract = [gemfile_path, "#{gemfile_path}.lock", "#{release_tag}/vendor/gems"]
+            execute(:tar, "--strip-components=1 -xzf #{release_package_path} #{paths_to_extract.join(' ')} > /dev/null 2>&1; true")
+            options = []
+            options << "--path #{bundle_path}"
+            unless test(bundle_cmd, :check, *options)
+              unless bundle_without.include?(stage.to_s)
+                options << "--without #{bundle_without.join(' ')}"
+              end
+              options << "--quiet"
+              execute(bundle_cmd, :install, *options)
+              info "Package gems bundled in Gemfile"
+              execute(bundle_cmd, :package, "--all --quiet")
+            end
+
+            gem_files = capture(:ls, '-xtd', "#{gems_cache.join('*')} | grep -v \"md5$\"").split
+            gem_files.each do |gem_file|
+              gem_name = File.basename(gem_file)
+              md5_file = "#{gem_file}.md5"
+              gems[gem_name] =
+                if file?(md5_file)
+                  gems[gem_name] = capture(:cat, md5_file)
+                else
+                  md5_for(gem_file).tap { |md5| execute(:echo, "#{md5} > #{md5_file}") }
                 end
-                options << "--quiet"
-                execute(bundle_cmd, :install, *options)
-                info "Package gems bundled in Gemfile"
-                execute(bundle_cmd, :package, "--all --quiet")
-              end
-              gem_files = capture(:ls, '-xt', gems_cache.join('*.gem')).split
-              gem_files.each do |gem_file|
-                gem_name = File.basename(gem_file)
-                md5_file = "#{gem_file}.md5"
-                gems[gem_name] =
-                  if file?(workspace_path.join(md5_file))
-                    gems[gem_name] = capture(:cat, md5_file)
-                  else
-                    md5_for_file(gem_file).tap { |md5|
-                      execute(:echo, "#{md5} > #{md5_file}")
-                    }
-                  end
-              end
             end
-            bundled_gems[:gems_cache] = workspace_path.join(gems_cache)
-            workspace_path.join('Gemfile.lock').tap do |p|
-              bundled_gems[:locked_gemfile] = { path: p, md5: md5_for_file(p) }
-            end
+          end
+          gems_path.join(gems_cache).tap do |p|
+            bundled_gems[:gems_cache] = { path: p, md5: md5_for_dir(p) }
+          end
+          gems_path.join('Gemfile.lock').tap do |p|
+            bundled_gems[:locked_gemfile] = { path: p, md5: md5_for_file(p) }
           end
           bundled_gems
         end
