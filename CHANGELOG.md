@@ -1,5 +1,13 @@
 # Change log
 
+## Version 0.9.15 (Nov 06, 2016)
+
+Minor enhancements:
+  * Refactored md5 calculation utilities
+
+Bug fixes:
+  * Properly synced git-based bundled gems to app servers
+
 ## Version 0.9.14 (Oct 31, 2016)
 
 Minor enhancements:
