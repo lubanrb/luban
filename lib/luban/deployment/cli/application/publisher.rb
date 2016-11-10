@@ -170,7 +170,7 @@ module Luban
           gems.each_pair do |gem_name, md5|
             gem_path = gems_cache_path.join(gem_name)
             unless md5_matched?(gem_path, md5)
-              if file?(gem_file = gems_source[:path].join(gem_name))
+              if File.file?(gem_file = gems_source[:path].join(gem_name))
                 upload!(gem_file.to_s, gem_path.to_s)
               else
                 upload!("#{gem_file.to_s}/", gem_path.to_s, recursive: true)
