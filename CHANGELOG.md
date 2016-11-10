@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.9.16 (Nov 09, 2016)
+
+Bug fixes:
+  * Fixed a bug in checking local gem file existence
+
 ## Version 0.9.15 (Nov 06, 2016)
 
 Minor enhancements:
