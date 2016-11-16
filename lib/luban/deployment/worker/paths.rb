@@ -74,10 +74,13 @@ module Luban
             @luban_install_path ||= project_path.join('.luban')
           end
 
+          def package_install_path(package_name)
+            luban_install_path.join('pkg', package_name.to_s, 'versions',
+                                    packages[package_name.to_sym].current_version)
+          end
+
           def package_bin_path(package_name)
-            @package_bin_path ||= 
-              luban_install_path.join('pkg', package_name.to_s, 'versions',
-                                      packages[package_name.to_sym].current_version, 'bin')
+            package_install_path(package_name).join('bin')
           end
 
           def app_archives_path
