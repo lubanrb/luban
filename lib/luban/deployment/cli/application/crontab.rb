@@ -105,7 +105,7 @@ module Luban
           end
         end
 
-        def crontab_entry(command:, schedule:, output: "", type: :shell, disabled: false)
+        def crontab_entry(command:, schedule:, output: "", type: :shell, disabled: false, **cmd_opts)
           if output.is_a?(String) and !output.empty?
             output = log_path.join("cron.#{output}")
           end
@@ -114,7 +114,7 @@ module Luban
             abort "Aborted! Unknown cronjob type: #{type.inspect}"
           end
           command = instance_exec(&command) if command.respond_to?(:call)
-          command = send(command_composer, command, output: output)
+          command = send(command_composer, command, output: output, **cmd_opts)
           entry = "#{schedule} #{command}"
           disabled ? "# DISABLED - #{entry}" : entry
         end
