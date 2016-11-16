@@ -1,5 +1,12 @@
 # Change log
 
+## Version 0.9.17 (Nov 16, 2016)
+
+Minor enhancements:
+  * Added convenient method #package_install_path to get package install path for a given package
+  * Added command options to customize a shell command for crontab entry
+  * Added a convenient file tester, #exists?, in Utils
+
 ## Version 0.9.16 (Nov 09, 2016)
 
 Bug fixes:
