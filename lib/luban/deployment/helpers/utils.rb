@@ -10,6 +10,10 @@ module Luban
           send("#{type}?", *args)
         end
 
+        def exists?(path)
+          test "[ -e #{path} ]"
+        end
+
         def directory?(path)
           test "[ -d #{path} ]"
         end
