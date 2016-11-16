@@ -85,7 +85,7 @@ module Luban
 
         def after_publish
           create_symlinks
-          bundle_gems unless locked_gemfile.nil?
+          bundle_gems if has_gemfile?
         end
 
         protected
