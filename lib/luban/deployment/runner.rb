@@ -20,10 +20,19 @@ module Luban
         @config_file ||= work_dir.join(lubanfile)
       end
 
+      def new_project?; !!@new_project; end
+
       def init_project(args:, opts:)
-        set_default :project, args[:project]
+        if new_project?
+          project args[:project]
+          if project == '.'
+            work_dir Pathname.pwd
+            project work_dir.basename(".deploy").to_s
+          end
+        end
         singleton_class.send(:include, Luban::Deployment::Helpers::Generator::Project)
         create_project_skeleton
+        create_project_bundle(opts[:bundle_path])
       end
 
       protected
@@ -80,6 +89,7 @@ module Luban
       end
 
       def setup_cli_with_projects
+        @new_project = false
         load_configuration_file(config_file)
         set_default_common_parameters
         set_default_project_parameters
@@ -87,7 +97,7 @@ module Luban
 
         version Luban::Deployment::VERSION
         desc "Manage the deployment of project #{project.camelcase}"
-        setup_init_project(false)
+        setup_init_project
         setup_projects
       end
 
@@ -106,6 +116,7 @@ module Luban
       end
 
       def setup_cli_without_projects
+        @new_project = true
         set_default_common_parameters
 
         version Luban::Deployment::VERSION
@@ -114,11 +125,22 @@ module Luban
         setup_init_project
       end
 
-      def setup_init_project(new_project = true)
+      def setup_init_project
+        _self = self
         command :init do
           desc 'Initialize a Luban deployment project'
-          argument :project, 'Project name', required: true if new_project
+          option :bundle_path, 'Bundle path', default: "vendor/bundle"
+          if _self.new_project?
+            argument :project, 'Project name', required: true, assure: ->(name) { !name.empty? }
+          end
           action! :init_project
+        end
+      end
+
+      def create_project_bundle(bundle_path)
+        Dir.chdir(work_dir) do
+          puts "Running bundle install"
+          `bundle install --path "#{bundle_path}" 2>&1`.chomp.split("\n").each { |l| puts "  #{l}" }
         end
       end
     end
