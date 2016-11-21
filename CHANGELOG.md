@@ -1,5 +1,17 @@
 # Change log
 
+## Version 0.10.0 (Nov 21, 2016)
+
+New features:
+  * Used bundler to manage gem dependencies in Luban deployment projects
+    * By default, gems will be bundled in vendor/bundle
+    * Added one command-line option, --bundle-path, to customize the bundle path
+    * Updated Gemfile template with Luban dependency on version 0.10.x
+
+Minor enhancements:
+  * Deprecated Rubygems-update and setup Rubygems directly for Rubygems upgrade
+  * Upgraded Rubygems to version 2.6.8
+
 ## Version 0.9.17 (Nov 16, 2016)
 
 Minor enhancements:
