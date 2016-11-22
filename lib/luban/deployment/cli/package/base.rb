@@ -30,7 +30,7 @@ module Luban
 
           def package_class(package)
             require_path = package_require_path(package)
-            require require_path
+            require require_path.to_s
             package_base_class(require_path)
           rescue LoadError => e
             abort "Aborted! Failed to load package #{require_path}: #{e.message}"
