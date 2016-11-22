@@ -32,7 +32,6 @@ module Luban
         end
         singleton_class.send(:include, Luban::Deployment::Helpers::Generator::Project)
         create_project_skeleton
-        create_project_bundle(opts[:bundle_path])
       end
 
       protected
@@ -129,18 +128,10 @@ module Luban
         _self = self
         command :init do
           desc 'Initialize a Luban deployment project'
-          option :bundle_path, 'Bundle path', default: "vendor/bundle"
           if _self.new_project?
             argument :project, 'Project name', required: true, assure: ->(name) { !name.empty? }
           end
           action! :init_project
-        end
-      end
-
-      def create_project_bundle(bundle_path)
-        Dir.chdir(work_dir) do
-          puts "Running bundle install"
-          `bundle install --path "#{bundle_path}" 2>&1`.chomp.split("\n").each { |l| puts "  #{l}" }
         end
       end
     end
