@@ -1,11 +1,14 @@
 # Change log
 
-## Version 0.10.2 (Nov 22, 2016)
+## Version 0.10.3 (Nov 22, 2016)
 
 Minor enhancements:
   * Upgraded Bundler for Ruby to version 0.13.6
   * Removed bundle install during deployment project bootstrap
     * Falled back to use "bundle install" which is a more persistent/general practice
+  * Ensured shell out bundler commands to setup application gems dependencies
+    * Luban deployment project also uses Bundler to manage its gems dependencies, therefore
+    * Used with_clean_env to invoke application level bundler commands
 
 Bug fixes:
   * Properly convert require path to string when loading luban package
