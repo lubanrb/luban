@@ -1,5 +1,12 @@
 # Change log
 
+## Version 0.10.1 (Nov 22, 2016)
+
+Minor enhancements:
+  * Upgraded Bundler for Ruby to version 0.13.6
+  * Removed bundle install during deployment project bootstrap
+    * Falled back to use "bundle install" which is a more persistent/general practice
+
 ## Version 0.10.0 (Nov 21, 2016)
 
 New features:
