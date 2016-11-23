@@ -217,7 +217,7 @@ module Luban
             gem_files = capture(:ls, '-xtd', "#{gems_cache.join('*')} | grep -v \"md5$\"").split
             gem_files.each do |gem_file|
               gem_name = File.basename(gem_file)
-              md5_file = "#{gem_file}.md5"
+              md5_file = gems_path.join("#{gem_file}.md5")
               gems[gem_name] =
                 if file?(md5_file)
                   gems[gem_name] = capture(:cat, md5_file)
