@@ -20,11 +20,11 @@ module Luban
         end
 
         def create_symlinks_for_linked_dirs
-          create_linked_dirs(linked_dirs, from: shared_path, to: install_path)
+          create_linked_dirs(to: install_path)
         end
 
         def create_symlinks_for_linked_files
-          create_linked_files(linked_files, from: profile_path, to: install_path.join('config'))
+          create_linked_files(to: install_path)
         end
       end
     end

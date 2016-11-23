@@ -113,7 +113,7 @@ module Luban
         def create_symlinks
           send("create_#{release_type}_symlinks")
           if has_gemfile?
-            create_linked_dirs(bundle_linked_dirs, from: shared_path, to: release_path)
+            create_linked_dirs(bundle_linked_dirs, to: release_path)
           end
         end
 
@@ -134,11 +134,11 @@ module Luban
         end
 
         def create_symlinks_for_linked_dirs
-          create_linked_dirs(linked_dirs, from: shared_path, to: release_path)
+          create_linked_dirs(to: release_path)
         end
 
         def create_symlinks_for_linked_files
-          create_linked_files(linked_files, from: profile_path, to: release_path.join('config'))
+          create_linked_files(to: release_path)
         end
 
         def update_releases_log
@@ -171,6 +171,7 @@ module Luban
         end
 
         def sync_gems_cache
+          return if md5_matched?(gems_cache_path, gems_source[:md5])
           gems.each_pair do |gem_name, md5|
             gem_path = gems_cache_path.join(gem_name)
             unless md5_matched?(gem_path, md5)

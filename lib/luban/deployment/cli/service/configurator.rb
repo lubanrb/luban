@@ -45,7 +45,7 @@ module Luban
             return if default_templates.empty?
             puts "  Initializing #{service_name} profile"
             assure_dirs(profile_templates_path, stage_profile_path)
-            upload_profile_templates
+            upload_profile_templates(default_templates)
           end
 
           def update_profile
@@ -56,16 +56,26 @@ module Luban
 
           protected
 
-          def upload_profile_templates
-            default_templates.each do |src_path|
-              next unless file?(src_path)
+          def upload_profile_templates(templates, dirs: Pathname.new(''), depth: 2)
+            indent = '  ' * depth
+            templates.each do |src_path|
               basename = src_path.basename
+              print indent + "- #{basename}"
+
+              if directory?(src_path)
+                [profile_templates_path, stage_profile_path].each do |p|
+                  assure_dirs(p.join(dirs).join(basename))
+                end
+                puts
+                upload_profile_templates(src_path.children, dirs: dirs.join(basename), depth: depth + 1)
+                next
+              end
+
               dst_path = if src_path.extname == '.erb'
                            profile_templates_path
                          else
                            stage_profile_path
-                         end.join(basename)
-              print "    - #{basename}"
+                         end.join(dirs).join(basename)
               if file?(dst_path)
                 puts " [skipped]"
               else
