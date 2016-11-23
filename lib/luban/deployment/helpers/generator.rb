@@ -50,7 +50,7 @@ module Luban
 
           def copy_dir(src_path, dst_path, stages: [], depth: 1)
             indent = '  ' * depth
-            print  indent + "- #{dst_path.basename}"
+            print indent + "- #{dst_path.basename}"
             mkdir(dst_path)
             src_files = []
             src_path.each_child do |p|
