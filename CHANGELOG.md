@@ -1,5 +1,15 @@
 # Change log
 
+## Version 0.10.4 (Nov 24, 2016)
+
+Minor enhancements:
+  * Enhanced linked_files become a convention instead of a configuration
+  * Checked md5 for gem cache directory before actually sync each gem in gem cache
+
+Bug fixes:
+  * Excluded *.md5 files, if any, when calculating md5 for a given directory
+  * Corrected the md5_file path when calculating md5 for each Ruby gem
+
 ## Version 0.10.3 (Nov 22, 2016)
 
 Minor enhancements:
