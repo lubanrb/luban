@@ -101,8 +101,7 @@ module Luban
         end
 
         def md5_for_dir(dir)
-          #capture(:tar, "-cf - #{dir} 2>/dev/null | openssl md5")[/\h+$/]
-          capture(:find, "#{dir} -type f 2>/dev/null | LC_ALL=C sort -u | xargs cat | openssl md5")[/\h+$/]
+          capture(:find, "#{dir} -type f ! -name '*.md5' 2>/dev/null | LC_ALL=C sort -u | xargs cat | openssl md5")[/\h+$/]
         end
 
         def sudo(*args)
