@@ -1,6 +1,6 @@
 # Change log
 
-## Version 0.10.4 (Nov 24, 2016)
+## Version 0.10.6 (Nov 24, 2016)
 
 Minor enhancements:
   * Enhanced linked_files become a convention instead of a configuration
@@ -10,6 +10,7 @@ Bug fixes:
   * Excluded *.md5 files, if any, when calculating md5 for a given directory
   * Corrected the md5_file path when calculating md5 for each Ruby gem
   * Checked linked files dir's existence before actually linking files
+  * Properly composed source path for linked files
 
 ## Version 0.10.3 (Nov 22, 2016)
 
