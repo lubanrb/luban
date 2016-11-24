@@ -9,6 +9,7 @@ Minor enhancements:
 Bug fixes:
   * Excluded *.md5 files, if any, when calculating md5 for a given directory
   * Corrected the md5_file path when calculating md5 for each Ruby gem
+  * Checked linked files dir's existence before actually linking files
 
 ## Version 0.10.3 (Nov 22, 2016)
 
