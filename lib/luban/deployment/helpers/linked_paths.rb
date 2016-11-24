@@ -30,6 +30,7 @@ module Luban
         end
 
         def init_linked_files
+          return unless linked_files_from.directory?
           Dir.chdir(linked_files_from) do
             linked_files.concat(Pathname.glob("**/*").select { |f| f.file? })
           end
