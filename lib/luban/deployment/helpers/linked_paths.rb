@@ -53,10 +53,10 @@ module Luban
 
         def create_linked_files(files = linked_files, from: profile_path, to:)
           files.each do |path|
-            target_path = to.join(linked_files_dir).join(path)
+            target_path = to.join(linked_files_dir, path)
             assure_dirs(target_path.dirname)
             rm(target_path) if file?(target_path)
-            source_path = from.join(path)
+            source_path = from.join(linked_files_dir, path)
             assure_symlink(source_path, target_path)
           end
         end
