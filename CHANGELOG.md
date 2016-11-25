@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.10.7 (Nov 25, 2016)
+
+Bug fixes:
+  * Normalized executable name into proper method name when defining executable for a given package
+
 ## Version 0.10.6 (Nov 24, 2016)
 
 Minor enhancements:
