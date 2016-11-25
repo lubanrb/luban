@@ -15,7 +15,7 @@ module Luban
 
           def define_executable(*names)
             names.each do |name|
-              define_method("#{name}_executable") do
+              define_method("#{name.gsub('-', '_')}_executable") do
                 if instance_variable_defined?("@#{__method__}")
                   instance_variable_get("@#{__method__}")
                 else
