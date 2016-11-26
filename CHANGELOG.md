@@ -1,6 +1,10 @@
 # Change log
 
-## Version 0.10.7 (Nov 25, 2016)
+## Version 0.10.8 (Nov 26, 2016)
+
+Minor enhancements:
+   Added #control_file_dir to specify directory name for control file
+    * By default, control_fir_dir is also used in linked_files handling
 
 Bug fixes:
   * Normalized executable name into proper method name when defining executable for a given package
