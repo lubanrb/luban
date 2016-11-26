@@ -67,8 +67,10 @@ module Luban
           end
 
           def control_file_path
-            @control_file_path ||= profile_path.join(control_file_name)
+            @control_file_path ||= profile_path.join(control_file_dir, control_file_name)
           end
+
+          def control_file_dir; @control_file_dir ||= ""; end
 
           def control_file_name
             @control_file_name ||= "#{service_name}.conf"

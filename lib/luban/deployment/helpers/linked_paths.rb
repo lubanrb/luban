@@ -5,16 +5,20 @@ module Luban
         def linked_dirs; @linked_dirs ||= []; end
         def linked_files; @linked_files ||= []; end
 
-        def linked_files_dir
-          @linked_files_dir ||= 'config'
-        end
-
         def linked_files_root
           @linked_files_root ||= config_finder[:application].stage_profile_path.join(profile_name)
         end
 
+        def linked_files_dir
+          @linked_files_dir ||= control_file_dir
+        end
+
         def linked_files_from
           @linked_files_from ||= linked_files_root.join(linked_files_dir)
+        end
+
+        def linked_files_dir_exists?
+          !linked_files_dir.to_s.empty? and linked_files_from.directory?
         end
 
         protected
@@ -30,7 +34,7 @@ module Luban
         end
 
         def init_linked_files
-          return unless linked_files_from.directory?
+          return unless linked_files_dir_exists?
           Dir.chdir(linked_files_from) do
             linked_files.concat(Pathname.glob("**/*").select { |f| f.file? })
           end
