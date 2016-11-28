@@ -29,7 +29,7 @@ module Luban
             if osx? 
               @configure_opts << "--with-darwinssl"
             else
-              @configure_opts << "--with-ssl=#{dir}"
+              @configure_opts << "--with-ssl=\"#{dir} -Wl,-rpath -Wl,#{dir.join('lib')}\""
             end
           end
         end
