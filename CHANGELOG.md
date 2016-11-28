@@ -1,9 +1,14 @@
 # Change log
 
+## Version 0.10.9 (Nov 28, 2016)
+
+Bug fixes:
+  * Used proper linker flag to ensure libssl shared library is being linked properly in Curl (Linux)
+
 ## Version 0.10.8 (Nov 26, 2016)
 
 Minor enhancements:
-   Added #control_file_dir to specify directory name for control file
+  * Added #control_file_dir to specify directory name for control file
     * By default, control_fir_dir is also used in linked_files handling
 
 Bug fixes:
