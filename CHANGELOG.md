@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.10.10 (Nov 29, 2016)
+
+Minor enhancements:
+  * Added #control_path to further refractor control file related paths
+
 ## Version 0.10.9 (Nov 28, 2016)
 
 Bug fixes:
