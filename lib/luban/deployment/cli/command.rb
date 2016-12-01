@@ -45,8 +45,8 @@ module Luban
               end
 
               task :binstubs do
-                desc "Update binstubs for required packages"
-                switch :force, "Force to update binstubs", short: :f
+                desc "Update binstubs/symlinks for required packages"
+                switch :force, "Force to update binstubs/symlinks", short: :f
                 action! :binstubs
               end
 

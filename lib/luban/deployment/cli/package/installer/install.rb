@@ -140,7 +140,7 @@ module Luban
           if current?
             if installed?
               update_binstubs!
-              update_result "Updated #{package_name} binstubs with current version #{package_version}"
+              update_result "Updated #{package_name} binstubs/symlinks with current version #{package_version}"
             else
               update_result "Skipped! #{package_full_name} is NOT installed yet. Please install it first.",
                             status: :failed, level: :error
@@ -149,7 +149,7 @@ module Luban
             if current_symlinked?
               remove_binstubs!
               remove_symlinks!
-              update_result "Removed #{package_name} binstubs with version #{package_version}. " +
+              update_result "Removed #{package_name} binstubs/symlinks with version #{package_version}. " +
                             "Current version of #{package_name} is NOT specified.",
                             level: :warn
             end
