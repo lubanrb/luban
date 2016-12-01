@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.10.11 (Dec 01, 2016)
+
+Minor enhancements:
+  * Enforced re-creation of binstubs/symlinks for services after profile deployment
+  * Updated decriptions for binstubs to include symlinks for the sake of clarity
+
 ## Version 0.10.10 (Nov 29, 2016)
 
 Minor enhancements:
