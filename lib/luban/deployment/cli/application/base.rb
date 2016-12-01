@@ -396,7 +396,6 @@ module Luban
           end
         end
       end
-      alias_method :deploy_profile!, :deploy_release!
       dispatch_task :package_release!, to: :repository, as: :package, locally: true
       dispatch_task :publish_release!, to: :publisher, as: :publish
 
@@ -409,6 +408,11 @@ module Luban
       end
       dispatch_task :deprecate_packaged_release!, to: :repository, as: :deprecate, locally: true
       dispatch_task :deprecate_published_release!, to: :publisher, as: :deprecate
+
+      def deploy_profile!(args:, opts:)
+        deploy_release!(args: args, opts: opts)
+        services.each_value { |s| s.binstubs(args: args, opts: opts) }
+      end
 
       def deploy_cronjobs(args:, opts:)
         opts = opts.merge(version: current_app) if has_source?
