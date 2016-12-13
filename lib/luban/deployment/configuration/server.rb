@@ -13,6 +13,14 @@ module Luban
           server
         end
 
+        def local?
+          super or (properties.has_key?(:local) ? properties[:local] : localhost?)
+        end
+
+        def localhost?
+          hostname == 'localhost' or hostname == `hostname -f`.chomp
+        end
+
         def roles
           self[:roles]
         end
