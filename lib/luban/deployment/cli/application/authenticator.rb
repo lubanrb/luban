@@ -56,7 +56,10 @@ module Luban
         def app; task.opts.app; end
 
         def promptless_authen
-          if promptless_authen_enabled?
+          if host.local?
+            update_result "Skipped! Promptless authentication is not necessary for local host.",
+                          status: :skipped
+          elsif promptless_authen_enabled?
             update_result "Skipped! Promptless authentication has been enabled ALREADY.",
                           status: :skipped, public_key: public_key
           else
