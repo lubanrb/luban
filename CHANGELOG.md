@@ -1,5 +1,14 @@
 # Change log
 
+## Version 0.10.12 (Dec 14, 2016)
+
+Minor enhancements:
+  * Added a host property, :local, to indicate if the host is a localhost
+    * If local host property is not set, hostname lookup will be carried out to check if the given hostname is a local host
+  * Added a general parameter, :skip_promptless_authen, to skip promptless authenticaiton setup
+    * By default, :skip_promptless_authen is turned off
+  * Skipped prompltess authentication setup for local host
+
 ## Version 0.10.11 (Dec 01, 2016)
 
 Minor enhancements:
