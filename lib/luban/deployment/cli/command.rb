@@ -356,8 +356,8 @@ module Luban
 
       def set_parameters
         copy_parameters_from_parent(
-          :luban_roles, :luban_root_path, :user,
-          :stages, :applications, :work_dir, :apps_path
+          :luban_roles, :luban_root_path, :work_dir, :apps_path,
+          :stages, :applications, :user, :skip_promptless_authen
         )
       end
 

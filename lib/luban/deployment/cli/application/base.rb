@@ -139,7 +139,7 @@ module Luban
 
       def promptless_authen(args:, opts:)
         opts = opts.merge(app: self, public_keys: Array(public_key!(args: args, opts: opts)))
-        public_keys = promptless_authen!(args: args, opts: opts).collect { |r| r[:public_key] }
+        public_keys = promptless_authen!(args: args, opts: opts).collect { |r| r[:public_key] }.compact
 
         opts[:roles] = []
         opts[:roles] << scm_role unless scm_role.nil?
@@ -156,7 +156,7 @@ module Luban
 
       def setup(args:, opts:)
         show_app_environment
-        promptless_authen(args: args, opts: opts)
+        promptless_authen(args: args, opts: opts) unless skip_promptless_authen
         setup!(args: args, opts: opts)
       end
       dispatch_task :setup!, to: :constructor, as: :setup

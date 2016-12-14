@@ -39,6 +39,8 @@ module Luban
         parameter :user, default: ENV['USER']
         parameter :config_finder, default: ->{ Hash.new }
 
+        parameter :skip_promptless_authen, default: false
+
         protected
 
         def validate_for_user
