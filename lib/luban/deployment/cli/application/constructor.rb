@@ -13,6 +13,7 @@ module Luban
         def setup
           bootstrap
           create_envrc_files
+          update_result "Application environment is setup successfully."
         end
 
         def destroy
