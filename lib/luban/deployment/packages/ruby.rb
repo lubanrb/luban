@@ -72,6 +72,7 @@ module Luban
         def setup_provision_tasks
           super
 
+          provision_tasks[:install].switch :install_static, "Install static Ruby library"
           provision_tasks[:install].switch :install_doc, "Install Ruby document"
           provision_tasks[:install].switch :install_tcl, "Install with Tcl"
           provision_tasks[:install].switch :install_tk, "Install with Tk"
@@ -82,6 +83,10 @@ module Luban
 
         class Installer < Luban::Deployment::Package::Installer
           attr_reader :opt_dirs
+
+          def install_static?
+            task.opts.install_static
+          end
 
           def install_doc?
             task.opts.install_doc
@@ -129,6 +134,7 @@ module Luban
           def configure_build_options
             super
             @configure_opts.unshift("--disable-install-doc") unless install_doc?
+            @configure_opts << "--enable-shared" unless install_static?
             @configure_opts << "--without-tcl" unless install_tcl?
             @configure_opts << "--without-tk" unless install_tk?
             @opt_dirs = []
