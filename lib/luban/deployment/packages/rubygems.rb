@@ -67,7 +67,7 @@ module Luban
 
           def configure_package!
             test(ruby_executable, 
-                 "setup.rb config #{configure_opts.reject(&:empty?).join(' ')} >> #{install_log_file_path} 2>&1")
+                 "setup.rb config >> #{install_log_file_path} 2>&1")
           end
 
           def make_package!
@@ -77,7 +77,7 @@ module Luban
 
           def install_package!
             test(ruby_executable, 
-                 "setup.rb install >> #{install_log_file_path} 2>&1")
+                 "setup.rb install #{configure_opts.reject(&:empty?).join(' ')} >> #{install_log_file_path} 2>&1")
           end
 
           def update_binstubs!; end
