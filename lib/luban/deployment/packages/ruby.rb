@@ -148,6 +148,7 @@ module Luban
           def after_install
             super
             create_symlinks_for_header_files
+            remove_static_library unless install_static?
           end
 
           def create_symlinks_for_header_files
@@ -169,6 +170,10 @@ module Luban
           end
 
           def header_file_exists?(file); !!find_header_file(file); end
+
+          def remove_static_library
+            rm(install_path.join('lib', 'libruby-static.a'))
+          end
         end
       end
     end
