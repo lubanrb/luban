@@ -1,5 +1,16 @@
 # Change log
 
+## Version 0.10.13 (Dec 17, 2016)
+
+Minor enhancements:
+  * Added switch, :install_static, to install static Ruby library
+    * By default, :install_static is turned off
+    * Ruby config switch "--enable-shared" will be added if :install_static is off
+    * Removed static Ruby library manually if :install_static is off
+
+Bug fixes:
+  * Disabled document generation for Rubygems
+
 ## Version 0.10.12 (Dec 14, 2016)
 
 Minor enhancements:
