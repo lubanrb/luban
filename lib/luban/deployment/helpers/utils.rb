@@ -206,6 +206,11 @@ module Luban
           Time.now().strftime("%d/%m/%Y %H:%M:%S")
         end
 
+        def with_clean_env
+          return unless block_given?
+          defined?(Bundler) ? Bundler.with_clean_env { yield } : yield
+        end
+
         #def method_missing(sym, *args, &blk)
         #  backend.respond_to?(sym) ? backend.send(sym, *args, &blk) : super
         #end
