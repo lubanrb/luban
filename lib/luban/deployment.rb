@@ -1,5 +1,6 @@
 require_relative 'deployment/version'
 require_relative 'deployment/error'
+require_relative 'deployment/sshkit_refinements'
 require_relative 'deployment/configuration'
 require_relative 'deployment/helpers'
 require_relative 'deployment/parameters'

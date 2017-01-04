@@ -163,11 +163,7 @@ module Luban
           assure_dirs(bundle_config_path, gems_cache_path, bundle_path)
           sync_gems_cache
           sync_locked_gemfile
-          if defined?(Bundler)
-            Bundler.with_clean_env { install_gems_from_cache }
-          else
-            install_gems_from_cache
-          end
+          with_clean_env { install_gems_from_cache }
         end
 
         def sync_gems_cache

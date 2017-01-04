@@ -40,7 +40,7 @@ module Luban
         def bootstrap
           assure_dirs(downloads_path, archived_logs_path, 
                       tmp_path, app_bin_path, app_tmp_path, 
-                      releases_path, shared_path)
+                      releases_path, packages_path, shared_path)
         end
 
         def create_envrc_files

@@ -58,11 +58,15 @@ module Luban
           end
 
           def install_gem!
-            test("#{gem_executable} install #{install_opts.join(' ')} #{src_cache_path} >> #{install_log_file_path} 2>&1")
+            with_clean_env do
+              test("#{gem_executable} install #{install_opts.join(' ')} #{src_cache_path} >> #{install_log_file_path} 2>&1")
+            end
           end
 
           def uninstall_gem!
-            test("#{gem_executable} uninstall #{package_name} -a -x -I >> #{install_log_file_path} 2>&1")
+            with_clean_env do
+              test("#{gem_executable} uninstall #{package_name} -a -x -I >> #{install_log_file_path} 2>&1")
+            end
           end
         end
       end

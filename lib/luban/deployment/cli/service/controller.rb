@@ -199,8 +199,8 @@ module Luban
             succeeded
           end
 
-          def start_process!; capture(start_command); end
-          def stop_process!; capture(stop_command); end
+          def start_process!; with_clean_env { capture(start_command) }; end
+          def stop_process!; with_clean_env { capture(stop_command) }; end
 
           def check_process!
             if pid_file_missing?
