@@ -1,6 +1,6 @@
 # Change log
 
-## Version 0.11.0 (Jan 04, 2017)
+## Version 0.11.1 (Jan 04, 2017)
 
 New features:
   * Restructured Luban project prepared for containerization with docker support
@@ -15,6 +15,7 @@ Minor enhancements:
     * In Publisher before installing gems from cache
     * In App Repository before bundling gems required by application
     * In Service Controller for process control actions
+  * Used md5sum/md5 instead of openssl to calculate md5 digests
 
 Bug fixes:
   * Refined SSHKit::Backend::Local and SSHKit::Runner::Abstract to handle local host object properly
