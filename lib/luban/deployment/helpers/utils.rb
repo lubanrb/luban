@@ -89,7 +89,7 @@ module Luban
         end
 
         def readlink(source_file)
-          capture("$(type -p readlink greadlink|head -1) #{source_file}") 
+          capture("$(type -p readlink greadlink | head -1) #{source_file}") 
         end
 
         def md5_for(path)
@@ -97,11 +97,11 @@ module Luban
         end
 
         def md5_for_file(file)
-          capture(:cat, "#{file} 2>/dev/null | openssl md5")[/\h+$/]
+          capture(:cat, "#{file} 2>/dev/null | $(type -p md5sum md5 | head -1)")[/^\h+/]
         end
 
         def md5_for_dir(dir)
-          capture(:find, "#{dir} -type f ! -name '*.md5' 2>/dev/null | LC_ALL=C sort -u | xargs cat | openssl md5")[/\h+$/]
+          capture(:find, "#{dir} -type f ! -name '*.md5' 2>/dev/null | LC_ALL=C sort -u | xargs cat | $(type -p md5sum md5 | head -1)")[/^\h+/]
         end
 
         def sudo(*args)
