@@ -42,7 +42,7 @@ module Luban
         end
 
         def packages_path
-          @packages_path ||= super.join(project)
+          @packages_path ||= super.join(project, application)
         end
 
         def package_path
