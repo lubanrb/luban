@@ -230,6 +230,7 @@ module Luban
           commands[:provision].alter do
             task :install do
               desc "Install a given version"
+              long_desc "Install a given version in #{_package.parent.class.name}"
               option :version, "Version to install", short: :v, required: true,
                      assure: ->(v){ _package.versions.include?(v) }
               switch :force, "Force to install", short: :f
@@ -238,12 +239,14 @@ module Luban
 
             task :install_all do
               desc "Install all versions"
+              long_desc "Install all versions in #{_package.parent.class.name}"
               switch :force, "Force to install", short: :f
               action! :install_all
             end
 
             task :uninstall do
               desc "Uninstall a given version"
+              long_desc "Uninstall a given version in #{_package.parent.class.name}"
               option :version, "Version to uninstall", short: :v, required: true,
                       assure: ->(v){ _package.versions.include?(v) }
               switch :force, "Force to uninstall", short: :f
@@ -252,6 +255,7 @@ module Luban
 
             task :uninstall_all do
               desc "Uninstall all versions"
+              long_desc "Uninstall all versions in #{_package.parent.class.name}"
               switch :force, "Force to uninstall", short: :f, required: true
               action! :uninstall_all
             end
