@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.11.2 (Jan 06, 2017)
+
+Minor enhancements:
+  * Separated package installations by application instead of by project
+
 ## Version 0.11.1 (Jan 04, 2017)
 
 New features:
