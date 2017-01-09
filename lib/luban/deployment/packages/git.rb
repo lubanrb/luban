@@ -5,6 +5,7 @@ module Luban
         apply_to :all do
           before_install do
             depend_on 'openssl', version: '1.0.2j'
+            depend_on 'curl', version: '7.52.1'
           end
         end
 
@@ -12,10 +13,16 @@ module Luban
 
         def setup_provision_tasks
           super
+          provision_tasks[:install].switch :install_tcltk, "Install with TclTk"
           provision_tasks[:install].option :openssl, "OpenSSL version"
+          provision_tasks[:install].option :curl, "Curl version"
         end
 
         class Installer < Luban::Deployment::Package::Installer
+          def install_tcltk?
+            task.opts.install_tcltk
+          end
+
           define_executable 'git'
 
           def source_repo
@@ -34,6 +41,25 @@ module Luban
 
           def with_openssl_dir(dir)
             @configure_opts << "--with-openssl=#{dir}"
+          end
+
+          def with_curl_dir(dir)
+            @configure_opts << "--with-curl=#{dir}"
+          end
+
+          protected
+
+          def configure_build_options
+            super
+            @configure_opts << "--without-tcltk" unless install_tcltk?
+          end
+
+          def make_package!
+            test(:make, "NO_GETTEXT=1 >> #{install_log_file_path} 2>&1")
+          end
+
+          def install_package!
+            test(:make, "NO_GETTEXT=1 install >> #{install_log_file_path} 2>&1")
           end
         end
       end
