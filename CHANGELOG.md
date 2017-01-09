@@ -1,9 +1,17 @@
 # Change log
 
-## Version 0.11.2 (Jan 06, 2017)
+## Version 0.11.3 (Jan 09, 2017)
 
 Minor enhancements:
   * Separated package installations by application instead of by project
+  * Enhanced the Curl package configure to set a hard-coded path to the run-time linker for SSL
+  * Enhanced Git installation:
+    * Added package dependency of Curl and an install option to specify Curl version
+    * Added install switch, #install_tcltk, to turn on/off tcltk installation (default: off)
+    * Turned off localization for Git installation (NO_GETTEXT=1)
+
+Bug fixes:
+  * Corrected the long descriptions for package provision commands
 
 ## Version 0.11.1 (Jan 04, 2017)
 
