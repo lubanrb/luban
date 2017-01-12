@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.11.4 (Jan 12, 2017)
+
+Minor enhancements:
+  * Added a package option, :deprecated, to manage package deprecation which is similar to release deprecation
+
 ## Version 0.11.3 (Jan 09, 2017)
 
 Minor enhancements:
