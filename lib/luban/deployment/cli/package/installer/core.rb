@@ -23,6 +23,8 @@ module Luban
         def current_configured?; task.opts.current; end
         alias_method :current?, :current_configured?
 
+        def deprecated?; task.opts.deprecated; end
+
         def current_package_version
           if symlink?(current_path)
             File.basename(readlink(current_path))

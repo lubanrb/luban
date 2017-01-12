@@ -115,7 +115,7 @@ module Luban
           status = if current_symlinked?
                      current? ? " *" : "s*"
                    else
-                     current? ? "c*" : "  "
+                     current? ? "c*" : (deprecated? ? " d" : "  ")
                     end
 
           if installed?

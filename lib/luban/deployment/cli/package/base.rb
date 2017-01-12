@@ -109,6 +109,8 @@ module Luban
         end
 
         def versions; package_options.keys; end
+        def deprecated_versions; package_options.select { |v, o| o[:deprecated] }.keys; end
+        def installable_versions; package_options.select { |v, o| !o[:deprecated] }.keys; end
 
         dispatch_task :download_package, to: :installer, as: :download, locally: true
         dispatch_task :install_package, to: :installer, as: :install
@@ -126,8 +128,11 @@ module Luban
         end
 
         def install_all(args:, opts:)
-          versions.each do |v| 
+          installable_versions.each do |v| 
             install(args: args, opts: opts.merge(version: v))
+          end
+          deprecated_versions.each do |v| 
+            uninstall(args: args, opts: opts.merge(version: v))
           end
         end
 
