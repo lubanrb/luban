@@ -75,7 +75,7 @@ module Luban
           end
 
           def package_install_path(package_name)
-            packages_path.join(project, package_name.to_s, 'versions',
+            packages_path.join(project, application, package_name.to_s, 'versions',
                                packages[package_name.to_sym].current_version)
           end
 
