@@ -26,6 +26,10 @@ module Luban
           mod.extend(Base)
         end
 
+        def current_user
+          ENV['USER'] || `whoami`.chomp
+        end
+
         parameter :luban_roles, default: %i(app)
         parameter :luban_root_path, default: DefaultLubanRootPath
 
@@ -36,7 +40,8 @@ module Luban
         parameter :work_dir
         parameter :apps_path
         parameter :project
-        parameter :user, default: ENV['USER']
+        parameter :user, default: -> { current_user }
+        parameter :author
         parameter :config_finder, default: ->{ Hash.new }
 
         parameter :skip_promptless_authen, default: false
@@ -44,7 +49,10 @@ module Luban
         protected
 
         def validate_for_user
-          if user != ENV['USER']
+          if user.nil?
+            abort "Abort! Please specify the user name: user 'user name'"
+          end
+          if user != current_user
             abort "Aborted! Given deployment user (#{user.inspect}) is NOT the current user #{ENV['USER'].inspect}" +
                   "Please switch to the deployment user before any deployments."
           end
@@ -107,8 +115,18 @@ module Luban
         end
       end
 
+      module Docker
+        extend Base
+
+        parameter :luban_user, default: 'luban'
+        parameter :build_tag, default: '0.0.0'
+        parameter :base_image, default: 'centos:7'
+        parameter :timezone, default: 'UTC'
+      end
+
       module Application
         extend Base
+        include Docker
 
         DefaultLogrotateMaxAge = 7 # days
         DefaultLogrotateInterval = 10 # mins
@@ -122,6 +140,16 @@ module Luban
         def env_name
           @env_name ||= "#{stage}.#{project}/#{application}"
         end
+
+        def dockerize
+          unless dockerized?
+            singleton_class.send(:prepend, Luban::Deployment::Application::Dockerable)
+            set :dockerized, true
+            skip_promptless_authen true
+          end
+        end
+
+        def dockerized?; fetch :dockerized; end
 
         def monitor_itself?
           env_name == process_monitor[:env]

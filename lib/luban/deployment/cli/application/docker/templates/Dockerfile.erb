@@ -1,0 +1,33 @@
+FROM <%= base_image %>
+MAINTAINER <%= author['name'] %> <%= author['email'].inspect %>
+
+RUN adduser -ms /bin/bash <%= luban_user %> && \
+    mkdir <%= luban_root_path %> && \
+    chown -R <%= luban_user %>:<%= luban_user %> <%= luban_root_path %>
+
+<% build[:archives].each_value do |archive| -%>
+ADD <%= archive[:path].basename %> /
+<% end -%>
+
+RUN ln -sf /usr/share/zoneinfo/<%= timezone %> /etc/localtime && \
+    echo "source <%= envrc_file %>" >> /home/<%= luban_user %>/.bashrc
+
+<% build[:archives].each_value do |archive| -%>
+ADD <%= archive[:path].basename %> /
+<% end -%>
+
+LABEL luban.project="<%= project %>" \
+      luban.application="<%= project %>" \
+      luban.stage="<%= stage %>" \
+      <%- build[:sources].each_pair do |name, source| -%>
+      luban.<%= name %>_tag="<%= source[:tag] %>" \
+      <%- end -%>
+      luban.build_tag="<%= build_tag %>" \
+      luban.bulid_rev="<%= build[:revision] %>"
+      luban.luban_user="<%= luban_user %>" \
+      luban.luban_root_path="<%= luban_root_path %>"
+
+USER <%= luban_user %>
+WORKDIR /home/<%= luban_user %>
+
+CMD ["/bin/bash"]

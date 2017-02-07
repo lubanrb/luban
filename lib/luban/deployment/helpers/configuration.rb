@@ -25,11 +25,11 @@ module Luban
         end
 
         def role(name, hosts, **properties)
-          config.role(name, hosts, properties)
+          config.role(name, hosts, properties.merge(local: dockerized?))
         end
 
         def server(name, **properties)
-          config.server(name, properties)
+          config.server(name, properties.merge(local: dockerized?))
         end
 
         def roles(*names)

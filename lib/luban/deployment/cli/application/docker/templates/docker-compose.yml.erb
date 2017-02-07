@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  <%= application %>:
+    image: <%= build[:image_tag] %>
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true

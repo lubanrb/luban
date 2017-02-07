@@ -1,7 +1,7 @@
 /.bundle/
-/Gemfile.lock
 .luban/
 vendor/cache/
+vendor/bundle/
 env_vars.rb
 .DS_Store
 .gitkeep
