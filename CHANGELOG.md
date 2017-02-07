@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.11.6 (Feb 07, 2017)
+
+Bug fixes:
+  * Fixed symlinks creation for profile when deploying releases
+
 ## Version 0.11.5 (Jan 12, 2017)
 
 Minor enhancements:
