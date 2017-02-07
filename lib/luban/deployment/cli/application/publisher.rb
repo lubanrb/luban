@@ -25,20 +25,16 @@ module Luban
           @releases_path ||= super.dirname.join(release_type)
         end
 
-        def releases_log_path
-          @releases_log_path ||= app_path.join('releases.log')
-        end
-
         def bundle_config_path
-          @bundle_config_path ||= shared_path.join('.bundle')
+          @bundle_config_path ||= releases_path.join('.bundle')
         end
 
         def bundle_path
-          @bundle_path ||= shared_path.join('vendor', 'bundle')
+          @bundle_path ||= releases_path.join('vendor', 'bundle')
         end
 
         def gems_cache_path
-          @gems_cache_path ||= shared_path.join('vendor', 'cache')
+          @gems_cache_path ||= releases_path.join('vendor', 'cache')
         end
 
         def bundle_without
@@ -102,7 +98,6 @@ module Luban
              test(:tar, "-xzf #{upload_to} -C #{releases_path}")
             touch(release_path)
             create_symlinks
-            update_releases_log
           else
             rmdir(release_path)
           end
@@ -113,6 +108,7 @@ module Luban
         def create_symlinks
           send("create_#{release_type}_symlinks")
           if has_gemfile?
+            create_linked_dirs(bundle_linked_dirs, from: releases_path, to: shared_path)
             create_linked_dirs(bundle_linked_dirs, to: release_path)
           end
         end
@@ -139,14 +135,6 @@ module Luban
 
         def create_symlinks_for_linked_files
           create_linked_files(to: release_path)
-        end
-
-        def update_releases_log
-          execute %{echo "[$(date -u)][#{user}] #{release_log_message}" >> #{releases_log_path}}
-        end
-
-        def release_log_message
-          "#{release_name} in #{stage} #{project} is published successfully."
         end
 
         def cleanup_releases(keep_releases = 1)
