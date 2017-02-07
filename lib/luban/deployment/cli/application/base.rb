@@ -216,8 +216,8 @@ module Luban
 
       def deploy(args:, opts:)
         show_app_environment
-        deploy_release(args: args, opts: opts) if has_source?
         deploy_profile(args: args, opts: opts) if has_profile?
+        deploy_release(args: args, opts: opts) if has_source?
         deploy_cronjobs(args: args, opts: opts)
       end
 
