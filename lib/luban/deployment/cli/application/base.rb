@@ -163,8 +163,8 @@ module Luban
 
       def build(args:, opts:)
         show_app_environment
-        install_all!(args: args, opts: opts)
         build_repositories(args: args, opts: opts)
+        install_all!(args: args, opts: opts)
       end
 
       def destroy(args:, opts:)
@@ -357,7 +357,7 @@ module Luban
         opts[:release][:tag] ||=
           release_tag(args: {}, opts: opts.merge(repository: source.merge(version: version)))
       end
-      dispatch_task :release_tag, to: :repository, as: :release_tag, locally: true
+      dispatch_task :release_tag, to: :repository, locally: true
 
       def show_app_environment
         puts "#{display_name} in #{parent.class.name}"
@@ -421,7 +421,7 @@ module Luban
       dispatch_task :deploy_cronjobs!, to: :crontab, as: :deploy_cronjobs
 
       def print_summary(result)
-        result.each do |entry|
+        Array(result).each do |entry|
           s = entry[:summary]
           puts "  [#{entry[:hostname]}] #{s[:status]} #{s[:name]} (#{s[:published]})"
           puts "  [#{entry[:hostname]}]    #{s[:alert]}" unless s[:alert].nil?

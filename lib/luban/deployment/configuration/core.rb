@@ -45,14 +45,11 @@ module Luban
         if name == :all
           raise ArgumentError, 'Reserved role name, :all, is NOT allowed to use.'
         end
-        @servers.add_hosts_for_role(name, hosts, properties)
+        servers.add_hosts_for_role(name, hosts, properties)
       end
 
       def server(name, **properties)
-        new_server = servers.add_host(name, properties)
-        if new_server
-          new_server.ssh_options = fetch(:ssh_options) || {}
-        end
+        servers.add_host(name, properties)
       end
 
       def ask(key=nil, default:, prompt: nil, echo: true)
