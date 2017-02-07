@@ -17,8 +17,12 @@ module Luban
         end
 
         module Remote
-          def releases_path
-            @releases_path ||= luban_root_path.join('releases')
+          def deployment_projects_path
+            @deployment_projects_path ||= luban_root_path.join('projects')
+          end
+
+          def releases_root_path
+            @releases_root_path ||= luban_root_path.join('releases')
           end
 
           def env_path
@@ -36,6 +40,10 @@ module Luban
 
           def downloads_path
             @downloads_path ||= luban_root_path.join('downloads')
+          end
+
+          def docker_root_path
+            @docker_root_path ||= luban_root_path.join('docker')
           end
 
           def project_path
@@ -70,17 +78,8 @@ module Luban
             @unset_envrc_file ||= app_path.join(".unset_envrc")
           end
 
-          def packages_path
-            @packages_path ||= luban_root_path.join('packages')
-          end
-
-          def package_install_path(package_name)
-            packages_path.join(project, application, package_name.to_s, 'versions',
-                               packages[package_name.to_sym].current_version)
-          end
-
-          def package_bin_path(package_name)
-            package_install_path(package_name).join('bin')
+          def packages_root_path
+            @packages_root_path ||= luban_root_path.join('packages')
           end
 
           def app_archives_path

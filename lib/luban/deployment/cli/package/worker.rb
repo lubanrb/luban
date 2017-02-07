@@ -4,6 +4,23 @@ module Luban
       class Worker < Luban::Deployment::Worker::Base
         include Luban::Deployment::Worker::Paths::Remote
 
+        module Base
+          def packages_path
+            @packages_path ||= packages_root_path.join(project, application)
+          end
+
+          def package_install_path(package_name)
+            packages_path.join(package_name.to_s, 'versions',
+                               packages[package_name.to_sym].current_version)
+          end
+
+          def package_bin_path(package_name)
+            package_install_path(package_name).join('bin')
+          end
+        end
+
+        include Base
+
         class << self
           def package_class(package)
             Luban::Deployment::Package::Base.package_class(package)
@@ -39,10 +56,6 @@ module Luban
 
         def current_bin_path
           @current_bin_path ||= current_path.join('bin')
-        end
-
-        def packages_path
-          @packages_path ||= super.join(project, application)
         end
 
         def package_path
