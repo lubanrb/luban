@@ -291,7 +291,7 @@ module Luban
 
         def dispatch_task(task, to:, as: task, locally: false, &blk)
           define_method(task) do |args:, opts:|
-            run_task(cmd: as, args: args, opts: opts, locally: locally,
+            run_task(cmd: as, args: args, opts: opts, locally: locally || opts[:locally],
                      worker_class: self.class.worker_class(to), &blk)
           end
 
@@ -356,7 +356,7 @@ module Luban
 
       def set_parameters
         copy_parameters_from_parent(
-          :luban_roles, :luban_root_path, :work_dir, :apps_path,
+          :luban_roles, :luban_root_path, :work_dir, :apps_path, :author,
           :stages, :applications, :user, :skip_promptless_authen
         )
       end

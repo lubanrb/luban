@@ -268,7 +268,7 @@ module Luban
         end
 
         def print_summary(result)
-          result.each do |entry|
+          Array(result).each do |entry|
             s = entry[:summary]
             puts "  [#{entry[:hostname]}] #{s[:status]} #{s[:name]} (#{s[:installed]})"
             puts "  [#{entry[:hostname]}]      #{s[:executable]}" unless s[:executable].nil?

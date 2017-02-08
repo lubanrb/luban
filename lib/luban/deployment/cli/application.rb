@@ -7,4 +7,4 @@ require_relative 'application/publisher'
 require_relative 'application/configurator'
 require_relative 'application/controller'
 require_relative 'application/crontab'
-
+require_relative 'application/docker'

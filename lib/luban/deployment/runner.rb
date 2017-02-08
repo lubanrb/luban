@@ -10,7 +10,8 @@ module Luban
       def default_rc
         @default_rc ||= { 'luban_roles' => %i(app),
                           'luban_root_path' => Parameters::General::DefaultLubanRootPath,
-                          'stages' => %w(development staging production)
+                          'stages' => %w(development staging production),
+                          'author' => { 'name' => 'author name', 'email' => 'author@email.com' }
                         }
       end
 
@@ -46,7 +47,7 @@ module Luban
       end
 
       def set_default_common_parameters
-        %i(luban_roles luban_root_path stages).each { |p| set_default p, rc[p.to_s] }
+        %i(luban_roles luban_root_path stages author).each { |p| set_default p, rc[p.to_s] }
         set_default :user, (rc['user'] || ENV['USER'])
       end
 

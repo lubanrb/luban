@@ -214,7 +214,7 @@ module Luban
               md5_file = gems_path.join("#{gem_file}.md5")
               gems[gem_name] =
                 if file?(md5_file)
-                  gems[gem_name] = capture(:cat, md5_file)
+                  capture(:cat, md5_file)
                 else
                   md5_for(gem_file).tap { |md5| execute(:echo, "#{md5} > #{md5_file}") }
                 end

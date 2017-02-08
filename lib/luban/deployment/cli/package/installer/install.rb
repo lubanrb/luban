@@ -157,19 +157,21 @@ module Luban
         end
 
         def which_current
-          get_summary
-          task.result.summary[:executable] = "Not found"
-          if current? and current_symlinked? and
-             file?(executable = File.join(readlink(current_path), 'bin', task.args.executable))
-            task.result.summary[:executable] = executable
+          get_summary.tap do |result|
+            result.summary[:executable] = "Not found"
+            if current? and current_symlinked? and
+               file?(executable = File.join(readlink(current_path), 'bin', task.args.executable))
+              result.summary[:executable] = executable
+            end
           end
         end
 
         def whence_origin
-          get_summary
-          task.result.summary[:executable] = "Not found"
-          if file?(executable = bin_path.join(task.args.executable))
-            task.result.summary[:executable] = executable
+          get_summary.tap do |result|
+            result.summary[:executable] = "Not found"
+            if file?(executable = bin_path.join(task.args.executable))
+              result.summary[:executable] = executable
+            end
           end
         end
 

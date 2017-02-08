@@ -41,6 +41,7 @@ module Luban
           assure_dirs(downloads_path, archived_logs_path, 
                       tmp_path, app_bin_path, app_tmp_path, 
                       releases_path, packages_path, shared_path)
+          assure_dirs(docker_path) if dockerized?
         end
 
         def create_envrc_files

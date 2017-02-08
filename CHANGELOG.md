@@ -1,5 +1,24 @@
 # Change log
 
+## Version 0.12.0 (Feb 08, 2017)
+
+New features
+  * Supported Docker deployment
+  * Handled docker options for remote connectivity properly
+    * Docker options could be set per stage config as well as per app server
+
+Minor enhancements:
+  * Refactored common paths into module Luban::Deployment::Package::Worker::Base
+  * Defined root paths for docker, releases, packages and deployment projects
+  * Restructured symlinks for vendor/cache and vendor/bundle
+  * Deprecated deployment release log
+  * Minor bug fixes and code cleanup
+
+## Version 0.11.6 (Feb 07, 2017)
+
+Bug fixes:
+  * Corrected symlink creations for profiles when deploying releases
+
 ## Version 0.11.6 (Feb 07, 2017)
 
 Bug fixes:

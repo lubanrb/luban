@@ -26,6 +26,10 @@ module Luban
           mod.extend(Base)
         end
 
+        def current_user
+          ENV['USER'] || `whoami`.chomp
+        end
+
         parameter :luban_roles, default: %i(app)
         parameter :luban_root_path, default: DefaultLubanRootPath
 
@@ -36,7 +40,8 @@ module Luban
         parameter :work_dir
         parameter :apps_path
         parameter :project
-        parameter :user, default: ENV['USER']
+        parameter :user, default: -> { current_user }
+        parameter :author
         parameter :config_finder, default: ->{ Hash.new }
 
         parameter :skip_promptless_authen, default: false
@@ -44,7 +49,10 @@ module Luban
         protected
 
         def validate_for_user
-          if user != ENV['USER']
+          if user.nil?
+            abort "Abort! Please specify the user name: user 'user name'"
+          end
+          if user != current_user
             abort "Aborted! Given deployment user (#{user.inspect}) is NOT the current user #{ENV['USER'].inspect}" +
                   "Please switch to the deployment user before any deployments."
           end
@@ -107,8 +115,32 @@ module Luban
         end
       end
 
+      module Docker
+        extend Base
+
+        parameter :luban_user, default: 'luban'
+        parameter :build_tag, default: '0.0.0'
+        parameter :base_image, default: 'centos:7'
+        parameter :timezone, default: 'UTC'
+        parameter :docker_tls_verify, default: false
+        parameter :docker_cert_path
+        parameter :docker_tcp_port
+        parameter :docker_unix_socket
+
+        def validate_for_docker_cert_path
+          return if !docker_tls_verify and docker_cert_path.nil?
+          if docker_cert_path.is_a?(String)
+            docker_cert_path Pathname.new(docker_cert_path)
+          end
+          unless docker_cert_path.is_a?(Pathname)
+            abort "Aborted! Docker cert path should be a String or a Pathname: docker_cert_path 'path to docker certs'"
+          end
+        end
+      end
+
       module Application
         extend Base
+        include Docker
 
         DefaultLogrotateMaxAge = 7 # days
         DefaultLogrotateInterval = 10 # mins
@@ -122,6 +154,16 @@ module Luban
         def env_name
           @env_name ||= "#{stage}.#{project}/#{application}"
         end
+
+        def dockerize
+          unless dockerized?
+            singleton_class.send(:prepend, Luban::Deployment::Application::Dockerable)
+            set :dockerized, true
+            skip_promptless_authen true
+          end
+        end
+
+        def dockerized?; fetch :dockerized; end
 
         def monitor_itself?
           env_name == process_monitor[:env]

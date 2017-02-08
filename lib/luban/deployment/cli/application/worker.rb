@@ -4,6 +4,7 @@ module Luban
       class Worker < Luban::Deployment::Worker::Base
         include Luban::Deployment::Worker::Paths::Remote
         include Luban::Deployment::Service::Worker::Base
+        include Luban::Deployment::Package::Worker::Base
 
         def gemfile
           @gemfile ||= release_path.join('Gemfile')
@@ -19,12 +20,16 @@ module Luban
           define_method("application_#{method}") { send("target_#{method}") }
         end
 
+        def docker_path
+          @docker_path ||= docker_root_path.join(project, application)
+        end
+
         def profile_name; 'app'; end
 
         def release_tag; task.opts.release[:tag]; end
 
         def releases_path
-          @releases_path ||= super.join(project, application, 'app')
+          @releases_path ||= releases_root_path.join(project, application, 'app')
         end
 
         def release_path
