@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.12.1 (Feb 09, 2017)
+
+Minor enhancements:
+  * Added build context in docker compose file template
+  * Used docker-compose to build application
+
 ## Version 0.12.0 (Feb 08, 2017)
 
 New features
