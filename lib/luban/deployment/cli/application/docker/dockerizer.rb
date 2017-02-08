@@ -89,7 +89,7 @@ module Luban
             update_result "Skipped! ALREADY built #{build[:image_tag]}.", status: :skipped
             return
           end
-          output = build_application!
+          output = compose_application!
 
           if built?
             update_result "Successfully built #{build[:image_tag]}."
@@ -248,6 +248,10 @@ module Luban
           within build[:context] do
             capture(:docker, :build, "-t", build[:image_tag], ".", "2>&1")
           end
+        end
+
+        def compose_application!
+          within build[:path] { capture(:"docker-compose", :build, "2>&1") }
         end
 
         def distribute_application!
