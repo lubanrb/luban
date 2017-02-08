@@ -14,12 +14,33 @@ module Luban
           task.opts.default_docker_templates_path
         end
 
+        def default_docker_tcp_port; docker_tls_verify? ? "2376" : "2375"; end
+
+        def docker_tls_verify?; 
+          host[:docker_tls_verify].nil? ? docker_tls_verify : host[:docker_tls_verify]
+        end
+
+        def docker_ca_cert_path; docker_cert_path.join("ca.pem"); end
+        def docker_client_cert_path; docker_cert_path.join("cert.pem"); end
+        def tls_key_path; docker_cert_path.join("key.pem"); end
+
+        def tls_options
+          ["--tlsverify", "--tlscacert #{docker_ca_cert_path}",
+           "--tlscert #{docker_client_cert_path}", "--tlskey #{tls_key_path}"]
+        end
+
         def docker_host
-          "tcp://#{hostname}:2375"
+          unix_socket = host[:docker_unix_socket] || docker_unix_socket
+          if unix_socket.nil?
+            tcp_port = host[:docker_tcp_port] || docker_tcp_port || default_docker_tcp_port
+            "tcp://#{hostname}:#{tcp_port}"
+          else
+            "unix://#{unix_socket}"
+          end
         end
 
         def docker_options
-          @docker_options ||= ["-H #{docker_host}"]
+          @docker_options ||= ["-H #{docker_host}"].concat(docker_tls_verify? ? tls_options : [])
         end
 
         def revision_size
@@ -174,6 +195,14 @@ module Luban
 
         def dockerize_application!
           assure_dirs(build[:context])
+          package_application!
+          render_dockerfile
+          render_compose_env_file
+          render_compose_file
+          build[:status] = status
+        end
+
+        def package_application!
           build[:archives].each_pair do |name, archive|
             source = build[:sources][name]
             archive[:status] = 
@@ -183,18 +212,24 @@ module Luban
                 execute(:tar, "-cJf", archive[:path], source[:path]) ? :succeeded : :failed
               end
           end
+        end
 
+        def render_dockerfile
           upload_by_template(file_to_upload: build[:dockerfile],
                              template_file: find_template_file('Dockerfile.erb'),
                              auto_revision: true)
+        end
+
+        def render_compose_env_file
           upload_by_template(file_to_upload: build[:compose_env_file],
                              template_file: find_template_file('docker-compose-env.erb'),
                              auto_revision: true)
+        end
+
+        def render_compose_file
           upload_by_template(file_to_upload: build[:compose_file],
                              template_file: find_template_file('docker-compose.yml.erb'),
                              auto_revision: true)
-
-          build[:status] = status
         end
 
         def status

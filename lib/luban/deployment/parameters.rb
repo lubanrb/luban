@@ -122,6 +122,20 @@ module Luban
         parameter :build_tag, default: '0.0.0'
         parameter :base_image, default: 'centos:7'
         parameter :timezone, default: 'UTC'
+        parameter :docker_tls_verify, default: false
+        parameter :docker_cert_path
+        parameter :docker_tcp_port
+        parameter :docker_unix_socket
+
+        def validate_for_docker_cert_path
+          return if !docker_tls_verify and docker_cert_path.nil?
+          if docker_cert_path.is_a?(String)
+            docker_cert_path Pathname.new(docker_cert_path)
+          end
+          unless docker_cert_path.is_a?(Pathname)
+            abort "Aborted! Docker cert path should be a String or a Pathname: docker_cert_path 'path to docker certs'"
+          end
+        end
       end
 
       module Application
