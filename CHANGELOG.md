@@ -1,5 +1,13 @@
 # Change log
 
+## Version 0.12.2 (Feb 13, 2017)
+
+Bug fixes:
+  * Correctly composed revisions for build sources
+  * Fixed a typo in the template of Dockerfile.erb
+  * Checked the result of bundle install/package in Repository before proceeding to the rest steps
+  * Checked the result of bundle install in Publisher before proceeding to the rest steps
+
 ## Version 0.12.1 (Feb 09, 2017)
 
 Minor enhancements:
