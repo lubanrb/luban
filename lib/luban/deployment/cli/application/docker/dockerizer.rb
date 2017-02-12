@@ -159,7 +159,7 @@ module Luban
 
         def compose_revision
           require 'digest/md5'
-          build[:sources].inject(revisions = '') { |r, (_, src)| r += src[:md5] }
+          revisions = build[:sources].inject('') { |r, (_, src)| r += src[:md5] }
           Digest::MD5.hexdigest(revisions)[0, revision_size]
         end
 
