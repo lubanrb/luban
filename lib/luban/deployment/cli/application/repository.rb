@@ -203,9 +203,16 @@ module Luban
                 options << "--without #{bundle_without.join(' ')}"
               end
               options << "--quiet"
-              execute(bundle_cmd, :install, *options)
-              info "Package gems bundled in Gemfile"
-              execute(bundle_cmd, :package, "--all --quiet")
+              if (output = capture(bundle_cmd, :install, *options)).empty?
+                info "Successfully bundled gems in Gemfile"
+              else
+                abort "FAILED to bundle gems in Gemfile: #{output}"
+              end
+              if (output = capture(bundle_cmd, :package, "--all --quiet")).empty?
+                info "Successfully packaged gems in Gemfile"
+              else
+                abort "Aborted! FAILED to package gems in Gemfile: #{output}"
+              end
             end
 
             gem_files = capture(:ls, '-xtd', "#{gems_cache.join('*')} | grep -v \"md5$\"").split
