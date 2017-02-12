@@ -185,7 +185,11 @@ module Luban
               options << "--without #{bundle_without.join(' ')}"
             end
             options << bundle_flags.join(' ')
-            execute(bundle_executable, :install, *options)
+            if (output = capture(bundle_executable, :install, *options)).empty?
+              info "Successfully deployed bundled gems"
+            else
+              abort("Aborted! FAILED to deploy bundled gems: #{output}")
+            end
           end
         end
       end
