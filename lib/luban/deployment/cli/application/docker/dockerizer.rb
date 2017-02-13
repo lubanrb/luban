@@ -141,14 +141,14 @@ module Luban
 
         def init_build_sources
           sources = { packages: packages_path }
-          releases = get_releases(releases_path)
-          if (v = releases.delete(:vendor))
-            sources[:vendor] = v 
+          releases = get_releases(releases_path, type: 'app')
+          if releases.has_key?(:"app.vendor")
+            sources[:"app.vendor"] = releases.delete(:"app.vendor") 
           end
           sources.merge!(releases)
           profile_path = releases_path.dirname.join('profile')
-          profile = directory?(profile_path) ? get_releases(profile_path) : {}
-          sources[stage.to_sym] = app_path
+          profile = directory?(profile_path) ? get_releases(profile_path, type: 'profile') : {}
+          sources["env.#{stage}".to_sym] = app_path
           sources.merge!(profile)
           sources.inject({}) do |srcs, (name, path)|
             md5 = md5_for_dir(path)
@@ -187,10 +187,10 @@ module Luban
         def compose_file; build[:path].join("docker-compose.yml"); end
         def compose_env_file; build[:path].join(".env"); end
 
-        def get_releases(path)
+        def get_releases(path, type:)
           capture(:ls, '-xtd', path.join('*')).split.
             collect { |p| File.basename(p) }.
-            inject({}) { |r, t| r[t.to_sym] = path.join(t); r }
+            inject({}) { |r, t| r["#{type}.#{t}".to_sym] = path.join(t); r }
         end
 
         def dockerize_application!
