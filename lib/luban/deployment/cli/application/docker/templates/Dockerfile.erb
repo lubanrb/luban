@@ -5,10 +5,6 @@ RUN adduser -ms /bin/bash <%= luban_user %> && \
     mkdir <%= luban_root_path %> && \
     chown -R <%= luban_user %>:<%= luban_user %> <%= luban_root_path %>
 
-<% build[:archives].each_value do |archive| -%>
-ADD <%= archive[:path].basename %> /
-<% end -%>
-
 RUN ln -sf /usr/share/zoneinfo/<%= timezone %> /etc/localtime && \
     echo "source <%= envrc_file %>" >> /home/<%= luban_user %>/.bashrc
 
