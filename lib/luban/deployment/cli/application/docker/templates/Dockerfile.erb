@@ -1,12 +1,13 @@
 FROM <%= base_image %>
 MAINTAINER <%= author['name'] %> <%= author['email'].inspect %>
 
-RUN adduser -ms /bin/bash <%= luban_user %> && \
-    mkdir <%= luban_root_path %> && \
-    chown -R <%= luban_user %>:<%= luban_user %> <%= luban_root_path %>
+ARG luban_uid
+ARG luban_user
 
-RUN ln -sf /usr/share/zoneinfo/<%= timezone %> /etc/localtime && \
-    echo "source <%= envrc_file %>" >> /home/<%= luban_user %>/.bashrc
+RUN adduser -ms /bin/bash -u $luban_uid $luban_user && \
+    mkdir <%= luban_root_path %> && \
+    chown -R $luban_user:$luban_user <%= luban_root_path %> && \
+    echo "source <%= envrc_file %>" >> /home/$luban_user/.bashrc
 
 <% build[:archives].each_value do |archive| -%>
 ADD <%= archive[:path].basename %> /
@@ -16,14 +17,20 @@ LABEL luban.project="<%= project %>" \
       luban.application="<%= project %>" \
       luban.stage="<%= stage %>" \
       <%- build[:sources].each_pair do |name, source| -%>
-      luban.<%= name %>_tag="<%= source[:tag] %>" \
+      luban.<%= name %>.source_tag="<%= source[:tag] %>" \
       <%- end -%>
       luban.build_tag="<%= build_tag %>" \
       luban.bulid_rev="<%= build[:revision] %>" \
-      luban.luban_user="<%= luban_user %>" \
+      <%- get_packages.each_pair do |name, package| -%>
+      <%- package.each_pair do |k, v| -%>
+      luban.packages.<%= name %>.<%= k %>="<%= v %>" \
+      <%- end -%>
+      <%- end -%>
+      luban.luban_uid="$luban_uid" \
+      luban.luban_user="$luban_user" \
       luban.luban_root_path="<%= luban_root_path %>"
 
-USER <%= luban_user %>
-WORKDIR /home/<%= luban_user %>
+USER $luban_user
+WORKDIR /home/$luban_user
 
 CMD ["/bin/bash"]

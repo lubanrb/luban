@@ -2,8 +2,14 @@ version: "3"
 
 services:
   <%= application %>:
-    build: ./context
+    build:
+      context: ./context
+      args:
+        luban_uid: $LUBAN_UID
+        luban_user: $LUBAN_USER
     image: <%= build[:image_tag] %>
+    environment:
+      TZ: <%= timezone %>
     entrypoint: /bin/bash
     stdin_open: true
     tty: true

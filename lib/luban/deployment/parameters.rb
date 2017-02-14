@@ -27,7 +27,11 @@ module Luban
         end
 
         def current_user
-          ENV['USER'] || `whoami`.chomp
+          ENV['USER'] || `whoami 2>/dev/null`.chomp
+        end
+
+        def current_uid
+          `id -u #{current_user} 2>/dev/null`.chomp
         end
 
         parameter :luban_roles, default: %i(app)
@@ -118,7 +122,8 @@ module Luban
       module Docker
         extend Base
 
-        parameter :luban_user, default: 'luban'
+        parameter :luban_uid, default: ->{ current_uid }
+        parameter :luban_user, default: ->{ current_user }
         parameter :build_tag, default: '0.0.0'
         parameter :base_image, default: 'centos:7'
         parameter :timezone, default: 'UTC'

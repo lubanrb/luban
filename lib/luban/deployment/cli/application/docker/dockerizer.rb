@@ -193,6 +193,18 @@ module Luban
             inject({}) { |r, t| r["#{type}.#{t}".to_sym] = path.join(t); r }
         end
 
+        def get_packages
+          packages.inject({}) do |pkgs, (name, package)|
+            pkgs[name] = package.class.required_packages_for(package.current_version).inject(
+                          { versions: package.installable_versions.join(', '),
+                            current_version: package.current_version }) do |pkg, (type, deps)|
+                          deps.each { |d| pkg["#{type}.#{d.name}".to_sym] = d.version }
+                          pkg
+                        end
+            pkgs
+          end
+        end
+
         def dockerize_application!
           assure_dirs(build[:context])
           package_application!
