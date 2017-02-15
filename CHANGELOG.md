@@ -1,12 +1,21 @@
 # Change log
 
-## Version 0.12.2 (Feb 13, 2017)
+## Version 0.12.3 (Feb 15, 2017)
+
+Minor enhancements:
+  * Added labels in docker image to show info about installed packages
+  * Added new parameter, #luban_uid, to specify user id for luban user
+    * This is mainly to address the permission issues on docker volumes
+  * Refactored luban_user and luban_uid as build arguments
+  * Used environment variable TZ to correctly control the timezone for a docker container
 
 Bug fixes:
   * Correctly composed revisions for build sources
   * Fixed a typo in the template of Dockerfile.erb
   * Checked the result of bundle install/package in Repository before proceeding to the rest steps
   * Checked the result of bundle install in Publisher before proceeding to the rest steps
+  * Removed redundant add commands in Dockerfile.erb
+  * Added proper prefix of build sources in dockerization
 
 ## Version 0.12.1 (Feb 09, 2017)
 
