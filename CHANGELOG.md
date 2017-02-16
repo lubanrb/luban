@@ -1,13 +1,18 @@
 # Change log
 
-## Version 0.12.3 (Feb 15, 2017)
+## Version 0.12.4 (Feb 16, 2017)
 
 Minor enhancements:
   * Added labels in docker image to show info about installed packages
-  * Added new parameter, #luban_uid, to specify user id for luban user
+  * Added new Dockerfile arguments, #luban_user and #luban_uid, to specify user name and user id used in a docker container if necessary
     * This is mainly to address the permission issues on docker volumes
+    * It can be changed thru dotenv file for docker-compose
+  * Added new Dockerfile argument, #luban_root_path, to specify root path for luban deployments if necessary
+    * It can be changed thru dotenv file for docker-compose
   * Refactored luban_user and luban_uid as build arguments
   * Used environment variable TZ to correctly control the timezone for a docker container
+  * Cleaned up and optimized Dockerfile
+  * Bump up gem dependency on luban-cli to version 0.4.9
 
 Bug fixes:
   * Correctly composed revisions for build sources
