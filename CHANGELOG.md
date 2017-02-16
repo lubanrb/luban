@@ -1,6 +1,6 @@
 # Change log
 
-## Version 0.12.4 (Feb 16, 2017)
+## Version 0.12.5 (Feb 16, 2017)
 
 Minor enhancements:
   * Added labels in docker image to show info about installed packages
