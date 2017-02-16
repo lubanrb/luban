@@ -4,15 +4,15 @@ MAINTAINER <%= author['name'] %> <%= author['email'].inspect %>
 ARG luban_uid
 ARG luban_user
 
+# Add application archives
+ADD <%= build[:archives].collect { |_, a| a[:path].basename }.join(" \\\n    ") %> /
+
+# Create luban user with the given uid
 RUN adduser -ms /bin/bash -u $luban_uid $luban_user && \
-    mkdir <%= luban_root_path %> && \
-    chown -R $luban_user:$luban_user <%= luban_root_path %> && \
-    echo "source <%= envrc_file %>" >> /home/$luban_user/.bashrc
+    echo "source <%= envrc_file %>" >> /home/$luban_user/.bashrc && \
+    chown -R $luban_user:$luban_user $luban_root_path
 
-<% build[:archives].each_value do |archive| -%>
-ADD <%= archive[:path].basename %> /
-<% end -%>
-
+# Populate image labels
 LABEL luban.project="<%= project %>" \
       luban.application="<%= project %>" \
       luban.stage="<%= stage %>" \
@@ -28,7 +28,7 @@ LABEL luban.project="<%= project %>" \
       <%- end -%>
       luban.luban_uid="$luban_uid" \
       luban.luban_user="$luban_user" \
-      luban.luban_root_path="<%= luban_root_path %>"
+      luban.luban_root_path="$luban_root_path"
 
 USER $luban_user
 WORKDIR /home/$luban_user
