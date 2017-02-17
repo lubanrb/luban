@@ -5,6 +5,13 @@ ARG luban_uid
 ARG luban_user
 ARG luban_root_path
 
+<% if has_base_packages? -%>
+# Install required tools and libraries
+RUN yum -y install \
+<%= "        " + base_packages.join(" \\\n        ") %> && \
+    yum clean all
+<% end -%>
+
 # Create luban user with the given uid
 RUN adduser -ms /bin/bash -u $luban_uid $luban_user && \
     echo "source <%= envrc_file %>" >> /home/$luban_user/.bashrc && \
@@ -13,6 +20,8 @@ RUN adduser -ms /bin/bash -u $luban_uid $luban_user && \
 
 # Add application archives
 ADD <%= build[:archives].collect { |_, a| a[:path].basename }.join(" \\\n    ") %> /
+
+# RUN chown -R $luban_user:$luban_user $luban_root_path
 
 # Populate image labels
 LABEL luban.project="<%= project %>" \

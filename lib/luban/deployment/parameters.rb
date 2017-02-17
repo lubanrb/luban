@@ -127,10 +127,13 @@ module Luban
         parameter :build_tag, default: '0.0.0'
         parameter :base_image, default: 'centos:7'
         parameter :timezone, default: 'UTC'
+        parameter :base_packages, default: ->{ Array.new }
         parameter :docker_tls_verify, default: false
         parameter :docker_cert_path
         parameter :docker_tcp_port
         parameter :docker_unix_socket
+
+        def has_base_packages?; !base_packages.empty?; end
 
         def validate_for_docker_cert_path
           return if !docker_tls_verify and docker_cert_path.nil?
