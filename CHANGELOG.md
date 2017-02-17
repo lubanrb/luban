@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.12.6 (Feb 17, 2017)
+
+Minor enhancements:
+  * Added new Luban parameter for docker, #base_packages, to specify OS packages/libs/tools
+    * As a result, optimized Dockerfile.erb for yum install with this new parameter
+
 ## Version 0.12.5 (Feb 16, 2017)
 
 Minor enhancements:
