@@ -29,7 +29,7 @@ module Luban
         def release_tag; task.opts.release[:tag]; end
 
         def releases_path
-          @releases_path ||= releases_root_path.join(project, application, 'app')
+          @releases_path ||= releases_root_path.join("#{stage}.#{project}", application, 'app')
         end
 
         def release_path

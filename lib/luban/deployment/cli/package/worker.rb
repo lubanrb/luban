@@ -6,7 +6,7 @@ module Luban
 
         module Base
           def packages_path
-            @packages_path ||= packages_root_path.join(project, application)
+            @packages_path ||= packages_root_path.join("#{stage}.#{project}", application)
           end
 
           def package_install_path(package_name)
