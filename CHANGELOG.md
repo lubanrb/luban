@@ -1,5 +1,28 @@
 # Change log
 
+## Version 0.12.7 (Feb 22, 2017)
+
+Minor enhancements:
+  * Upgraded Curl's dependency on OpenSSL to version 1.1.0e
+  * Upgraded Git's dependency on OpenSSL to version 1.0.2k
+  * Upgraded Ruby's dependency on Rubygems to version 2.6.10
+  * Supported Ruby 2.4.0 installation with OpenSSL 1.1.0e
+    * For Ruby version between 1.9.3 and 2.4.0, Upgraded dependency on OpenSSL to version 1.0.2k
+  * Cleaned up Bundler environment before executing any worker tasks
+  * Deprecated docker build command and used docker compose instead
+  * Separated packages and releases by stage
+    * Although packages and releases are not related to stages directly, there are edge cases that package config and release config could be conflicting between stages; therefore,
+    * decided to put back stage into packages and releases deployment
+  * Added convenient method, #version_match?, to check version requirements easily
+  * Supported OpenSSL 1.1 installation
+    * Optimized OpenSSL configuration parameters for 1.1.x and 1.0.x
+    * Added switch to enable/disable document generation
+    * Decompose OpenSSL version more accurately
+
+Bug fixes:
+  * Disabled rdoc/ri generation gracefully based on actual Rubygems version
+  * Output exception backtrace regardless what output format is specified
+
 ## Version 0.12.6 (Feb 17, 2017)
 
 Minor enhancements:
