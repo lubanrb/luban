@@ -309,6 +309,7 @@ module Luban
         task_msg = { cmd: cmd, config: config, local: locally,
                      args: task_args, opts: task_opts}
         result = []
+        exception_raised = false
         mutex = Mutex.new
         run(**run_opts) do |backend|
           begin 
@@ -321,9 +322,9 @@ module Luban
               error: e
             }
           end
-          mutex.synchronize { result << r }
+          mutex.synchronize { result << r; exception_raised = true }
         end
-        print_task_result(result) if opts[:format] == :blackhole
+        print_task_result(result) if opts[:format] == :blackhole or exception_raised
         locally ? result.first[:__return__] : result
       end
 
