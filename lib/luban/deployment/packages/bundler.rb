@@ -9,7 +9,7 @@ module Luban
 
           def installed?
             return false unless file?(bundler_executable)
-            with_clean_env { match?("#{bundler_executable} -v", package_version) }
+            match?("#{bundler_executable} -v", package_version)
           end
 
           protected

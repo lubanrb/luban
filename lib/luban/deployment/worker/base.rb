@@ -35,7 +35,9 @@ module Luban
         def packages; task.opts.packages; end
 
         def run
-          update_result(__return__: @run_blk ? run_with_block : run_with_command).to_h
+          with_clean_env do
+            update_result(__return__: @run_blk ? run_with_block : run_with_command).to_h
+          end
         end
 
         def method_missing(sym, *args, &blk)

@@ -184,7 +184,7 @@ module Luban
           bundle_path = Pathname.new('vendor').join('bundle')
           if release_with_gemfile?(gemfile_path)
             assure_dirs(gems_path)
-            with_clean_env { bundle_gems!(gemfile_path, gems_cache, bundle_path) }
+            bundle_gems!(gemfile_path, gems_cache, bundle_path)
           else
             {}
           end
