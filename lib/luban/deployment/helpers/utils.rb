@@ -211,6 +211,12 @@ module Luban
           defined?(Bundler) ? Bundler.with_clean_env { yield } : yield
         end
 
+        def version_match?(version, version_requirement)
+          with_clean_env do
+            Gem::Requirement.new(version_requirement).satisfied_by?(Gem::Version.new(version))
+          end
+        end
+
         #def method_missing(sym, *args, &blk)
         #  backend.respond_to?(sym) ? backend.send(sym, *args, &blk) : super
         #end
