@@ -52,7 +52,11 @@ module Luban
           def configure_build_options
             super
             unless install_doc?
-              @configure_opts.push('--no-rdoc', '--no-ri')
+              if version_match?(package_version, ">=2.0.0")
+                @configure_opts.push("--no-document")
+              else
+                @configure_opts.push('--no-rdoc', '--no-ri')
+              end
             end
           end
 
