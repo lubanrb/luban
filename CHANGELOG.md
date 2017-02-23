@@ -1,5 +1,12 @@
 # Change log
 
+## Version 0.12.8 (Feb 23, 2017)
+
+Bug fixes:
+  * Changed vendor path to bundler path to ensure bundle config is properly packaged into the docker image
+    * Relocated bundle config path (.bundle) into bundler path
+    * Relocated vendor path (vendor/bundle and vendor/cache) into bundler path
+
 ## Version 0.12.7 (Feb 22, 2017)
 
 Minor enhancements:
