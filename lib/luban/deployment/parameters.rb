@@ -1,3 +1,5 @@
+require 'etc'
+
 module Luban
   module Deployment
     module Parameters
@@ -31,7 +33,7 @@ module Luban
         end
 
         def current_uid
-          `id -u #{current_user} 2>/dev/null`.chomp
+          Etc.getpwnam(current_user).uid
         end
 
         parameter :luban_roles, default: %i(app)
@@ -44,7 +46,7 @@ module Luban
         parameter :work_dir
         parameter :apps_path
         parameter :project
-        parameter :user, default: -> { current_user }
+        parameter :user, default: ->{ current_user }
         parameter :author
         parameter :config_finder, default: ->{ Hash.new }
 
