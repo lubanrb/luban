@@ -142,8 +142,8 @@ module Luban
         def init_build_sources
           sources = { packages: packages_path }
           releases = get_releases(releases_path, type: 'app')
-          if releases.has_key?(:"app.vendor")
-            sources[:"app.vendor"] = releases.delete(:"app.vendor") 
+          if releases.has_key?(:"app.bundler")
+            sources[:"app.bundler"] = releases.delete(:"app.bundler")
           end
           sources.merge!(releases)
           profile_path = releases_path.dirname.join('profile')

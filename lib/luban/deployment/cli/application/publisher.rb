@@ -25,16 +25,20 @@ module Luban
           @releases_path ||= super.dirname.join(release_type)
         end
 
-        def bundle_config_path
-          @bundle_config_path ||= releases_path.join('.bundle')
+        def bundler_path
+          @bundler_path ||= releases_path.join('bundler')
         end
 
-        def bundle_path
-          @bundle_path ||= releases_path.join('vendor', 'bundle')
+        def bundle_config_path
+          @bundle_config_path ||= bundler_path.join('.bundle')
+        end
+
+        def gems_bundle_path
+          @gems_bundle_path ||= bundler_path.join('vendor', 'bundle')
         end
 
         def gems_cache_path
-          @gems_cache_path ||= releases_path.join('vendor', 'cache')
+          @gems_cache_path ||= bundler_path.join('vendor', 'cache')
         end
 
         def bundle_without
@@ -108,7 +112,7 @@ module Luban
         def create_symlinks
           send("create_#{release_type}_symlinks")
           if has_gemfile?
-            create_linked_dirs(bundle_linked_dirs, from: releases_path, to: shared_path)
+            create_linked_dirs(bundle_linked_dirs, from: bundler_path, to: shared_path)
             create_linked_dirs(bundle_linked_dirs, to: release_path)
           end
         end
@@ -148,7 +152,7 @@ module Luban
         def cleanup_profile_releases; cleanup_releases; end
 
         def bundle_gems
-          assure_dirs(bundle_config_path, gems_cache_path, bundle_path)
+          assure_dirs(bundle_config_path, gems_cache_path, gems_bundle_path)
           sync_gems_cache
           sync_locked_gemfile
           install_gems_from_cache
@@ -178,7 +182,7 @@ module Luban
         def install_gems_from_cache
           options = []
           options << "--gemfile #{gemfile}"
-          options << "--path #{bundle_path}"
+          options << "--path #{gems_bundle_path}"
           unless test(bundle_executable, :check, *options)
             options << "--local"
             unless bundle_without.include?(stage.to_s)
