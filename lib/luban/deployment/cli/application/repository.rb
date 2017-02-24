@@ -5,6 +5,7 @@ module Luban
         using Luban::CLI::CoreRefinements
         include Luban::Deployment::Worker::Paths::Local
 
+        DefaultBundleJobs = 4
         DefaultRevisionSize = 12
 
         attr_reader :type
@@ -74,6 +75,10 @@ module Luban
 
         def bundle_without
           @bundle_without ||= %w(development test)
+        end
+
+        def bundle_jobs
+          @bundle_jobs ||= DefaultBundleJobs
         end
 
         # Description on abstract methods:
@@ -202,7 +207,7 @@ module Luban
               unless bundle_without.include?(stage.to_s)
                 options << "--without #{bundle_without.join(' ')}"
               end
-              options << "--quiet"
+              options << "--jobs #{bundle_jobs} --quiet"
               if (output = capture(bundle_cmd, :install, *options)).empty?
                 info "Successfully bundled gems in Gemfile"
               else

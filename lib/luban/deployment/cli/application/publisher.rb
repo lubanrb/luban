@@ -4,6 +4,8 @@ module Luban
       class Publisher < Worker
         include Luban::Deployment::Helpers::LinkedPaths
 
+        DefaultBundleJobs = Luban::Deployment::Application::Repository::DefaultBundleJobs
+
         def release_type; task.opts.release_pack[:type]; end
         def release_version; task.opts.release_pack[:version]; end
         def release_tag; task.opts.release_pack[:tag]; end
@@ -47,6 +49,10 @@ module Luban
 
         def bundle_flags
           @bundle_flags ||= %w(--deployment --quiet)
+        end
+
+        def bundle_jobs
+          @bundle_jobs ||= DefaultBundleJobs
         end
 
         def bundle_linked_dirs
@@ -189,6 +195,7 @@ module Luban
               options << "--without #{bundle_without.join(' ')}"
             end
             options << bundle_flags.join(' ')
+            options << "--jobs #{bundle_jobs}"
             if (output = capture(bundle_executable, :install, *options)).empty?
               info "Successfully deployed bundled gems"
             else
