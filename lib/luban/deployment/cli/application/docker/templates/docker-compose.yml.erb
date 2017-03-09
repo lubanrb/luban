@@ -11,6 +11,7 @@ services:
     image: <%= build[:image_tag] %>
     environment:
       TZ: <%= timezone %>
-    entrypoint: /bin/bash
-    stdin_open: true
-    tty: true
+      <%- env_vars.each_pair do |name, value| -%>
+      <%= name.upcase %>: <%= value %>
+      <%- end -%>
+    command: <%= docker_command %>
