@@ -177,6 +177,7 @@ module Luban
           protected
 
           def init
+            super
             load_process_monitor_commands if monitorable?
           end
 
