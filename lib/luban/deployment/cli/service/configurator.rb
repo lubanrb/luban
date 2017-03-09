@@ -56,6 +56,22 @@ module Luban
 
           protected
 
+          def init
+            super
+            if dockerized?
+              init_docker_workdir
+              init_docker_entrypoint
+              init_docker_command
+            end
+          end
+
+          def init_docker_workdir
+            docker_workdir app_path
+          end
+
+          def init_docker_entrypoint; end
+          def init_docker_command; end
+
           def upload_profile_templates(templates, dirs: Pathname.new(''), depth: 2)
             indent = '  ' * depth
             templates.each do |src_path|

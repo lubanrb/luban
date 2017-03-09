@@ -20,6 +20,12 @@ module Luban
             cp('-r', default_source_template_path, default_source_path)
           end
         end
+
+        protected
+
+        def init_docker_workdir
+          docker_workdir current_app_path
+        end
       end
     end
   end

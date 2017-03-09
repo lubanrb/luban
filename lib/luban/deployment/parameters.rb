@@ -130,6 +130,9 @@ module Luban
         parameter :base_image, default: 'centos:7'
         parameter :timezone, default: 'UTC'
         parameter :base_packages, default: ->{ Array.new }
+        parameter :docker_workdir, default: '/home/$luban_user'
+        parameter :docker_entrypoint, default: ->{ Array.new }
+        parameter :docker_command, default: ->{ ["/bin/bash"] }
         parameter :docker_tls_verify, default: false
         parameter :docker_cert_path
         parameter :docker_tcp_port
