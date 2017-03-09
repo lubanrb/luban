@@ -14,7 +14,6 @@ RUN yum -y install \
 
 # Create luban user with the given uid
 RUN adduser -ms /bin/bash -u $luban_uid $luban_user && \
-    echo "source <%= envrc_file %>" >> /home/$luban_user/.bashrc && \
     mkdir -p $luban_root_path && \
     chown -R $luban_user:$luban_user $luban_root_path
 
@@ -25,7 +24,7 @@ ADD <%= build[:archives].collect { |_, a| a[:path].basename }.join(" \\\n    ") 
 
 # Populate image labels
 LABEL luban.project="<%= project %>" \
-      luban.application="<%= project %>" \
+      luban.application="<%= application %>" \
       luban.stage="<%= stage %>" \
       <%- build[:sources].each_pair do |name, source| -%>
       luban.<%= name %>.source_tag="<%= source[:tag] %>" \
@@ -42,6 +41,13 @@ LABEL luban.project="<%= project %>" \
       luban.luban_root_path="$luban_root_path"
 
 USER $luban_user
-WORKDIR /home/$luban_user
+WORKDIR <%= docker_workdir %>
 
-CMD ["/bin/bash"]
+ENV PATH=<%= app_bin_path %>:$PATH
+
+<% unless docker_entrypoint.empty? -%>
+ENTRYPOINT <%= docker_entrypoint.inspect %>
+<% end -%>
+<% unless docker_command.empty? -%>
+CMD <%= docker_command.inspect %>
+<% end -%>
