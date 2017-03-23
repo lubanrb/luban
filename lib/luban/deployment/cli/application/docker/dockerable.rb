@@ -28,6 +28,16 @@ module Luban
           @default_docker_template_path ||= base_templates_path(__FILE__)
         end
 
+        def package(name, version:, **opts)
+          opts.merge!(deprecated: true) unless opts[:current]
+          super
+        end
+
+        def release(version, **opts)
+          opts.merge!(deprecated: true) unless opts[:current]
+          super
+        end
+
         protected
 
         %i(setup! install_all! uninstall_all! destroy! 
