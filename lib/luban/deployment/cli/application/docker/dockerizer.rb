@@ -140,16 +140,21 @@ module Luban
         end
 
         def init_build_sources
+          # Init packages
           sources = { packages: packages_path }
+          # Init releases
           releases = get_releases(releases_path, type: 'app')
           if releases.has_key?(:"app.bundler")
             sources[:"app.bundler"] = releases.delete(:"app.bundler")
           end
           sources.merge!(releases)
+          # Init profile
           profile_path = releases_path.dirname.join('profile')
           profile = directory?(profile_path) ? get_releases(profile_path, type: 'profile') : {}
-          sources["env.#{stage}".to_sym] = app_path
           sources.merge!(profile)
+          # Init environment
+          sources["env.#{stage}".to_sym] = app_path
+
           sources.inject({}) do |srcs, (name, path)|
             md5 = md5_for_dir(path)
             srcs[name] = { path: path, md5: md5, tag: md5[0, revision_size] }
@@ -215,15 +220,29 @@ module Luban
         end
 
         def package_application!
-          build[:archives].each_pair do |name, archive|
-            source = build[:sources][name]
-            archive[:status] = 
-              if file?(archive[:path]) and archive[:path].basename.to_s =~ /#{source[:tag]}/
-                :skipped
-              else
-                execute(:tar, "-cJf", archive[:path], source[:path]) ? :succeeded : :failed
-              end
+          changed = false
+          env_archive = "env.#{stage}".to_sym
+          build[:archives].each_key do |name|
+            changed = true if name != env_archive and package_archive!(name) == :succeeded
           end
+          package_archive!(env_archive, force: changed)
+        end
+
+        def package_archive!(name, force: false)
+          source = build[:sources][name]
+          archive = build[:archives][name]
+          archive[:status] = 
+            if !force and file?(archive[:path]) and archive[:path].basename.to_s =~ /#{source[:tag]}/
+              :skipped
+            else
+              execute(:tar, "-cJf", archive[:path], source[:path]) ? :succeeded : :failed
+            end.tap do |status| 
+              cleanup_archive!(name) unless status == :failed
+            end
+        end
+
+        def cleanup_archive!(name)
+          cleanup_files(archive_file_path("#{name.to_s.gsub(/-\h+$/, '')}-*"))
         end
 
         def render_dockerfile
