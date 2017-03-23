@@ -88,7 +88,11 @@ module Luban
               update_result "#{package_full_name} is uninstalled. "
             end
           else
-            message = "#{package_full_name} is NOT installed."
+            message = if deprecated? 
+                        "#{package_full_name} has been deprecated."
+                      else
+                        "#{package_full_name} is NOT installed."
+                      end
             if directory?(install_path) or directory?(build_path)
               if force?
                 uninstall!
