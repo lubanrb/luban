@@ -137,6 +137,7 @@ module Luban
         end
 
         def update_binstubs
+          return if child?
           if current?
             if installed?
               update_binstubs!
