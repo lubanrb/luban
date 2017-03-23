@@ -59,16 +59,43 @@ module Luban
       def deployable?; true; end
       def controllable?; has_source? or has_services?; end
 
-      def use_package?(package_name, package_version, servers: [])
-        package_name = package_name.to_sym
+      def use_package?(package_name, package_version)
         packages.has_key?(package_name) and
-        packages[package_name].has_version?(package_version) and
-        packages[package_name].config.servers.any? { |s| servers.include?(s) }
+        packages[package_name].has_version?(package_version)
+      end
+
+      def depend_on_package?(package_name, package_version)
+        !dependent_packages_for(package_name, package_version).empty?
+      end
+
+      def dependent_packages_for(package_name, package_version)
+        packages.inject([]) do |dependent_pkgs, (pkg_name, pkg)|
+          if pkg.package_options.any? do |version, _|
+               pkg.class.required_packages_for(version).any? do |_, deps|
+                 deps.any? { |dep| dep.name == package_name.to_s and dep.version == package_version }
+               end
+             end
+            dependent_pkgs << "#{display_name}.#{pkg_name}"
+          end
+          dependent_pkgs
+        end
       end
 
       def other_package_users_for(package_name, package_version, servers: [])
+        dependent_packages_for(package_name, package_version) | 
         find_project.package_users_for(package_name, package_version, 
                                        exclude: [name], servers: servers)
+      end
+
+      def package_users_for(package_name, package_version, servers: [])
+        package_users = []
+        if config.servers.any? { |s| servers.include?(s) }
+          if use_package?(package_name, package_version)
+            package_users << "#{display_name}.#{package_name}"
+          end
+          package_users |= dependent_packages_for(package_name, package_version)
+        end
+        package_users
       end
 
       def package(name, version:, **opts)

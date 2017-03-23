@@ -14,9 +14,8 @@ module Luban
 
       def package_users_for(package_name, package_version, exclude: [], servers: [])
         apps.values.inject([]) do |package_users, app|
-          if !exclude.include?(app.name) and
-              app.use_package?(package_name, package_version, servers: servers)
-            package_users << app.display_name
+          unless exclude.include?(app.name)
+            package_users |= app.package_users_for(package_name, package_version, servers: servers)
           end
           package_users
         end

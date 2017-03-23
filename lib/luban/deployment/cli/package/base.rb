@@ -149,7 +149,7 @@ module Luban
           if apps.empty? or opts[:force]
             uninstall!(args: args, opts: opts)
           else
-            puts "Skipped. #{name}-#{opts[:version]} is being referenced by #{apps.join(', ')}. " +
+            puts "  Skipped! #{name}-#{opts[:version]} is being used by #{apps.join(', ')}. " +
                  "use -f to force uninstalling if necessary."
           end
         end
