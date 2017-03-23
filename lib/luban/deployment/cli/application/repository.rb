@@ -172,11 +172,8 @@ module Luban
         end
 
         def cleanup_releases(keep_releases = 1)
-          path = releases_path.join("#{release_prefix}-#{version}-*.#{release_package_extname}")
-          files = capture(:ls, '-xt', path).split(" ")
-          if files.count > keep_releases
-            files.last(files.count - keep_releases).each { |f| rm(f) }
-          end
+          cleanup_files(releases_path.join("#{release_prefix}-#{version}-*.#{release_package_extname}"),
+                        keep_copies: keep_releases)
         end
 
         def release_with_gemfile?(gemfile_path)

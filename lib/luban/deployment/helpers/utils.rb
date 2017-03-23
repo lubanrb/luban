@@ -104,6 +104,13 @@ module Luban
           capture(:find, "#{dir} -type f ! -name '*.md5' 2>/dev/null | LC_ALL=C sort -u | xargs cat | $(type -p md5sum md5 | head -1)")[/^\h+/]
         end
 
+        def cleanup_files(path, keep_copies: 1)
+          files = capture(:ls, '-xtd', path).split(" ")
+          if files.count > keep_copies
+            files.last(files.count - keep_copies).each { |f| execute(:rm, '-fr', f) }
+          end
+        end
+
         def sudo(*args)
           execute(:sudo, *args)
         end

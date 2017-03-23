@@ -148,10 +148,7 @@ module Luban
         end
 
         def cleanup_releases(keep_releases = 1)
-          files = capture(:ls, '-xtd', releases_path.join("#{release_version}-*")).split(" ")
-          if files.count > keep_releases
-            files.last(files.count - keep_releases).each { |f| rmdir(f) }
-          end
+          cleanup_files(releases_path.join("#{release_version}-*"), keep_copies: keep_releases)
         end
 
         def cleanup_app_releases; cleanup_releases(5); end
