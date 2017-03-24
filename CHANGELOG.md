@@ -1,5 +1,25 @@
 # Change log
 
+## Version 0.12.9 (Mar 23, 2017)
+
+Minor enhancements:
+  * Used Etc.getpwnam to retrieve current user id
+  * Speeded up bundle install gems with bundle jobs (default: 4)
+  * Added docker config parameters, #docker_workdir, #docker_entrypoint, #docker_command
+    * Applied the new docker config parameters in Dockerfile template
+    * Also, setup PATH properly instead of using environment resource file in Dockerfile template
+  * Added environment variables in docker-compose template
+  * Added util method, #cleanup_files, to manage retention of file copies like releases
+  * Upgraded dependency of Git on Curl to version 7.53.1
+  * Ensured environment dockerization occur if any dockerized components are changed
+  * Cleaned up dockerized archives properly
+  * Only install packages that are currently used during dockerization
+  * Only deploy releases that are currently used during dockerization
+
+Bug fixes:
+  * Skipped uninstalling a given package if any other packages depends on it
+  * Skipped binstubs updates in package installation if the package is a dependence of another package
+
 ## Version 0.12.8 (Feb 23, 2017)
 
 Bug fixes:
