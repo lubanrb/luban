@@ -151,7 +151,7 @@ module Luban
           cleanup_files(releases_path.join("#{release_version}-*"), keep_copies: keep_releases)
         end
 
-        def cleanup_app_releases; cleanup_releases(5); end
+        def cleanup_app_releases; cleanup_releases(dockerized? ? 1 : 5); end
         def cleanup_profile_releases; cleanup_releases; end
 
         def bundle_gems
