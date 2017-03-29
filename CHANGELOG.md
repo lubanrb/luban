@@ -1,5 +1,10 @@
 # Change log
 
+## Version 0.12.10 (Mar 28, 2017)
+
+Bug fixes:
+  * Cleaned up app releases except the most recent one during dockerization
+
 ## Version 0.12.9 (Mar 23, 2017)
 
 Minor enhancements:
