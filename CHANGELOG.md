@@ -1,9 +1,11 @@
 # Change log
 
-## Version 0.12.10 (Mar 28, 2017)
+## Version 0.12.11 (Mar 29, 2017)
 
 Bug fixes:
   * Cleaned up app releases except the most recent one during dockerization
+  * Corrected the default value for parameter :user in Luban::Deployment::Runner
+  * Fixed typos in the template of Lubanfile.rb.erb
 
 ## Version 0.12.9 (Mar 23, 2017)
 
