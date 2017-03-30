@@ -1,5 +1,13 @@
 # Change log
 
+## Version 0.12.12 (Mar 30, 2017)
+
+Minor enhancements:
+  * Added parameter, :base_os, to specify the Dockerfile template by OS
+    * By default, :base_os is set to "centos"
+    * The original Dockerfile.erb was renamed to Dockerfile.centos.erb
+    * Down the road more other OS Dockerfile templates will be added
+
 ## Version 0.12.11 (Mar 29, 2017)
 
 Bug fixes:
