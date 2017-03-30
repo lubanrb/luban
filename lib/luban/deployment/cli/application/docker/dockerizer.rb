@@ -247,7 +247,7 @@ module Luban
 
         def render_dockerfile
           upload_by_template(file_to_upload: build[:dockerfile],
-                             template_file: find_template_file('Dockerfile.erb'),
+                             template_file: find_template_file("Dockerfile.#{base_os}.erb"),
                              auto_revision: true)
         end
 

@@ -127,6 +127,7 @@ module Luban
         parameter :luban_uid, default: ->{ current_uid }
         parameter :luban_user, default: ->{ current_user }
         parameter :build_tag, default: '0.0.0'
+        parameter :base_os, default: 'centos'
         parameter :base_image, default: 'centos:7'
         parameter :timezone, default: 'UTC'
         parameter :base_packages, default: ->{ Array.new }
