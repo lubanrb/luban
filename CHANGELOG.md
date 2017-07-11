@@ -1,10 +1,19 @@
 # Change log
 
-## Version 0.12.13 (Jul 10, 2017)
+## Version 0.12.14 (Jul 12, 2017)
 
 Minor enahancements:
   * Added optional package dependency of Jemalloc for Ruby installer
   * Made custom uncompress format of tar in package installer
+  * Upgraded dependency on OpenSSL for Curl to version 1.1.0f
+  * Upgraded following dependencies for Git
+    * OpenSSL to version 1.0.2l
+    * Curl to version 7.54.1
+  * Upgraded following dependencies for Ruby
+    * OpenSSL to version 1.0.2l (Ruby >= 1.9.3 and < 2.4.0)
+    * OpenSSL to version 1.1.0f (Ruby >= 2.4.0)
+    * Rubygems to version 2.6.12 (Ruby >= 1.9.3)
+    * Bundler to version 1.15.1
 
 ## Version 0.12.12 (Mar 30, 2017)
 
