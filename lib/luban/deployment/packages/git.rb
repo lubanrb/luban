@@ -4,8 +4,8 @@ module Luban
       class Git < Luban::Deployment::Package::Base
         apply_to :all do
           before_install do
-            depend_on 'openssl', version: '1.0.2k'
-            depend_on 'curl', version: '7.53.1'
+            depend_on 'openssl', version: '1.0.2l'
+            depend_on 'curl', version: '7.54.1'
           end
         end
 
