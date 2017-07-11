@@ -46,19 +46,19 @@ module Luban
 
         apply_to [">= 1.9.3", "< 2.4.0"] do
           before_install do
-            depend_on 'openssl', version: '1.0.2k'
+            depend_on 'openssl', version: '1.0.2l'
           end
         end
 
         apply_to '>= 2.4.0' do
           before_install do
-            depend_on 'openssl', version: '1.1.0e'
+            depend_on 'openssl', version: '1.1.0f'
           end
         end
 
         apply_to '>= 1.9.3' do
           after_install do
-            depend_on 'rubygems', version: '2.6.10'
+            depend_on 'rubygems', version: '2.6.12'
           end
         end
 
@@ -72,7 +72,7 @@ module Luban
 
         apply_to :all do
           after_install do
-            depend_on 'bundler', version: '1.14.4'
+            depend_on 'bundler', version: '1.15.1'
           end
         end
         
