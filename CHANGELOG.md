@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.12.13 (Jul 10, 2017)
+
+Minor enahancements:
+  * Added optional package dependency of Jemalloc for Ruby installer
+  * Made custom uncompress format of tar in package installer
+
 ## Version 0.12.12 (Mar 30, 2017)
 
 Minor enhancements:
