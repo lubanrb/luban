@@ -62,6 +62,14 @@ module Luban
           end
         end
 
+        apply_to '>= 2.2.0' do
+          before_install do
+            unless ENV['NO_JEMALLOC']
+              depend_on 'jemalloc', version: '5.0.1'
+            end
+          end
+        end
+
         apply_to :all do
           after_install do
             depend_on 'bundler', version: '1.14.4'
@@ -79,7 +87,6 @@ module Luban
 
         def setup_provision_tasks
           super
-
           provision_tasks[:install].switch :install_static, "Install static Ruby library"
           provision_tasks[:install].switch :install_doc, "Install Ruby document"
           provision_tasks[:install].switch :install_tcl, "Install with Tcl"
@@ -87,6 +94,7 @@ module Luban
           provision_tasks[:install].option :rubygems, "Rubygems version"
           provision_tasks[:install].option :bundler, "Bundler version"
           provision_tasks[:install].option :openssl, "OpenSSL version (effective for v1.9.3 or above)"
+          provision_tasks[:install].option :jemalloc, "Jemalloc version (effective for v2.2.0 or above)"
         end
 
         class Installer < Luban::Deployment::Package::Installer
@@ -136,6 +144,12 @@ module Luban
           end
           alias_method :with_openssl_dir, :with_opt_dir
           alias_method :with_yaml_dir, :with_opt_dir
+
+          def with_jemalloc_dir(dir)
+            with_opt_dir(dir)
+            @configure_opts << "--with-jemalloc"
+            @configure_opts << "LDFLAGS=\"-Wl,-rpath -Wl,#{dir.join('lib')}\""
+          end
 
           protected
 
