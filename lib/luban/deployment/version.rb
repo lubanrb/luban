@@ -1,5 +1,5 @@
 module Luban
   module Deployment
-    VERSION = "0.12.12"
+    VERSION = "0.12.13"
   end
 end
