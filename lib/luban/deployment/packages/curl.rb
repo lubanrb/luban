@@ -4,7 +4,7 @@ module Luban
       class Curl < Luban::Deployment::Package::Base
         apply_to :all do
           before_install do
-            depend_on 'openssl', version: '1.1.0e'
+            depend_on 'openssl', version: '1.1.0f'
           end
         end
 
