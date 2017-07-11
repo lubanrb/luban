@@ -4,6 +4,16 @@ module Luban
       class Installer
         class InstallFailure < Luban::Deployment::Error; end
 
+        UncompressOptions = {
+          ".gz" => "-z", ".tgz" => "-z", ".taz" => "-z", # gzip
+          ".Z" => "-Z", ".taZ" => "-Z", # compress
+          ".bz2" => "-j", ".tz2" => "-j", ".tbz2" => "-j", ".tbz" => "-j", # bzip2
+          ".lz" => "--lzip", # lzip
+          ".lzma" => "--lzma", ".tlz" => "--lzma", # lzma
+          ".lzo" => "--lzop", # lzop
+          ".xz" => "J" # xz
+        }
+
         def src_file_md5
           @src_file_md5 ||= File.file?(src_md5_file_path) ? File.read(src_md5_file_path).chomp : ''
         end
@@ -347,8 +357,12 @@ module Luban
           uncompress_package!
         end
 
+        def uncompress_option
+          @uncompress_option ||= UncompressOptions[File.extname(src_file_name)]
+        end
+
         def uncompress_package!
-          unless test("tar -xzf #{src_cache_path} -C #{package_tmp_path} >> #{install_log_file_path} 2>&1")
+          unless test("tar #{uncompress_option} -xf #{src_cache_path} -C #{package_tmp_path} >> #{install_log_file_path} 2>&1")
             abort_action('uncompress')
           end
         end
